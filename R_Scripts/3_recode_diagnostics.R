@@ -58,7 +58,6 @@ ces %>%
   filter(male==1) %>% 
   ggplot(., aes(x=election, y=pct))+geom_col()+labs(title="Percentage of men in CES Studies")
 
-
 ces %>% 
   group_by(election, sector) %>% 
   summarize(n=n()) %>% 
