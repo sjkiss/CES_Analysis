@@ -22,6 +22,7 @@ table(ces0411$male)
 
 #recode Union Household (ces04_CPS_S6B)
 ces0411$union04<-Recode(ces0411$ces04_CPS_S6A, "1=1; 5=0; else=NA")
+
 val_labels(ces0411$union04)<-c(None=0, Union=1)
 #checks
 val_labels(ces0411$union04)
