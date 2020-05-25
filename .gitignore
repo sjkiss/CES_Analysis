@@ -3,4 +3,5 @@
 .RData
 .Ruserdata
 /Data/*.sav
-/income_quintiles/*
+/income_quintiles/*.DS_Store
+.DS_Store
