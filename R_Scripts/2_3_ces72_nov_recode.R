@@ -19,7 +19,11 @@ val_labels(ces72_nov$union)<-c(None=0, Union=1)
 val_labels(ces72_nov$union)
 table(ces72_nov$union)
 
-#No Union Combined variable
+#Union Combined variable (identical copy of union)
+ces72_nov$union_both<-ces72_nov$union
+#checks
+val_labels(ces72_nov$union_both)
+table(ces72_nov$union_both)
 
 #recode Education (qvi)
 look_for(ces72_nov, "school")

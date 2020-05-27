@@ -18,7 +18,11 @@ val_labels(ces93$union)<-c(None=0, Union=1)
 val_labels(ces93$union)
 table(ces93$union)
 
-#No Union Combined variable
+#Union Combined variable (identical copy of union)
+ces93$union_both<-ces93$union
+#checks
+val_labels(ces93$union_both)
+table(ces93$union_both)
 
 #recode Education (CPSO3)
 look_for(ces93, "education")

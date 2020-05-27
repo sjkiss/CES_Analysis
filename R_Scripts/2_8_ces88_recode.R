@@ -19,7 +19,11 @@ val_labels(ces88$union)<-c(None=0, Union=1)
 val_labels(ces88$union)
 table(ces88$union)
 
-#No Union Combined variable
+#Union Combined variable (identical copy of union) ### Respondent only
+ces88$union_both<-ces88$union
+#checks
+val_labels(ces88$union_both)
+table(ces88$union_both)
 
 #recode Education (n3)
 look_for(ces88, "education")
