@@ -7,6 +7,7 @@ data("ces68")
 look_for(ces68, "sex")
 ces68$male<-Recode(ces68$var401, "1=1; 2=0")
 val_labels(ces68$male)<-c(Female=0, Male=1)
+names(ces68)
 #checks
 val_labels(ces68$male)
 table(ces68$male)
@@ -14,6 +15,7 @@ table(ces68$male)
 #recode Union Household (var363)
 look_for(ces68, "union")
 ces68$union<-Recode(ces68$var363, "1=0; 2:4=1; 5=NA")
+val_labels(ces68$var363)
 val_labels(ces68$union)<-c(None=0, Union=1)
 #checks
 val_labels(ces68$union)
@@ -25,14 +27,18 @@ ces68 %>%
     var363==2 | var379==2 ~ 1,
     var363==3 | var379==3 ~ 1,
     var363==4 | var379==4 ~ 1,
-    var363==1 | var379==1 ~ 0,
-    var363==5 | var379==5 ~ NA_real_,
+    #This should only be missing if BOTH are not members, right?
+    var363==1 & var379==1 ~ 0,
+    #This should only be missing if BOTH are no reply, right?
+    var363==5 & var379==5 ~ NA_real_,
   ))->ces68
 
 val_labels(ces68$union_both)<-c(None=0, Union=1)
 #checks
 val_labels(ces68$union_both)
 table(ces68$union_both)
+table(ces68$union_both, ces68$var363)
+table(ces68$union_both, ces68$var379)
 
 #recode Education (var334)
 ces68$degree<-Recode(ces68$var334, "17:20=1; 25:26=1; 1:16=0; 21:24=0; 27=0; 30=NA")

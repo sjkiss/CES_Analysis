@@ -6,6 +6,7 @@ data("ces65")
 look_for(ces65, "sex")
 ces65$male<-Recode(ces65$v337, "1=1; 2=0")
 val_labels(ces65$male)<-c(Female=0, Male=1)
+names(ces65)
 #checks
 val_labels(ces65$male)
 table(ces65$male)
