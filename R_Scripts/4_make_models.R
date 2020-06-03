@@ -115,6 +115,7 @@ ces %>%
          tidied=map(mods, tidy)) -> models
 #take a look at models
 head(models)
+models
 #as always start with the data frame and pipe
 models %>% 
   #unnest takes the tidied column and spreads it out for viewing
@@ -185,10 +186,3 @@ ces %>%
   #Remember income is stored as a number, need to turn it into a factor on the fly
   mutate(mods=map(data, function(x) glm(ndp~union+as.factor(income), data=x, family="binomial")))->poor_models
 
-##Lots of functions to print regression tables
-library(stargazer)
-##stargazer works best with the untidied models
-stargazer(models$mods, type="text")
-#Can also output models as an html file
-stargazer(models$mods, type="html", out=here("Tables", "union_models.html"))
-##The other way would be to turn the election variable into a series of dichotommous variables. 
