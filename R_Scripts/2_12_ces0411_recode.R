@@ -329,9 +329,9 @@ ces0411 %>%
     ces06_PES_B4A==1 | ces06_PES_B4B==1 ~ 1,
     ces06_PES_B4A==2 | ces06_PES_B4B==2 ~ 2,
     ces06_PES_B4A==3 | ces06_PES_B4B==3 ~ 3,
-    ces06_PES_B4A==5 | ces06_PES_B4B==5 ~ 0,
+    ces06_PES_B4A==5 | ces06_PES_B4B==5 ~ 5,
     ces06_PES_B4A==0 | ces06_PES_B4B==0 ~ 0,
-    ces06_PES_B4A==4 | ces06_PES_B4B==4 ~ 0,
+    ces06_PES_B4A==4 | ces06_PES_B4B==4 ~ 4,
   ))->ces0411
 
 val_labels(ces0411$vote06)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
