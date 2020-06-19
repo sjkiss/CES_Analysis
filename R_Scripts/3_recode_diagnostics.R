@@ -1,8 +1,11 @@
 ##Run some diagnostics
 #Start with CES  
+names(ces)
+ces$region2
 ces %>% 
   # form groups by election year
   group_by(election) %>% 
+  select(-region2) %>% 
   # summarize each variable by summing, removing any missing values
   summarize_all(sum, na.rm=T)
 
@@ -37,11 +40,12 @@ ces %>%
 
 ces %>% 
   group_by(election, union) %>% 
+   filter(employment==1) %>% 
   summarize(n=n()) %>% 
   mutate(pct=n/sum(n)) %>% 
   filter(union==1) %>% 
   #Percentage of union members in CES Studies
-  ggplot(., aes(x=election, y=pct))+geom_col()+labs(title="Percentage of union members in CES Studies")
+  ggplot(., aes(x=election, y=pct))+geom_col()+labs(title="Percentage of union members in CES Studies\n employed respondents only")
 
 
 ces %>% 
