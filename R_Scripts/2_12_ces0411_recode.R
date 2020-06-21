@@ -28,16 +28,17 @@ table(ces0411$union04)
 
 #recode Union Combined (ces04_CPS_S6A and ces04_CPS_S6B)
 table(ces0411$ces04_CPS_S6A, ces0411$ces04_CPS_S6B, useNA = "ifany")
-802+259+982
-# Note! The household union question was only asked if the respondent was not a member of a union or if they didn't answer!!
+
 ces0411 %>%
   mutate(union_both04=case_when(
-    #If the person is in a union OR if the household is in a union, then they get a 1
-    ces04_CPS_S6A==1 |    ces04_CPS_S6B==1 ~ 1,
-    #If the person is not in a union AND if the household is not in a union then theyy get a 0
-     ces04_CPS_S6B==5 ~ 0,
+    ces04_CPS_S6A==1 | ces04_CPS_S6B==1 ~ 1,
+    ces04_CPS_S6A==5 ~ 0,
+    ces04_CPS_S6B==5 ~ 0,
     ces04_CPS_S6A==8 & ces04_CPS_S6B==8 ~ NA_real_,
     ces04_CPS_S6A==9 & ces04_CPS_S6B==9 ~ NA_real_,
+    ces06_CPS_S6A==1 | ces06_CPS_S6B==1 & ces04_rtype1==1 ~ 1,
+    ces06_CPS_S6A==5 & ces04_rtype1==1 ~ 0,
+    ces06_CPS_S6B==5 & ces04_rtype1==1 ~ 0,
   ))->ces0411
 
 table(ces0411$union_both04, useNA = "ifany")
@@ -128,7 +129,24 @@ table(ces0411$non_charter_language04)
 
 #recode Employment (ces04_CPS_S4)
 look_for(ces0411, "employed")
-ces0411$employment04<-Recode(ces0411$ces04_CPS_S4, "3:7=0; 1:2=1; 8:11=1; else=NA")
+#ces0411$employment04<-Recode(ces0411$ces04_CPS_S4, "3:7=0; 1:2=1; 8:11=1; else=NA")
+#ces0411$employment06<-Recode(ces0411$ces06_CPS_S4, "3:7=0; 1:2=1; 8:12=1; 13=0; 14:15=1; else=NA")
+
+ces0411 %>%
+  mutate(employment04=case_when(
+    ces04_CPS_S4==1 ~ 1,
+    ces04_CPS_S4==2 ~ 1,
+    ces04_CPS_S4>2 & ces04_CPS_S4<8 ~ 0,
+    ces04_CPS_S4>7 & ces04_CPS_S4<12 ~ 1,
+    ces06_CPS_S4==1 & ces04_rtype1==1~ 1,
+    ces06_CPS_S4==2 & ces04_rtype1==1~ 1,
+    ces06_CPS_S4>2 & ces06_CPS_S4<8 & ces04_rtype1==1~ 0,
+    ces06_CPS_S4>7 & ces06_CPS_S4<13 & ces04_rtype1==1~ 1,
+    ces06_CPS_S4==13 & ces04_rtype1==1~ 0,
+    ces06_CPS_S4==14 & ces04_rtype1==1~ 1,
+    ces06_CPS_S4==15 & ces04_rtype1==1~ 1
+  ))->ces0411
+
 val_labels(ces0411$employment04)<-c(Unemployed=0, Employed=1)
 #checks
 val_labels(ces0411$employment04)
@@ -145,6 +163,11 @@ ces0411 %>%
     ces04_CPS_S4> 2 & ces04_CPS_S4< 12 ~ 0,
     ces04_CPS_S5==9 ~NA_real_ ,
     ces04_CPS_S5==8 ~NA_real_ ,
+    ces06_CPS_S5==5 & ces04_rtype1==1~1,
+    ces06_CPS_S5==1 & ces04_rtype1==1~0,
+    ces06_CPS_S5==0 & ces04_rtype1==1~0,
+    ces06_CPS_S4==1 & ces04_rtype1==1~0,
+    ces06_CPS_S4> 2 & ces06_CPS_S4< 15 & ces04_rtype1==1~ 0,
   ))->ces0411
 
 val_labels(ces0411$sector04)<-c(Private=0, Public=1)
@@ -182,7 +205,42 @@ table(ces0411$vote04)
 #recode Occupation (ces04_PINPORR)
 look_for(ces0411, "occupation")
 look_for(ces0411, "pinporr")
-ces0411$occupation04<-Recode(ces0411$ces04_PINPORR, "1:2:=1; 4:5=1; 3=2; 6:7=2; 9=3; 12=3; 14=3; 8=4; 10=4; 13=4; 15:16=5; else=NA")
+#ces0411$occupation04<-Recode(ces0411$ces04_PINPORR, "1:2:=1; 4:5=1; 3=2; 6:7=2; 9=3; 12=3; 14=3; 8=4; 10=4; 13=4; 15:16=5; else=NA")
+#ces0411$occupation08<-Recode(ces0411$ces08_PES_S3_NOCS, "1:1000=2; 1100:1199=1; 2100:3300=1; 4100:6300=1; 1200:1500=3; 6400:6700=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
+
+ces0411 %>% 
+  mutate(occupation04=case_when(
+    ces04_PES_SD3 >0 & ces04_PES_SD3 <1001 ~ 2,
+    ces04_PINPORR==1 ~ 1,
+    ces04_PINPORR==2 ~ 1,
+    ces04_PINPORR==4 ~ 1,
+    ces04_PINPORR==5 ~ 1,
+    ces04_PINPORR==3 ~ 2,
+    ces04_PINPORR==6 ~ 2,
+    ces04_PINPORR==7 ~ 2,
+    ces04_PINPORR==9 ~ 3,
+    ces04_PINPORR==12 ~ 3,
+    ces04_PINPORR==14 ~ 3,
+    ces04_PINPORR==8 ~ 4,
+    ces04_PINPORR==10 ~ 4,
+    ces04_PINPORR==13 ~ 5,
+    ces04_PINPORR==15 ~ 5,
+    ces04_PINPORR==16 ~ 5,
+    ces08_PES_S3_NOCS >0 & ces08_PES_S3_NOCS <1001 & ces04_rtype1==1 ~ 2,
+    ces08_PES_S3_NOCS >1099 & ces08_PES_S3_NOCS <1200 & ces04_rtype1==1~ 1,
+    ces08_PES_S3_NOCS >2099 & ces08_PES_S3_NOCS <3301 & ces04_rtype1==1~ 1,
+    ces08_PES_S3_NOCS >4099 & ces08_PES_S3_NOCS <6301 & ces04_rtype1==1~ 1,
+    ces08_PES_S3_NOCS >1199 & ces08_PES_S3_NOCS <1501 & ces04_rtype1==1~ 3,
+    ces08_PES_S3_NOCS >6399 & ces08_PES_S3_NOCS <6701 & ces04_rtype1==1~ 3,
+    ces08_PES_S3_NOCS >3399 & ces08_PES_S3_NOCS <3501 & ces04_rtype1==1~ 3,
+    ces08_PES_S3_NOCS >7199 & ces08_PES_S3_NOCS <7400 & ces04_rtype1==1~ 4,
+    ces08_PES_S3_NOCS >7399 & ces08_PES_S3_NOCS <7701 & ces04_rtype1==1~ 5,
+    ces08_PES_S3_NOCS >8199 & ces08_PES_S3_NOCS <8400 & ces04_rtype1==1~ 4,
+    ces08_PES_S3_NOCS >8399 & ces08_PES_S3_NOCS <8701 & ces04_rtype1==1~ 5,
+    ces08_PES_S3_NOCS >9199 & ces08_PES_S3_NOCS <9600 & ces04_rtype1==1~ 4,
+    ces08_PES_S3_NOCS >9599 & ces08_PES_S3_NOCS <9701 & ces04_rtype1==1~ 5,
+  ))->ces0411
+
 val_labels(ces0411$occupation04)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
 #checks
 val_labels(ces0411$occupation04)
@@ -190,7 +248,33 @@ table(ces0411$occupation04)
 
 #recode Income (ces04_CPS_S18)
 look_for(ces0411, "income")
-ces0411$income04<-Recode(ces0411$ces04_CPS_S18, "1=1; 2:3=2; 4:5=3; 6:7=4; 8:10=5; else=NA")
+#ces0411$income04<-Recode(ces0411$ces04_CPS_S18, "1=1; 2:3=2; 4:5=3; 6:7=4; 8:10=5; else=NA")
+#ces0411$income06<-Recode(ces0411$ces06_CPS_S18, "1=1; 2:3=2; 4:5=3; 6:9=4; 10=5; else=NA")
+
+ces0411 %>% 
+  mutate(income04=case_when(
+    ces04_CPS_S18==1 ~ 1,
+    ces04_CPS_S18==2 ~ 2,
+    ces04_CPS_S18==3 ~ 2,
+    ces04_CPS_S18==4 ~ 3,
+    ces04_CPS_S18==5 ~ 3,
+    ces04_CPS_S18==6 ~ 4,
+    ces04_CPS_S18==7 ~ 4,
+    ces04_CPS_S18==8 ~ 5,
+    ces04_CPS_S18==9 ~ 5,
+    ces04_CPS_S18==10 ~ 5,
+    ces06_CPS_S18==1 & ces04_rtype1==1 ~ 1,
+    ces06_CPS_S18==2 & ces04_rtype1==1 ~ 2,
+    ces06_CPS_S18==3 & ces04_rtype1==1 ~ 2,
+    ces06_CPS_S18==4 & ces04_rtype1==1 ~ 3,
+    ces06_CPS_S18==5 & ces04_rtype1==1 ~ 3,
+    ces06_CPS_S18==6 & ces04_rtype1==1 ~ 4,
+    ces06_CPS_S18==7 & ces04_rtype1==1 ~ 4,
+    ces06_CPS_S18==8 & ces04_rtype1==1 ~ 4,
+    ces06_CPS_S18==9 & ces04_rtype1==1 ~ 4,
+    ces06_CPS_S18==10 & ces04_rtype1==1 ~ 5,
+  ))->ces0411
+
 val_labels(ces0411$income04)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
 #checks
 val_labels(ces0411$income04)
@@ -212,12 +296,17 @@ table(ces0411$union06)
 #recode Union Combined (ces06_CPS_S6A and ces06_CPS_S6B)
 ces0411 %>% 
   mutate(union_both06=case_when(
-    #If the person is in a union OR if the household is in a union, then they get a 1
     ces06_CPS_S6A==1 | ces06_CPS_S6B==1 ~ 1,
-    #If the person is not in a union AND if the household is in a union, then they get a 0
+    ces06_CPS_S6A==5 ~ 0,
     ces06_CPS_S6B==5 ~ 0,
     ces06_CPS_S6A==8 & ces06_CPS_S6B==8 ~ NA_real_,
     ces06_CPS_S6A==9 & ces06_CPS_S6B==9 ~ NA_real_,
+    ces04_CPS_S6A==1 | ces04_CPS_S6B==1 & ces06_RECALL==1~ 1,
+    ces04_CPS_S6A==5 & ces06_RECALL==1~ 0,
+    ces04_CPS_S6B==5 & ces06_RECALL==1~ 0,
+#    ces08_CPS_S6A==1 | ces04_CPS_S6B==1 & ces06_RECALL==1~ 1,
+#    ces08_CPS_S6A==5 & ces06_RECALL==1~ 0,
+#    ces08_CPS_S6B==5 & ces06_RECALL==1~ 0,
   ))->ces0411
 
 val_labels(ces0411$union_both06)<-c(None=0, Union=1)
@@ -449,6 +538,19 @@ ces0411 %>%
     ces04_PINPORR==13 & ces06_RECALL==1~ 5,
     ces04_PINPORR==15 & ces06_RECALL==1~ 5,
     ces04_PINPORR==16 & ces06_RECALL==1~ 5,
+    ces08_PES_S3_NOCS >0 & ces08_PES_S3_NOCS <1001 & ces06_RECALL==1~ 2,
+    ces08_PES_S3_NOCS >1099 & ces08_PES_S3_NOCS <1200 & ces06_RECALL==1~ 1,
+    ces08_PES_S3_NOCS >2099 & ces08_PES_S3_NOCS <3301 & ces06_RECALL==1~ 1,
+    ces08_PES_S3_NOCS >4099 & ces08_PES_S3_NOCS <6301 & ces06_RECALL==1~ 1,
+    ces08_PES_S3_NOCS >1199 & ces08_PES_S3_NOCS <1501 & ces06_RECALL==1~ 3,
+    ces08_PES_S3_NOCS >6399 & ces08_PES_S3_NOCS <6701 & ces06_RECALL==1~ 3,
+    ces08_PES_S3_NOCS >3399 & ces08_PES_S3_NOCS <3501 & ces06_RECALL==1~ 3,
+    ces08_PES_S3_NOCS >7199 & ces08_PES_S3_NOCS <7400 & ces06_RECALL==1~ 4,
+    ces08_PES_S3_NOCS >7399 & ces08_PES_S3_NOCS <7701 & ces06_RECALL==1~ 5,
+    ces08_PES_S3_NOCS >8199 & ces08_PES_S3_NOCS <8400 & ces06_RECALL==1~ 4,
+    ces08_PES_S3_NOCS >8399 & ces08_PES_S3_NOCS <8701 & ces06_RECALL==1~ 5,
+    ces08_PES_S3_NOCS >9199 & ces08_PES_S3_NOCS <9600 & ces06_RECALL==1~ 4,
+    ces08_PES_S3_NOCS >9599 & ces08_PES_S3_NOCS <9701 & ces06_RECALL==1~ 5,
   ))->ces0411
 
 val_labels(ces0411$occupation06)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
@@ -458,7 +560,44 @@ table(ces0411$occupation06)
 
 #recode Income (ces06_CPS_S18)
 look_for(ces0411, "income")
-ces0411$income06<-Recode(ces0411$ces06_CPS_S18, "1=1; 2:3=2; 4:5=3; 6:9=4; 10=5; else=NA")
+#ces0411$income06<-Recode(ces0411$ces06_CPS_S18, "1=1; 2:3=2; 4:5=3; 6:9=4; 10=5; else=NA")
+#ces0411$income04<-Recode(ces0411$ces04_CPS_S18, "1=1; 2:3=2; 4:5=3; 6:7=4; 8:10=5; else=NA")
+ces0411 %>% 
+  mutate(income06=case_when(
+    ces06_CPS_S18==1 ~ 1,
+    ces06_CPS_S18==2 ~ 2,
+    ces06_CPS_S18==3 ~ 2,
+    ces06_CPS_S18==4 ~ 3,
+    ces06_CPS_S18==5 ~ 3,
+    ces06_CPS_S18==6 ~ 4,
+    ces06_CPS_S18==7 ~ 4,
+    ces06_CPS_S18==8 ~ 4,
+    ces06_CPS_S18==9 ~ 4,
+    ces06_CPS_S18==10 ~ 5,
+    ces04_CPS_S18==1 & ces06_RECALL==1 ~ 1,
+    ces04_CPS_S18==2 & ces06_RECALL==1 ~ 2,
+    ces04_CPS_S18==3 & ces06_RECALL==1 ~ 2,
+    ces04_CPS_S18==4 & ces06_RECALL==1 ~ 3,
+    ces04_CPS_S18==5 & ces06_RECALL==1 ~ 3,
+    ces04_CPS_S18==6 & ces06_RECALL==1 ~ 4,
+    ces04_CPS_S18==7 & ces06_RECALL==1 ~ 4,
+    ces04_CPS_S18==8 & ces06_RECALL==1 ~ 5,
+    ces04_CPS_S18==9 & ces06_RECALL==1 ~ 5,
+    ces04_CPS_S18==10 & ces06_RECALL==1 ~ 5,
+    ces08_PES_S9A> -1 & ces08_PES_S9A < 30 & ces06_RECALL==1~ 1,
+    ces08_PES_S9A> -1 & ces08_PES_S9A < 30 & ces06_RECALL==1~ 1,
+    ces08_PES_S9A> 29 & ces08_PES_S9A < 50 & ces06_RECALL==1~ 2,
+    ces08_PES_S9A> 29 & ces08_PES_S9A < 50 & ces06_RECALL==1~ 2,
+    ces08_PES_S9A> 49 & ces08_PES_S9A < 70 & ces06_RECALL==1~ 3,
+    ces08_PES_S9A> 49 & ces08_PES_S9A < 70 & ces06_RECALL==1~ 3,
+    ces08_PES_S9A> 69 & ces08_PES_S9A < 100 & ces06_RECALL==1~ 4,
+    ces08_PES_S9A> 69 & ces08_PES_S9A < 100 & ces06_RECALL==1~ 4,
+    ces08_PES_S9A> 69 & ces08_PES_S9A < 100 & ces06_RECALL==1~ 4,
+    ces08_PES_S9A> 69 & ces08_PES_S9A < 100 & ces06_RECALL==1~ 4,
+    ces08_PES_S9A> 99 & ces08_PES_S9A < 998 & ces06_RECALL==1~ 5,
+    ces08_PES_S9A> 99 & ces08_PES_S9A < 998 & ces06_RECALL==1~ 5,
+  ))->ces0411
+
 val_labels(ces0411$income06)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
 #checks
 val_labels(ces0411$income06)
@@ -469,7 +608,7 @@ table(ces0411$income06)
 
 # Gender done at top
 
-#recode Union Respondent (ces08_CPS_S6B)
+#recode Union Respondent (ces08_CPS_S6A)
 look_for(ces0411, "union")
 #Make sure the union variable is coming from the respondent question
 ces0411$union08<-Recode(ces0411$ces08_CPS_S6A, "1=1; 5=0; else=NA")
@@ -481,12 +620,17 @@ table(ces0411$union08)
 #recode Union Combined (ces08_CPS_S6A and ces08_CPS_S6B)
 ces0411 %>% 
   mutate(union_both08=case_when(
-    #If the person is in a union OR if the household is in a union, then they get a 1
     ces08_CPS_S6A==1 | ces08_CPS_S6B==1 ~ 1,
-    #If the person is in a union AND if the household is in a union, then they get a 1
+    ces08_CPS_S6A==5 ~ 0,
     ces08_CPS_S6B==5 ~ 0,
     ces08_CPS_S6A==8 & ces08_CPS_S6B==8 ~ NA_real_,
     ces08_CPS_S6A==9 & ces08_CPS_S6B==9 ~ NA_real_,
+    ces06_CPS_S6A==1 | ces06_CPS_S6B==1 & ces08_CPS_REPLICATE==9999~ 1,
+    ces06_CPS_S6A==5 & ces08_CPS_REPLICATE==9999~ 0,
+    ces06_CPS_S6B==5 & ces08_CPS_REPLICATE==9999~ 0,
+    ces04_CPS_S6A==1 | ces04_CPS_S6B==1 & ces08_CPS_REPLICATE==9999~ 1,
+    ces04_CPS_S6A==5 & ces08_CPS_REPLICATE==9999~ 0,
+    ces04_CPS_S6B==5 & ces08_CPS_REPLICATE==9999~ 0,
   ))->ces0411
 
 val_labels(ces0411$union_both08)<-c(None=0, Union=1)
@@ -494,9 +638,19 @@ val_labels(ces0411$union_both08)<-c(None=0, Union=1)
 val_labels(ces0411$union_both08)
 table(ces0411$union_both08)
 table(as_factor(ces0411$ces08_CPS_S6A), as_factor(ces0411$union_both08), useNA = "ifany")
+
 #recode Education (ces08_CPS_S3)
 look_for(ces0411, "education")
-ces0411$degree08<-Recode(ces0411$ces08_CPS_S3, "9:11=1; 1:8=0; else=NA")
+#ces0411$degree08<-Recode(ces0411$ces08_CPS_S3, "9:11=1; 1:8=0; else=NA")
+
+ces0411 %>% 
+  mutate(degree08=case_when(
+    ces08_CPS_S3 >0 & ces08_CPS_S3 <9 ~ 0,
+    ces08_CPS_S3 >8 & ces08_CPS_S3 <12 ~ 1,
+    ces04_CPS_S3 >0 & ces04_CPS_S3 <9 & ces08_CPS_REPLICATE==9999 ~ 0,
+    ces04_CPS_S3 >8 & ces04_CPS_S3 <12 & ces08_CPS_REPLICATE==9999 ~ 1,
+  ))->ces0411
+
 val_labels(ces0411$degree08)<-c(nodegree=0, degree=1)
 #checks
 val_labels(ces0411$degree08)
@@ -532,7 +686,48 @@ table(ces0411$age08)
 
 #recode Religion (ces08_CPS_S9)
 look_for(ces0411, "relig")
-ces0411$religion08<-Recode(ces0411$ces08_CPS_S9, "0=0; 1:2=2; 4:5=1; 7=2; 9:10=2; 12:14=2; 16:20=2; 98:99=NA; 3=3; 6=3; 8=3; 11=3; 15=3; 97=3;")
+#ces0411$religion08<-Recode(ces0411$ces08_CPS_S9, "0=0; 1:2=2; 4:5=1; 7=2; 9:10=2; 12:14=2; 16:20=2; 98:99=NA; 3=3; 6=3; 8=3; 11=3; 15=3; 97=3;")
+
+ces0411 %>% 
+  mutate(religion08=case_when(
+    ces08_CPS_S9==0 ~ 0,
+    ces08_CPS_S9==1 ~ 2,
+    ces08_CPS_S9==2 ~ 2,
+    ces08_CPS_S9==3 ~ 3,
+    ces08_CPS_S9==4 ~ 1,
+    ces08_CPS_S9==5 ~ 1,
+    ces08_CPS_S9==6 ~ 3,
+    ces08_CPS_S9==7 ~ 2,
+    ces08_CPS_S9==8 ~ 3,
+    ces08_CPS_S9==9 ~ 2,
+    ces08_CPS_S9==10 ~ 2,
+    ces08_CPS_S9==11 ~ 3,
+    ces08_CPS_S9==12 ~ 2,
+    ces08_CPS_S9==13 ~ 2,
+    ces08_CPS_S9==14 ~ 2,
+    ces08_CPS_S9==15 ~ 3,
+    ces08_CPS_S9 >15 & ces08_CPS_S9 <21 ~ 2,
+    ces08_CPS_S9==97 ~ 3,
+    ces04_CPS_S9==0 & ces08_CPS_REPLICATE==9999~ 0,
+    ces04_CPS_S9==1 & ces08_CPS_REPLICATE==9999~ 2,
+    ces04_CPS_S9==2 & ces08_CPS_REPLICATE==9999~ 2,
+    ces04_CPS_S9==3 & ces08_CPS_REPLICATE==9999~ 3,
+    ces04_CPS_S9==4 & ces08_CPS_REPLICATE==9999~ 1,
+    ces04_CPS_S9==5 & ces08_CPS_REPLICATE==9999~ 1,
+    ces04_CPS_S9==6 & ces08_CPS_REPLICATE==9999~ 3,
+    ces04_CPS_S9==7 & ces08_CPS_REPLICATE==9999~ 2,
+    ces04_CPS_S9==8 & ces08_CPS_REPLICATE==9999~ 3,
+    ces04_CPS_S9==9 & ces08_CPS_REPLICATE==9999~ 2,
+    ces04_CPS_S9==10 & ces08_CPS_REPLICATE==9999~ 2,
+    ces04_CPS_S9==11 & ces08_CPS_REPLICATE==9999~ 3,
+    ces04_CPS_S9==12 & ces08_CPS_REPLICATE==9999~ 2,
+    ces04_CPS_S9==13 & ces08_CPS_REPLICATE==9999~ 2,
+    ces04_CPS_S9==14 & ces08_CPS_REPLICATE==9999~ 2,
+    ces04_CPS_S9==15 & ces08_CPS_REPLICATE==9999~ 3,
+    ces04_CPS_S9 >15 & ces04_CPS_S9 <22 & ces08_CPS_REPLICATE==9999~ 2,
+    ces04_CPS_S9==97 & ces08_CPS_REPLICATE==9999~ 3,
+  ))->ces0411
+
 val_labels(ces0411$religion08)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 #checks
 val_labels(ces0411$religion08)
@@ -540,7 +735,16 @@ table(ces0411$religion08)
 
 #recode Language (ces08_CPS_INTLANG)
 look_for(ces0411, "language")
-ces0411$language08<-Recode(ces0411$ces08_CPS_INTLANG, "2=0; 1=1; else=NA")
+#ces0411$language08<-Recode(ces0411$ces08_CPS_INTLANG, "2=0; 1=1; else=NA")
+
+ces0411 %>% 
+  mutate(language08=case_when(
+    ces08_CPS_INTLANG==2 ~ 0,
+    ces08_CPS_INTLANG==1 ~ 1,
+    ces04_CPS_INTLANG==2 & ces08_CPS_REPLICATE==9999 ~ 0,
+    ces04_CPS_INTLANG==1 & ces08_CPS_REPLICATE==9999 ~ 1,
+  ))->ces0411
+
 val_labels(ces0411$language08)<-c(French=0, English=1)
 #checks
 val_labels(ces0411$language08)
@@ -548,7 +752,20 @@ table(ces0411$language08)
 
 #recode Non-charter Language (ces08_CPS_S17)
 look_for(ces0411, "language")
-ces0411$non_charter_language08<-Recode(ces0411$ces08_CPS_S17, "1:5=0; 8:64=1; 65:66=0; 95:97=1; else=NA")
+#ces0411$non_charter_language08<-Recode(ces0411$ces08_CPS_S17, "1:5=0; 8:64=1; 65:66=0; 95:97=1; else=NA")
+
+ces0411 %>% 
+  mutate(non_charter_language08=case_when(
+    ces08_CPS_S17 >0 & ces08_CPS_S17 <6 ~ 0,
+    ces08_CPS_S17 >7 & ces08_CPS_S17 <65 ~ 1,
+    ces08_CPS_S17 >64 & ces08_CPS_S17 <67 ~ 0,
+    ces08_CPS_S17 >94 & ces08_CPS_S17 <98 ~ 1,
+    ces04_CPS_S17 >0 & ces04_CPS_S17 <6 & ces08_CPS_REPLICATE==9999~ 0,
+    ces04_CPS_S17 >7 & ces04_CPS_S17 <65 & ces08_CPS_REPLICATE==9999~ 1,
+    ces04_CPS_S17 >64 & ces04_CPS_S17 <67 & ces08_CPS_REPLICATE==9999~ 0,
+    ces04_CPS_S17 >94 & ces04_CPS_S17 <98 & ces08_CPS_REPLICATE==9999~ 1,
+  ))->ces0411
+
 val_labels(ces0411$non_charter_language08)<-c(Charter=0, Non_Charter=1)
 #checks
 val_labels(ces0411$non_charter_language08)
@@ -557,7 +774,28 @@ table(ces0411$survey, ces0411$non_charter_language08)
 
 #recode Employment (ces08_CPS_S4)
 look_for(ces0411, "employed")
-ces0411$employment08<-Recode(ces0411$ces08_CPS_S4, "3:7=0; 1:2=1; 8:11=1; else=NA")
+#ces0411$employment08<-Recode(ces0411$ces08_CPS_S4, "3:7=0; 1:2=1; 8:11=1; else=NA")
+#ces0411$employment06<-Recode(ces0411$ces06_CPS_S4, "3:7=0; 1:2=1; 8:12=1; 13=0; 14:15=1; else=NA")
+#ces0411$employment04<-Recode(ces0411$ces04_CPS_S4, "3:7=0; 1:2=1; 8:11=1; else=NA")
+
+ces0411 %>% 
+  mutate(employment08=case_when(
+    ces08_CPS_S4 >2 & ces08_CPS_S4 <8 ~ 0,
+    ces08_CPS_S4 >7 & ces08_CPS_S4 <12 ~ 1,
+    ces08_CPS_S4==1 ~ 1,
+    ces08_CPS_S4==2 ~ 1,
+    ces06_CPS_S4 >2 & ces06_CPS_S4 <8 & ces08_CPS_REPLICATE==9999~ 0,
+    ces06_CPS_S4 >7 & ces06_CPS_S4 <13 & ces08_CPS_REPLICATE==9999~ 1,
+    ces06_CPS_S4==1 & ces08_CPS_REPLICATE==9999~ 1,
+    ces06_CPS_S4==2 & ces08_CPS_REPLICATE==9999~ 1,
+    ces06_CPS_S4==14 & ces08_CPS_REPLICATE==9999~ 1,
+    ces06_CPS_S4==15 & ces08_CPS_REPLICATE==9999~ 1,
+    ces04_CPS_S4 >2 & ces04_CPS_S4 <8 & ces08_CPS_REPLICATE==9999~ 0,
+    ces04_CPS_S4 >7 & ces04_CPS_S4 <13 & ces08_CPS_REPLICATE==9999~ 1,
+    ces04_CPS_S4==1 & ces08_CPS_REPLICATE==9999~ 1,
+    ces04_CPS_S4==2 & ces08_CPS_REPLICATE==9999~ 1,
+  ))->ces0411
+
 val_labels(ces0411$employment08)<-c(Unemployed=0, Employed=1)
 #checks
 val_labels(ces0411$employment08)
@@ -574,6 +812,16 @@ ces0411 %>%
     ces08_CPS_S4> 2 & ces08_CPS_S4< 12 ~ 0,
     ces08_CPS_S5==9 ~NA_real_ ,
     ces08_CPS_S5==8 ~NA_real_ ,
+    ces06_CPS_S5==5 & ces08_CPS_REPLICATE==9999~1,
+    ces06_CPS_S5==1 & ces08_CPS_REPLICATE==9999~0,
+    ces06_CPS_S5==0 & ces08_CPS_REPLICATE==9999~0,
+    ces06_CPS_S4==1 & ces08_CPS_REPLICATE==9999~0,
+    ces06_CPS_S4> 2 & ces06_CPS_S4< 16 & ces08_CPS_REPLICATE==9999~ 0,
+    ces04_CPS_S5==5 & ces08_CPS_REPLICATE==9999~1,
+    ces04_CPS_S5==1 & ces08_CPS_REPLICATE==9999~0,
+    ces04_CPS_S5==0 & ces08_CPS_REPLICATE==9999~0,
+    ces04_CPS_S4==1 & ces08_CPS_REPLICATE==9999~0,
+    ces04_CPS_S4> 2 & ces04_CPS_S4< 12 & ces08_CPS_REPLICATE==9999~ 0,
   ))->ces0411
 
 val_labels(ces0411$sector08)<-c(Private=0, Public=1)
@@ -599,7 +847,56 @@ table(ces0411$vote08)
 
 #recode Occupation (ces08_PES_S3_NOCS)
 look_for(ces0411, "occupation")
-ces0411$occupation08<-Recode(ces0411$ces08_PES_S3_NOCS, "1:1000=2; 1100:1199=1; 2100:3300=1; 4100:6300=1; 1200:1500=3; 6400:6700=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
+#ces0411$occupation08<-Recode(ces0411$ces08_PES_S3_NOCS, "1:1000=2; 1100:1199=1; 2100:3300=1; 4100:6300=1; 1200:1500=3; 6400:6700=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
+#ces0411$occupation06<-Recode(ces0411$ces06_PES_SD3, "1:1000=2; 1100:1199=1; 2100:3300=1; 4100:6300=1; 1200:1500=3; 6400:6700=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
+#ces0411$occupation04<-Recode(ces0411$ces04_PINPORR, "1:2:=1; 4:5=1; 3=2; 6:7=2; 9=3; 12=3; 14=3; 8=4; 10=4; 13=4; 15:16=5; else=NA")
+
+ces0411 %>% 
+  mutate(occupation08=case_when(
+    ces08_PES_S3_NOCS >0 & ces08_PES_S3_NOCS <1001 ~ 2,
+    ces08_PES_S3_NOCS >1099 & ces08_PES_S3_NOCS <1200 ~ 1,
+    ces08_PES_S3_NOCS >2099 & ces08_PES_S3_NOCS <3301 ~ 1,
+    ces08_PES_S3_NOCS >4099 & ces08_PES_S3_NOCS <6301 ~ 1,
+    ces08_PES_S3_NOCS >1199 & ces08_PES_S3_NOCS <1501 ~ 3,
+    ces08_PES_S3_NOCS >6399 & ces08_PES_S3_NOCS <6701 ~ 3,
+    ces08_PES_S3_NOCS >3399 & ces08_PES_S3_NOCS <3501 ~ 3,
+    ces08_PES_S3_NOCS >7199 & ces08_PES_S3_NOCS <7400 ~ 4,
+    ces08_PES_S3_NOCS >7399 & ces08_PES_S3_NOCS <7701 ~ 5,
+    ces08_PES_S3_NOCS >8199 & ces08_PES_S3_NOCS <8400 ~ 4,
+    ces08_PES_S3_NOCS >8399 & ces08_PES_S3_NOCS <8701 ~ 5,
+    ces08_PES_S3_NOCS >9199 & ces08_PES_S3_NOCS <9600 ~ 4,
+    ces08_PES_S3_NOCS >9599 & ces08_PES_S3_NOCS <9701 ~ 5,
+    ces06_PES_SD3 >0 & ces06_PES_SD3 <1001 & ces08_CPS_REPLICATE==9999~ 2,
+    ces06_PES_SD3 >1099 & ces06_PES_SD3 <1200 & ces08_CPS_REPLICATE==9999~ 1,
+    ces06_PES_SD3 >2099 & ces06_PES_SD3 <3301 & ces08_CPS_REPLICATE==9999~ 1,
+    ces06_PES_SD3 >4099 & ces06_PES_SD3 <6301 & ces08_CPS_REPLICATE==9999~ 1,
+    ces06_PES_SD3 >1199 & ces06_PES_SD3 <1501 & ces08_CPS_REPLICATE==9999~ 3,
+    ces06_PES_SD3 >6399 & ces06_PES_SD3 <6701 & ces08_CPS_REPLICATE==9999~ 3,
+    ces06_PES_SD3 >3399 & ces06_PES_SD3 <3501 & ces08_CPS_REPLICATE==9999~ 3,
+    ces06_PES_SD3 >7199 & ces06_PES_SD3 <7400 & ces08_CPS_REPLICATE==9999~ 4,
+    ces06_PES_SD3 >7399 & ces06_PES_SD3 <7701 & ces08_CPS_REPLICATE==9999~ 5,
+    ces06_PES_SD3 >8199 & ces06_PES_SD3 <8400 & ces08_CPS_REPLICATE==9999~ 4,
+    ces06_PES_SD3 >8399 & ces06_PES_SD3 <8701 & ces08_CPS_REPLICATE==9999~ 5,
+    ces06_PES_SD3 >9199 & ces06_PES_SD3 <9600 & ces08_CPS_REPLICATE==9999~ 4,
+    ces06_PES_SD3 >9599 & ces06_PES_SD3 <9701 & ces08_CPS_REPLICATE==9999~ 5,
+    ces04_PES_SD3 >0 & ces04_PES_SD3 <1001 & ces08_CPS_REPLICATE==9999~ 2,
+    ces04_PINPORR==1 & ces08_CPS_REPLICATE==9999~ 1,
+    ces04_PINPORR==2 & ces08_CPS_REPLICATE==9999~ 1,
+    ces04_PINPORR==4 & ces08_CPS_REPLICATE==9999~ 1,
+    ces04_PINPORR==5 & ces08_CPS_REPLICATE==9999~ 1,
+    ces04_PINPORR==3 & ces08_CPS_REPLICATE==9999~ 2,
+    ces04_PINPORR==6 & ces08_CPS_REPLICATE==9999~ 2,
+    ces04_PINPORR==7 & ces08_CPS_REPLICATE==9999~ 2,
+    ces04_PINPORR==9 & ces08_CPS_REPLICATE==9999~ 3,
+    ces04_PINPORR==12 & ces08_CPS_REPLICATE==9999~ 3,
+    ces04_PINPORR==14 & ces08_CPS_REPLICATE==9999~ 3,
+    ces04_PINPORR==8 & ces08_CPS_REPLICATE==9999~ 4,
+    ces04_PINPORR==10 & ces08_CPS_REPLICATE==9999~ 4,
+    ces04_PINPORR==13 & ces08_CPS_REPLICATE==9999~ 5,
+    ces04_PINPORR==15 & ces08_CPS_REPLICATE==9999~ 5,
+    ces04_PINPORR==16 & ces08_CPS_REPLICATE==9999~ 5,
+  ))->ces0411
+
 val_labels(ces0411$occupation08)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
 #checks
 val_labels(ces0411$occupation08)
@@ -607,6 +904,8 @@ table(ces0411$occupation08)
 
 #recode Income (ces08_CPS_S18A, ces08_CPS_S18B, ces08_PES_S9A, ces08_PES_S9B)
 look_for(ces0411, "income")
+#ces0411$income06<-Recode(ces0411$ces06_CPS_S18, "1=1; 2:3=2; 4:5=3; 6:9=4; 10=5; else=NA")
+#ces0411$income04<-Recode(ces0411$ces04_CPS_S18, "1=1; 2:3=2; 4:5=3; 6:7=4; 8:10=5; else=NA")
 ces0411 %>% 
   mutate(income08=case_when(
     ces08_CPS_S18B==1 | ces08_CPS_S18A> -1 & ces08_CPS_S18A < 30 | ces08_PES_S9B==1 | ces08_PES_S9A> -1 & ces08_PES_S9A < 30 ~ 1,
@@ -621,6 +920,26 @@ ces0411 %>%
     ces08_CPS_S18B==10 | ces08_CPS_S18A> 69 & ces08_CPS_S18A < 100 | ces08_PES_S9B==10 | ces08_PES_S9A> 69 & ces08_PES_S9A < 100 ~ 4,
     ces08_CPS_S18B==11 | ces08_CPS_S18A> 99 & ces08_CPS_S18A < 998 | ces08_PES_S9B==11 | ces08_PES_S9A> 99 & ces08_PES_S9A < 998 ~ 5,
     ces08_CPS_S18B==12 | ces08_CPS_S18A> 99 & ces08_CPS_S18A < 998 | ces08_PES_S9B==12 | ces08_PES_S9A> 99 & ces08_PES_S9A < 998 ~ 5,
+    ces06_CPS_S18==1 & ces08_CPS_REPLICATE==9999 ~ 1,
+    ces06_CPS_S18==2 & ces08_CPS_REPLICATE==9999 ~ 2,
+    ces06_CPS_S18==3 & ces08_CPS_REPLICATE==9999 ~ 2,
+    ces06_CPS_S18==4 & ces08_CPS_REPLICATE==9999 ~ 3,
+    ces06_CPS_S18==5 & ces08_CPS_REPLICATE==9999 ~ 3,
+    ces06_CPS_S18==6 & ces08_CPS_REPLICATE==9999 ~ 4,
+    ces06_CPS_S18==7 & ces08_CPS_REPLICATE==9999 ~ 4,
+    ces06_CPS_S18==8 & ces08_CPS_REPLICATE==9999 ~ 4,
+    ces06_CPS_S18==9 & ces08_CPS_REPLICATE==9999 ~ 4,
+    ces06_CPS_S18==10 & ces08_CPS_REPLICATE==9999 ~ 5,
+    ces04_CPS_S18==1 & ces08_CPS_REPLICATE==9999 ~ 1,
+    ces04_CPS_S18==2 & ces08_CPS_REPLICATE==9999 ~ 2,
+    ces04_CPS_S18==3 & ces08_CPS_REPLICATE==9999 ~ 2,
+    ces04_CPS_S18==4 & ces08_CPS_REPLICATE==9999 ~ 3,
+    ces04_CPS_S18==5 & ces08_CPS_REPLICATE==9999 ~ 3,
+    ces04_CPS_S18==6 & ces08_CPS_REPLICATE==9999 ~ 4,
+    ces04_CPS_S18==7 & ces08_CPS_REPLICATE==9999 ~ 4,
+    ces04_CPS_S18==8 & ces08_CPS_REPLICATE==9999 ~ 5,
+    ces04_CPS_S18==9 & ces08_CPS_REPLICATE==9999 ~ 5,
+    ces04_CPS_S18==10 & ces08_CPS_REPLICATE==9999 ~ 5,
   ))->ces0411
 
 val_labels(ces0411$income08)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
@@ -646,7 +965,8 @@ ces0411 %>%
   mutate(union_both11=case_when(
     #If the person is in a union OR if the household is in a union, then they get a 1
     PES11_93==1 | PES11_94==1 ~ 1,
-     PES11_94==5 ~ 0,
+    PES11_94==5 ~ 0,
+    PES11_93==5 ~ 0,
     PES11_93==8 & PES11_94==8 ~ NA_real_,
     PES11_93==9 & PES11_94==9 ~ NA_real_,
   ))->ces0411
