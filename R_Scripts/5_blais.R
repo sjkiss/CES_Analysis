@@ -259,12 +259,32 @@ unnest(tidied) %>%
   ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
 ggsave(here("Plots", "sector_conservative_1968_2015.png"))
 ndp_models_complete
+
 #Join all parties and plot sector coefficients
 ndp_models_complete %>% 
+  #bind liberal models to ndp models
   bind_rows(., liberal_models_complete) %>% 
-  bind_rows(., conservative_models_complete) %>% 
+  #add conservative models to liberal models
+  bind_rows(., conservative_models_complete) %>%
+  #unnest the tidied models so the spread out one row for each coefficient
   unnest(tidied) %>% 
+  #only keep the coefficients for sector and union
   filter(term=="sector"| term=="union_both") %>% 
-  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "union_both")))+geom_point()+labs(title="OLS Coefficients of Public Sector on Party Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))+scale_color_manual(values=c("blue", "red", "orange"))+facet_wrap(~vote)
-
+  #plot x=election, y=estimate, differentiate the parties by color, and set alpha (transparency) to vary by the variable term
+  #I'm setting the union_both category of term to be the reference category, this will make it transparaent. I only figured this out after running this once.
+  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "union_both")))+
+  #make it a point plot
+  geom_point()+
+  #add titles
+  labs(title="OLS Coefficients of Public Sector on Party Vote")+
+  #add errorbars, width=0 so that it is just a vertical line
+  #ymin =estimate -1.96*standard aerror, ymax = estimate+1.96* standard error
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+  #Set the y-axis limits to -0.2 and 0.2
+  ylim(c(-0.2,0.2))+
+  #modify the color scale specifying the colors of the points to be blue red and orange
+  scale_color_manual(values=c("blue", "red", "orange"))+
+  #panel this by vote with one panel per party
+  facet_wrap(~vote)
+#save 
 ggsave(here("Plots", "public_sector_all_parties.png"))
