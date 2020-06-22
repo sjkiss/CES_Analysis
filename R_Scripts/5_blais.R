@@ -270,13 +270,14 @@ ndp_models_complete %>%
   unnest(tidied) %>% 
   #only keep the coefficients for sector and union
   filter(term=="sector"| term=="union_both") %>% 
+  mutate(term=Recode(term, "'sector'='Sector'; 'union_both'='Union'")) %>% 
   #plot x=election, y=estimate, differentiate the parties by color, and set alpha (transparency) to vary by the variable term
   #I'm setting the union_both category of term to be the reference category, this will make it transparaent. I only figured this out after running this once.
-  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "union_both")))+
+  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "Union")))+
   #make it a point plot
   geom_point()+
   #add titles
-  labs(title="OLS Coefficients of Public Sector on Party Vote")+
+  labs(title="OLS Coefficients of Public Sector on Party Vote", alpha="Variable", color="Vote", x="Election", y="Estimate")+
   #add errorbars, width=0 so that it is just a vertical line
   #ymin =estimate -1.96*standard aerror, ymax = estimate+1.96* standard error
   geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
@@ -285,6 +286,7 @@ ndp_models_complete %>%
   #modify the color scale specifying the colors of the points to be blue red and orange
   scale_color_manual(values=c("blue", "red", "orange"))+
   #panel this by vote with one panel per party
-  facet_wrap(~vote)
+  facet_grid(rows=vars(vote), switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+
 #save 
 ggsave(here("Plots", "public_sector_all_parties.png"))
