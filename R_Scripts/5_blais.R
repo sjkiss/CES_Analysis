@@ -148,23 +148,45 @@ stargazer(liberal_models$liberal,
 #### Blais Replication Extension ####
 table(ces$election, ces$sector)
 ces %>% 
+  #filter out elections missing key variables
    filter(election!=1965 & election!=2019&election!=1972) %>%
+  #Nest by election
    nest(variables=-election) %>% 
-mutate(ndp=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector, data=x)), 
-       tidied=map(ndp, tidy))->ndp_models_complete
+  #create the model variable
+mutate(model=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector, data=x)),
+       #tidy that model variable 
+       tidied=map(model, tidy), 
+       #add party name variable
+       vote=rep('NDP', nrow(.)))->ndp_models_complete
 ces %>% 
+    #filter out elections missing key variables
    filter(election!=1965 & election!=2019&election!=1972) %>%
+    #Nest by election
    nest(variables=-election) %>% 
-mutate(conservative=map(variables, function(x) lm(conservative~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector, data=x)), 
-       tidied=map(conservative, tidy))->conservative_models_complete
+    #create the model variable
+mutate(model=map(variables, function(x) lm(conservative~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector, data=x)), 
+              #tidy that model variable 
+       tidied=map(model, tidy),
+              #add party name variable
+       #this is still in the mutate function above
+       #It makes the variable vote equal to the repetition rep() of the term 'conservaive', the number of rows nrow() of the dataframe that is fed to it. 
+     vote=rep('Conservative', nrow(.))  
+       )->conservative_models_complete
 
 ces %>% 
+    #filter out elections missing key variables
    filter(election!=1965 & election!=2019&election!=1972) %>%
+      #Nest by election
    nest(variables=-election) %>% 
-mutate(liberal=map(variables, function(x) lm(liberal~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector, data=x)), 
-       tidied=map(liberal, tidy))->liberal_models_complete
+     #create the model variable
+mutate(model=map(variables, function(x) lm(liberal~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector, data=x)), 
+                     #tidy that model variable 
+       tidied=map(model, tidy),
+                     #add party name variable
+            vote=rep('Liberal', nrow(.))  
+       )->liberal_models_complete
 
-stargazer(ndp_models_complete$ndp, 
+stargazer(ndp_models_complete$model, 
           type="html", 
           out=here("Tables", "NDP_Models_1968_2015.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015"), 
@@ -173,7 +195,7 @@ stargazer(ndp_models_complete$ndp,
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
-stargazer(liberal_models_complete$liberal, 
+stargazer(liberal_models_complete$model, 
           type="html", 
           out=here("Tables", "liberal_Models_1968_2015.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015"), 
@@ -183,7 +205,7 @@ stargazer(liberal_models_complete$liberal,
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 
-stargazer(conservative_models_complete$conservative, 
+stargazer(conservative_models_complete$model, 
           type="html", 
           out=here("Tables", "conservative_Models_1968_2015.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015"), 
@@ -236,4 +258,13 @@ unnest(tidied) %>%
   filter(term=="sector") %>% 
   ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
 ggsave(here("Plots", "sector_conservative_1968_2015.png"))
-  
+ndp_models_complete
+#Join all parties and plot sector coefficients
+ndp_models_complete %>% 
+  bind_rows(., liberal_models_complete) %>% 
+  bind_rows(., conservative_models_complete) %>% 
+  unnest(tidied) %>% 
+  filter(term=="sector"| term=="union_both") %>% 
+  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "union_both")))+geom_point()+labs(title="OLS Coefficients of Public Sector on Party Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))+scale_color_manual(values=c("blue", "red", "orange"))+facet_wrap(~vote)
+
+ggsave(here("Plots", "public_sector_all_parties.png"))
