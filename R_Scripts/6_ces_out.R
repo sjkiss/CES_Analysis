@@ -84,6 +84,7 @@ stargazer(ndp_models_complete1$model,
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="NDP Models 1968-2019", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
@@ -93,6 +94,7 @@ stargazer(liberal_models_complete1$model,
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Liberal Models 1968-2019", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
@@ -102,7 +104,7 @@ stargazer(conservative_models_complete1$model,
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
-          title="Conservative Models some subsector", 
+          title="Conservative Models 1968-2019", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
@@ -204,28 +206,31 @@ ces.out %>%
 
 stargazer(ndp_models_complete2$model, 
           type="html", 
-          out=here("Tables", "NDP_Models_1968_2019_2.html"),
+          out=here("Tables", "NDP_Models_Female_int_1968_2019_2.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="NDP Models 1968-2019 Female:Sector interaction", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(liberal_models_complete2$model, 
           type="html", 
-          out=here("Tables", "liberal_Models_1968_2019_2.html"),
+          out=here("Tables", "liberal_Models_Female_int_1968_2019_2.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Liberal Models 1968-2019 Female:Sector interaction", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(conservative_models_complete2$model, 
           type="html", 
-          out=here("Tables", "conservative_Models_1968_2019_2.html"),
+          out=here("Tables", "conservative_Models_Female_int_1968_2019_2.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Conservative Models 1968-2019 Female:Sector interaction", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
@@ -327,28 +332,31 @@ ces.out %>%
 
 stargazer(ndp_models_complete3$model, 
           type="html", 
-          out=here("Tables", "NDP_Models_1968_2019_3.html"),
+          out=here("Tables", "NDP_Models_without_union_1968_2019_3.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
-          star.cutoffs=c(0.05), 
+          star.cutoffs=c(0.05),
+          title="NDP Models 1968-2019 without Union", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(liberal_models_complete3$model, 
           type="html", 
-          out=here("Tables", "liberal_Models_1968_2019_3.html"),
+          out=here("Tables", "liberal_Models_without_union_1968_2019_3.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Liberal Models 1968-2019 without Union", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(conservative_models_complete3$model, 
           type="html", 
-          out=here("Tables", "conservative_Models_1968_2019_3.html"),
+          out=here("Tables", "conservative_Models_without_union_1968_2019_3.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Conservative Models 1968-2019 without Union", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
@@ -451,28 +459,31 @@ ces.out %>%
 
 stargazer(ndp_models_complete4$model, 
           type="html", 
-          out=here("Tables", "NDP_Models_1968_2019_4.html"),
+          out=here("Tables", "NDP_Models_workingclass_int_1968_2019_4.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="NDP Models 1968-2019 Working class:Sector interaction", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(liberal_models_complete4$model, 
           type="html", 
-          out=here("Tables", "liberal_Models_1968_2019_4.html"),
+          out=here("Tables", "liberal_Models_workingclass_int_1968_2019_4.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Liberal Models 1968-2019 Working class:Sector interaction", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(conservative_models_complete4$model, 
           type="html", 
-          out=here("Tables", "conservative_Models_1968_2019_4.html"),
+          out=here("Tables", "conservative_Models_workingclass_int_1968_2019_4.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Conservative Models 1968-2019 Working class:Sector interaction", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
@@ -574,28 +585,31 @@ ces.out %>%
 
 stargazer(ndp_models_complete5$model, 
           type="html", 
-          out=here("Tables", "NDP_Models_1968_2019_5.html"),
+          out=here("Tables", "NDP_Models_union_int_1968_2019_5.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="NDP Models 1968-2019 Union:Sector interaction", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(liberal_models_complete5$model, 
           type="html", 
-          out=here("Tables", "liberal_Models_1968_2019_5.html"),
+          out=here("Tables", "liberal_Models_union_int_1968_2019_5.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Liberal Models 1968-2019 Union:Sector interaction", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(conservative_models_complete5$model, 
           type="html", 
-          out=here("Tables", "conservative_Models_1968_2019_5.html"),
+          out=here("Tables", "conservative_union_int_Models_1968_2019_5.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Conservative Models 1968-2019 Union:Sector interaction", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
@@ -697,28 +711,31 @@ ces.out %>%
 
 stargazer(ndp_models_complete6$model, 
           type="html", 
-          out=here("Tables", "NDP_Models_1968_2019_6.html"),
+          out=here("Tables", "NDP_Models_Degree_Income_1968_2019_6.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="NDP Models 1968-2019 with Degree and Income", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(liberal_models_complete6$model, 
           type="html", 
-          out=here("Tables", "liberal_Models_1968_2019_6.html"),
+          out=here("Tables", "liberal_Models_Degree_Income_1968_2019_6.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Liberal Models 1968-2019 with Degree and Income", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(conservative_models_complete6$model, 
           type="html", 
-          out=here("Tables", "conservative_Models_1968_2019_6.html"),
+          out=here("Tables", "conservative_Models_Degree_Income_1968_2019_6.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Conservative Models 1968-2019 with Degree and Income", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
@@ -872,28 +889,31 @@ ces.out %>%
 
 stargazer(ndp_models_complete7$model, 
           type="html", 
-          out=here("Tables", "NDP_Models_1968_2019_7.html"),
+          out=here("Tables", "NDP_Models_Degree_int_1968_2019_7.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="NDP Models 1968-2019 with Degree:Sector interaction", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(liberal_models_complete7$model, 
           type="html", 
-          out=here("Tables", "liberal_Models_1968_2019_7.html"),
+          out=here("Tables", "liberal_Models_Degree_int_1968_2019_7.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Liberal Models 1968-2019 with Degree:Sector interaction", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(conservative_models_complete7$model, 
           type="html", 
-          out=here("Tables", "conservative_Models_1968_2019_7.html"),
+          out=here("Tables", "conservative_Models_Degree_int_1968_2019_7.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Conservative Models 1968-2019 with Degree:Sector interaction", 
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
@@ -995,28 +1015,31 @@ ces.out %>%
 
 stargazer(ndp_models_complete8$model, 
           type="html", 
-          out=here("Tables", "NDP_Models_1968_2019_10.html"),
+          out=here("Tables", "NDP_Models_income_int_1968_2019_10.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="NDP Models 1968-2019 with Income:Sector interaction",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(liberal_models_complete8$model, 
           type="html", 
-          out=here("Tables", "liberal_Models_1968_2019_10.html"),
+          out=here("Tables", "liberal_Models_income_int_1968_2019_10.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Liberal Models 1968-2019 with Income:Sector interaction",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(conservative_models_complete8$model, 
           type="html", 
-          out=here("Tables", "conservative_Models_1968_2019_10.html"),
+          out=here("Tables", "conservative_Models_income_int_1968_2019_10.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Conservative Models 1968-2019 with Income:Sector interaction",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
@@ -1131,37 +1154,41 @@ ces.out %>%
 
 stargazer(ndp_models_complete9$model, 
           type="html", 
-          out=here("Tables", "NDP_Models_quebec_1968_2019_9.html"),
+          out=here("Tables", "NDP_Models_Quebec_1968_2019_9.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="NDP Models 1968-2019 Quebec only",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(liberal_models_complete9$model, 
           type="html", 
-          out=here("Tables", "liberal_Models_quebec_1968_2019_9.html"),
+          out=here("Tables", "liberal_Models_Quebec_1968_2019_9.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Liberal Models 1968-2019 Quebec only",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(conservative_models_complete9$model, 
           type="html", 
-          out=here("Tables", "conservative_Models_quebec_1968_2019_9.html"),
+          out=here("Tables", "conservative_Models_Quebec_1968_2019_9.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Conservative Models 1968-2019 Quebec only",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(bloc_models_complete9$model, 
           type="html", 
-          out=here("Tables", "bloc_Models_quebec_1968_2019_9.html"),
+          out=here("Tables", "bloc_Models_Quebec_1968_2019_9.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Bloc Models 1968-2019 Quebec only",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
@@ -1272,28 +1299,31 @@ ces.out %>%
 
 stargazer(ndp_models_complete10$model, 
           type="html", 
-          out=here("Tables", "NDP_Models_1968_2019_8.html"),
+          out=here("Tables", "NDP_Models_abortion_1984_1993_8.html"),
           column.labels=c("1984", "1988", "1993"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="NDP Models 1984-1993 with Abortion",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(liberal_models_complete10$model, 
           type="html", 
-          out=here("Tables", "liberal_Models_1968_2019_8.html"),
+          out=here("Tables", "liberal_Models_abortion_1984_1993_8.html"),
           column.labels=c("1984", "1988", "1993"),  
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Liberal Models 1984-1993 with Abortion",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(conservative_models_complete10$model, 
           type="html", 
-          out=here("Tables", "conservative_Models_1968_2019_8.html"),
+          out=here("Tables", "conservative_Models_abortion_1984_1993_8.html"),
           column.labels=c("1984", "1988", "1993"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Conservative Models 1984-1993 with Abortion",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
@@ -1395,28 +1425,31 @@ ces.out %>%
 
 stargazer(ndp_models_complete11$model, 
           type="html", 
-          out=here("Tables", "NDP_Models_1968_2019_11.html"),
+          out=here("Tables", "NDP_Models_abortion_int_1968_2019_11.html"),
           column.labels=c("1984", "1988", "1993"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="NDP Models 1984-1993 Abortion:Sector interaction",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(liberal_models_complete11$model, 
           type="html", 
-          out=here("Tables", "liberal_Models_1968_2019_11.html"),
+          out=here("Tables", "liberal_Models_abortion_int_1968_2019_11.html"),
           column.labels=c("1984", "1988", "1993"),  
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Liberal Models 1984-1993 Abortion:Sector interaction",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(conservative_models_complete11$model, 
           type="html", 
-          out=here("Tables", "conservative_Models_1968_2019_11.html"),
+          out=here("Tables", "conservative_Models_abortion_int_1968_2019_11.html"),
           column.labels=c("1984", "1988", "1993"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Conservative Models 1984-1993 Abortion:Sector interaction",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
@@ -1518,28 +1551,31 @@ ces.out %>%
 
 stargazer(ndp_models_complete12$model, 
           type="html", 
-          out=here("Tables", "NDP_Models_sector_subsample_1968_2019_12.html"),
+          out=here("Tables", "NDP_Models_Sector_subsample_1968_2019_12.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="NDP Models 1968-2019 Sector subsample",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(liberal_models_complete12$model, 
           type="html", 
-          out=here("Tables", "liberal_Models_sector_subsample_1968_2019_12.html"),
+          out=here("Tables", "liberal_Models_Sector_subsample_1968_2019_12.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Liberal Models 1968-2019 Sector subsample",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 stargazer(conservative_models_complete12$model, 
           type="html", 
-          out=here("Tables", "conservative_Models_sector_subsample_1968_2019_12.html"),
+          out=here("Tables", "conservative_Models_Sector_subsample_1968_2019_12.html"),
           column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
+          title="Conservative Models 1968-2019 Sector subsample",
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
@@ -1596,9 +1632,135 @@ ndp_models_complete12 %>%
 ggsave(here("Plots", "M12_public_sector_subsample_all_parties.png"))
 
 #-------------------------------------------------------------------------------------------------
+#### M1 Blais Replication Extension (including 2019) ####
+table(ces$election, ces$sector)
+
+ces.out %>% 
+  #filter out elections missing key variables
+  filter(election!=1965 & election!=1972) %>%
+  #Nest by election
+  nest(variables=-election) %>% 
+  #create the model variable
+  mutate(model=map(variables, function(x) lm(ndp~as.factor(region)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+degree+income+sector, data=x)),
+         #tidy that model variable 
+         tidied=map(model, tidy), 
+         #add party name variable
+         vote=rep('NDP', nrow(.)))->ndp_models_complete13
+
+ces.out %>% 
+  #filter out elections missing key variables
+  filter(election!=1965 & election!=1972) %>%
+  #Nest by election
+  nest(variables=-election) %>% 
+  #create the model variable
+  mutate(model=map(variables, function(x) lm(conservative~as.factor(region)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+degree+income+sector, data=x)), 
+         #tidy that model variable 
+         tidied=map(model, tidy),
+         #add party name variable
+         #this is still in the mutate function above
+         #It makes the variable vote equal to the repetition rep() of the term 'conservaive', the number of rows nrow() of the dataframe that is fed to it. 
+         vote=rep('Conservative', nrow(.))  
+  )->conservative_models_complete13
+
+ces.out %>% 
+  #filter out elections missing key variables
+  filter(election!=1965 & election!=1972) %>%
+  #Nest by election
+  nest(variables=-election) %>% 
+  #create the model variable
+  mutate(model=map(variables, function(x) lm(liberal~as.factor(region)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+degree+income+sector, data=x)), 
+         #tidy that model variable 
+         tidied=map(model, tidy),
+         #add party name variable
+         vote=rep('Liberal', nrow(.))  
+  )->liberal_models_complete13
+
+stargazer(ndp_models_complete13$model, 
+          type="html", 
+          out=here("Tables", "NDP_Models_ROC_1968_2019_13.html"),
+          column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          #set the cutoffs for one star to be 0.05
+          star.cutoffs=c(0.05), 
+          title="NDP Models 1968-2019 Rest of Canada", 
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(liberal_models_complete13$model, 
+          type="html", 
+          out=here("Tables", "liberal_Models_ROC_1968_2019_13.html"),
+          column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          #set the cutoffs for one star to be 0.05
+          star.cutoffs=c(0.05), 
+          title="Liberal Models 1968-2019 Rest of Canada", 
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(conservative_models_complete13$model, 
+          type="html", 
+          out=here("Tables", "conservative_Models_ROC_1968_2019_13.html"),
+          column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          #set the cutoffs for one star to be 0.05
+          star.cutoffs=c(0.05), 
+          title="Conservative Models 1968-2019 Rest of Canada", 
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+#### Blais Plots ####
+# Set theme
+theme_set(theme_bw())
+ndp_models_complete13 %>% 
+  unnest(tidied) %>% 
+  filter(term=="sector") %>% 
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on NDP Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+ggsave(here("Plots", "ROC_sector_ndp_1968_2019_13.png"))
+
+liberal_models_complete13 %>% 
+  unnest(tidied) %>% 
+  filter(term=="sector") %>% 
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on Liberal Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+ggsave(here("Plots", "ROC_sector_liberal_1968_2019_13.png"))
+
+conservative_models_complete13 %>% 
+  unnest(tidied) %>% 
+  filter(term=="sector") %>% 
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+ggsave(here("Plots", "ROC_sector_conservative_1968_2019_13.png"))
+
+#Join all parties and plot sector coefficients
+ndp_models_complete13 %>% 
+  #bind liberal models to ndp models
+  bind_rows(., liberal_models_complete13) %>% 
+  #add conservative models to liberal models
+  bind_rows(., conservative_models_complete13) %>%
+  #unnest the tidied models so the spread out one row for each coefficient
+  unnest(tidied) %>% 
+  #only keep the coefficients for sector and union
+  filter(term=="sector"| term=="union_both") %>% 
+  mutate(term=Recode(term, "'sector'='Sector'; 'union_both'='Union'")) %>% 
+  #plot x=election, y=estimate, differentiate the parties by color, and set alpha (transparency) to vary by the variable term
+  #I'm setting the union_both category of term to be the reference category, this will make it transparaent. I only figured this out after running this once.
+  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "Union")))+
+  #make it a point plot
+  geom_point()+
+  #add titles
+  labs(title="OLS Coefficients of Public Sector Rest of Canada on Party Vote", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  #add errorbars, width=0 so that it is just a vertical line
+  #ymin =estimate -1.96*standard aerror, ymax = estimate+1.96* standard error
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+  #Set the y-axis limits to -0.2 and 0.2
+  ylim(c(-0.2,0.2))+
+  #modify the color scale specifying the colors of the points to be blue red and orange
+  scale_color_manual(values=c("blue", "red", "orange"))+
+  #panel this by vote with one panel per party
+  facet_grid(rows=vars(vote), switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+
+#save 
+ggsave(here("Plots", "M13_public_sector_ROC_all_parties.png"))
+
 #-------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------
-###Vote Shares###
+#-------------------------------------------------------------------------------------------------
+####Vote Shares####
 
 # Percent of NDP Voters in Public Sector
 ces.out %>% 
@@ -1618,17 +1780,17 @@ ces.out %>%
   filter(working_class==1 & vote==3) %>% 
   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="NDP Voter % that are Working Class")
 #save
-ggsave(here("Plots", "NDP_Voters_Union_Percent.png"))
+ggsave(here("Plots", "NDP_Voters_Working_Class_Percent.png"))
 
-# Percent of NDP Voters Low Income
+# Percent of NDP Voters Union Households
 ces.out %>% 
-  group_by(election, vote, income) %>% 
+  group_by(election, vote, union) %>% 
   summarize(n=n()) %>% 
   mutate(pct=n/sum(n)) %>%
-  filter(income==1 & vote==3) %>% 
-  ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="NDP Voter % that are Low Income")
+  filter(union_both==1 & vote==3) %>% 
+  ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="NDP Voter % that are Union Households")
 #save
-ggsave(here("Plots", "NDP_Voters_Low_Income_Percent.png"))
+ggsave(here("Plots", "NDP_Voters_Union_Percent.png"))
 
 # Percent of NDP Voters Low Income
 ces.out %>% 

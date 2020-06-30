@@ -375,7 +375,6 @@ names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988',
 # rm(ces93)
 # rm(ces97)
 # rm(ces19phone)
-
 # 
 # str(ces.list)
 # str(ces.list$`2019`)
@@ -429,7 +428,6 @@ names(ces)
 ces$election
 table(ces$union)
 
-
 #### Currently region is regions of English Canada only
 #### quebec is dichotomous Quebec v. non-quebec
 #### Create region2 which is one region variable for all of Canada
@@ -445,6 +443,7 @@ ces %>%
 #### This can be changed anytime very easily 
 ces$region2<-factor(ces$region2, levels=c("Quebec", "Atlantic", "Ontario", "West"))
 levels(ces$region2)
+
 ##Create female variable
 ## Sometimes we may want to report male dichotomous variable, sometimes female. 
 ces %>% 
@@ -453,6 +452,7 @@ ces %>%
     male==0~1
   ))->ces
 library(car)
+
 #To model party voting we need to create party vote dummy variables
 ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
 ces$liberal<-Recode(ces$vote, "1=1; 2:5=0; NA=NA")
@@ -463,6 +463,7 @@ ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
 val_labels(ces$sector)<-c(Private=0, Public=1)
 val_labels(ces$vote)<-c(Conservative=2,  Liberal=1, NDP=3)
 table(ces79$sector)
+
 #### Call other Scripts ####
 #This command calls the file 2_diagnostics.R
 source("R_scripts/3_recode_diagnostics.R", echo=T)
