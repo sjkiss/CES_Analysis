@@ -9,7 +9,7 @@ library(stargazer)
 library(ggeffects)
 
 ces %>% 
-  select(male, union_both, union, degree, region, quebec, age, religion, language, employment, sector, party_id, vote, occupation, income, non_charter_language, election, size, abortion) -> ces.out
+  select(male, union_both, union, degree, region, quebec, age, religion, language, employment, sector, party_id, vote, occupation, income, non_charter_language, election, size) -> ces.out
 
 ces.out$catholic<-Recode(ces.out$religion, "1=1; 2:3=0; 0=0; NA=NA")
 ces.out$no_religion<-Recode(ces.out$religion, "0=1; 1:3=0; NA=NA")
