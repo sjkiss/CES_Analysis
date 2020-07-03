@@ -370,6 +370,7 @@ ggsave(here("Plots", "M9_difference_sectoral_NDP_vote_Quebec.png"))
 #------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------
+<<<<<<< HEAD
 
 
 #### M7 Blais Replication Extension (including 2019)(Degree:Sector interaction) ####
@@ -439,14 +440,3 @@ degree_sector$model %>%
   mutate(election=rep(degree_sector$election, each=4)) %>% 
 ggplot(., aes(x=election, y=predicted, col=as.factor(x)))+facet_grid(~group)+geom_point()+labs(title="Marginal Effect of Degree and Sector on vote for NDP, 1968, 2019")
 
-
-#Normally, I would do something like this in ggeffects package, but I don't quite know technically what ggeffects returns. 
-#start with wherever th emodels are stored
-degree_sector$model %>% 
-  #use map to apply a function to each item in degree_sector$model
-  #the function is ggeffect and we want to get basically all effects, so we specify sector[0, 1] (private and public ) and non-degree and degree
-  map(., ggpredict, terms=c('sector[0,1]', 'degree[0,1]')) %>% 
-  bind_rows() %>% 
-  #add election, we need to specify each=4 because ther eare four combinations of effects
-  mutate(election=rep(degree_sector$election, each=4)) %>% 
-ggplot(., aes(x=election, y=predicted, col=as.factor(x)))+facet_grid(~group)+geom_point()+labs(title="Predicted Probabilities of Degree and Sector on vote for NDP, 1968, 2019")

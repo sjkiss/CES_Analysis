@@ -1666,7 +1666,7 @@ ndp_models_complete12 %>%
 ggsave(here("Plots", "M12_public_sector_subsample_all_parties.png"))
 
 #-------------------------------------------------------------------------------------------------
-#### M13 Blais Replication Extension (including 2019) ####
+#### M13 Blais Replication Extension (including 2019) (ROC only) ####
 
 ces %>% 
   #filter out elections missing key variables
@@ -1789,6 +1789,257 @@ ndp_models_complete13 %>%
 
 #save 
 ggsave(here("Plots", "M13_public_sector_ROC_all_parties.png"))
+
+#-------------------------------------------------------------------------------------------------
+#### M14 Blais Replication Extension (including 2019) (ROC only)& no Degree or Income) ####
+
+ces %>% 
+  #filter out elections missing key variables
+  filter(election!=1965 & election!=1972) %>%
+  #Nest by election
+  nest(variables=-election) %>% 
+  #create the model variable
+  mutate(model=map(variables, function(x) lm(ndp~as.factor(region)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector, data=x)),
+         #tidy that model variable 
+         tidied=map(model, tidy), 
+         #add party name variable
+         vote=rep('NDP', nrow(.)))->ndp_models_complete14
+
+ces %>% 
+  #filter out elections missing key variables
+  filter(election!=1965 & election!=1972) %>%
+  #Nest by election
+  nest(variables=-election) %>% 
+  #create the model variable
+  mutate(model=map(variables, function(x) lm(conservative~as.factor(region)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector, data=x)), 
+         #tidy that model variable 
+         tidied=map(model, tidy),
+         #add party name variable
+         #this is still in the mutate function above
+         #It makes the variable vote equal to the repetition rep() of the term 'conservaive', the number of rows nrow() of the dataframe that is fed to it. 
+         vote=rep('Conservative', nrow(.))  
+  )->conservative_models_complete14
+
+ces %>% 
+  #filter out elections missing key variables
+  filter(election!=1965 & election!=1972) %>%
+  #Nest by election
+  nest(variables=-election) %>% 
+  #create the model variable
+  mutate(model=map(variables, function(x) lm(liberal~as.factor(region)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector, data=x)), 
+         #tidy that model variable 
+         tidied=map(model, tidy),
+         #add party name variable
+         vote=rep('Liberal', nrow(.))  
+  )->liberal_models_complete14
+
+stargazer(ndp_models_complete14$model, 
+          type="html", 
+          out=here("Tables", "NDP_Models_ROC_1968_2019_14.html"),
+          column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          #set the cutoffs for one star to be 0.05
+          star.cutoffs=c(0.05), 
+          title="NDP Models 1968-2019 Rest of Canada", 
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(liberal_models_complete14$model, 
+          type="html", 
+          out=here("Tables", "liberal_Models_ROC_1968_2019_14.html"),
+          column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          #set the cutoffs for one star to be 0.05
+          star.cutoffs=c(0.05), 
+          title="Liberal Models 1968-2019 Rest of Canada", 
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(conservative_models_complete14$model, 
+          type="html", 
+          out=here("Tables", "conservative_Models_ROC_1968_2019_14.html"),
+          column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          #set the cutoffs for one star to be 0.05
+          star.cutoffs=c(0.05), 
+          title="Conservative Models 1968-2019 Rest of Canada", 
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+#### Blais Plots ####
+# Set theme
+theme_set(theme_bw())
+ndp_models_complete14 %>% 
+  unnest(tidied) %>% 
+  filter(term=="sector") %>% 
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on NDP Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+ggsave(here("Plots", "ROC_sector_ndp_1968_2019_14.png"))
+
+liberal_models_complete14 %>% 
+  unnest(tidied) %>% 
+  filter(term=="sector") %>% 
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on Liberal Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+ggsave(here("Plots", "ROC_sector_liberal_1968_2019_14.png"))
+
+conservative_models_complete14 %>% 
+  unnest(tidied) %>% 
+  filter(term=="sector") %>% 
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+ggsave(here("Plots", "ROC_sector_conservative_1968_2019_14.png"))
+
+#Join all parties and plot sector coefficients
+ndp_models_complete14 %>% 
+  #bind liberal models to ndp models
+  bind_rows(., liberal_models_complete14) %>% 
+  #add conservative models to liberal models
+  bind_rows(., conservative_models_complete14) %>%
+  #unnest the tidied models so the spread out one row for each coefficient
+  unnest(tidied) %>% 
+  #only keep the coefficients for sector and union
+  filter(term=="sector"| term=="union_both") %>% 
+  mutate(term=Recode(term, "'sector'='Sector'; 'union_both'='Union'")) %>% 
+  #plot x=election, y=estimate, differentiate the parties by color, and set alpha (transparency) to vary by the variable term
+  #I'm setting the union_both category of term to be the reference category, this will make it transparaent. I only figured this out after running this once.
+  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "Union")))+
+  #make it a point plot
+  geom_point()+
+  #add titles
+  labs(title="OLS Coefficients of Public Sector Rest of Canada on Party Vote", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  #add errorbars, width=0 so that it is just a vertical line
+  #ymin =estimate -1.96*standard aerror, ymax = estimate+1.96* standard error
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+  #Set the y-axis limits to -0.2 and 0.2
+  ylim(c(-0.2,0.2))+
+  #modify the color scale specifying the colors of the points to be blue red and orange
+  scale_color_manual(values=c("blue", "red", "orange"))+
+  #panel this by vote with one panel per party
+  facet_grid(rows=vars(vote), switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+
+#save 
+ggsave(here("Plots", "M14_public_sector_ROC_all_parties.png"))
+
+#------------------------------------------------------------------------------------------------
+
+#### M15 Blais Replication Extension (including 2019)(Quebec:Sector interaction) ####
+
+ces %>% 
+  #filter out elections missing key variables
+  filter(election!=1965 & election!=1972) %>%
+  #Nest by election
+  nest(variables=-election) %>% 
+  #create the model variable
+  mutate(model=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+degree+income+quebec:sector+sector, data=x)),
+         #tidy that model variable 
+         tidied=map(model, tidy), 
+         #add party name variable
+         vote=rep('NDP', nrow(.)))->ndp_models_complete15
+
+ces %>% 
+  #filter out elections missing key variables
+  filter(election!=1965 & election!=1972) %>%
+  #Nest by election
+  nest(variables=-election) %>% 
+  #create the model variable
+  mutate(model=map(variables, function(x) lm(conservative~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+degree+income+quebec:sector+sector, data=x)), 
+         #tidy that model variable 
+         tidied=map(model, tidy),
+         #add party name variable
+         #this is still in the mutate function above
+         #It makes the variable vote equal to the repetition rep() of the term 'conservaive', the number of rows nrow() of the dataframe that is fed to it. 
+         vote=rep('Conservative', nrow(.))  
+  )->conservative_models_complete15
+
+ces %>% 
+  #filter out elections missing key variables
+  filter(election!=1965 & election!=1972) %>%
+  #Nest by election
+  nest(variables=-election) %>% 
+  #create the model variable
+  mutate(model=map(variables, function(x) lm(liberal~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+degree+income+quebec:sector+sector, data=x)), 
+         #tidy that model variable 
+         tidied=map(model, tidy),
+         #add party name variable
+         vote=rep('Liberal', nrow(.))  
+  )->liberal_models_complete15
+
+stargazer(ndp_models_complete15$model, 
+          type="html", 
+          out=here("Tables", "NDP_Models_quebec_int_1968_2019_15.html"),
+          column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          #set the cutoffs for one star to be 0.05
+          star.cutoffs=c(0.05), 
+          title="NDP Models 1968-2019 with Quebec:Sector interaction",
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(liberal_models_complete15$model, 
+          type="html", 
+          out=here("Tables", "liberal_Models_quebec_int_1968_2019_15.html"),
+          column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          #set the cutoffs for one star to be 0.05
+          star.cutoffs=c(0.05), 
+          title="Liberal Models 1968-2019 with Quebec:Sector interaction",
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(conservative_models_complete15$model, 
+          type="html", 
+          out=here("Tables", "conservative_Models_quebec_int_1968_2019_15.html"),
+          column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          #set the cutoffs for one star to be 0.05
+          star.cutoffs=c(0.05), 
+          title="Conservative Models 1968-2019 with Quebec:Sector interaction",
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+#### Blais Plots ####
+# Set theme
+theme_set(theme_bw())
+ndp_models_complete15 %>% 
+  unnest(tidied) %>% 
+  filter(term=="quebec:sector") %>% 
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Quebec:Sector interaction on NDP Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+ggsave(here("Plots", "quebec_sector_ndp_1968_2019_15.png"))
+
+liberal_models_complete15 %>% 
+  unnest(tidied) %>% 
+  filter(term=="quebec:sector") %>% 
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Quebec:Sector interaction on Liberal Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+ggsave(here("Plots", "quebec_sector_liberal_1968_2019_15.png"))
+
+conservative_models_complete15 %>% 
+  unnest(tidied) %>% 
+  filter(term=="quebec:sector") %>% 
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Quebec:Sector interaction on Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+ggsave(here("Plots", "quebec_sector_conservative_1968_2019_15.png"))
+
+#Join all parties and plot sector coefficients
+ndp_models_complete15 %>%
+  #bind liberal models to ndp models
+  bind_rows(., liberal_models_complete15) %>%
+  #add conservative models to liberal models
+  bind_rows(., conservative_models_complete15) %>%
+  #unnest the tidied models so the spread out one row for each coefficient
+  unnest(tidied) %>%
+  #only keep the coefficients for quebec:sector and sector
+  filter(term=="quebec:sector"| term=="sector") %>%
+  #  mutate(term=Recode(term, "'quebec:sector'='Quebec:Sector'; 'sector'='Sector'")) %>%
+  #plot x=election, y=estimate, differentiate the parties by color, and set alpha (transparency) to vary by the variable term
+  #I'm setting the union_both category of term to be the reference category, this will make it transparaent. I only figured this out after running this once.
+  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "sector")))+
+  #make it a point plot
+  geom_point()+
+  #add titles
+  labs(title="OLS Coefficients of Quebec:Sector on Party Vote", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  #add errorbars, width=0 so that it is just a vertical line
+  #ymin =estimate -1.96*standard aerror, ymax = estimate+1.96* standard error
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+  #Set the y-axis limits to -0.2 and 0.2
+  ylim(c(-0.2,0.2))+
+  #modify the color scale specifying the colors of the points to be blue red and orange
+  scale_color_manual(values=c("blue", "red", "orange"))+
+  #panel this by vote with one panel per party
+  facet_grid(rows=vars(vote), switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+
+#save
+ggsave(here("Plots", "M15_quebec_sector_int_all_parties.png"))
 
 #-------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------
