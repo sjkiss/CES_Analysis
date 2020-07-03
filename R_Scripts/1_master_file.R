@@ -467,6 +467,6 @@ table(ces79$sector)
 #### Call other Scripts ####
 #This command calls the file 2_diagnostics.R
 source("R_scripts/3_recode_diagnostics.R", echo=T)
-source("R_scripts/4_make_models.R", echo=T)
-source("R_scripts/5_blais.R", echo=T)
-
+#source("R_scripts/5_blais.R", echo=T)
+source("R_scripts/6_ces_out.R", echo=T)
+source("R_scripts/7_predicted_probabilities.R", echo=T)

@@ -366,19 +366,19 @@ theme_set(theme_bw())
 ndp_models_complete3 %>% 
   unnest(tidied) %>% 
   filter(term=="sector") %>% 
-  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on NDP Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on NDP Vote", subtitle="Full Blais Model No Union")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
 ggsave(here("Plots", "sector_ndp_1968_2019_3.png"))
 
 liberal_models_complete3 %>% 
   unnest(tidied) %>% 
   filter(term=="sector") %>% 
-  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on Liberal Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on Liberal Vote", subtitle="Full Blais Model No Union")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
 ggsave(here("Plots", "sector_liberal_1968_2019_3.png"))
 
 conservative_models_complete3 %>% 
   unnest(tidied) %>% 
   filter(term=="sector") %>% 
-  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sectoron Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sectoron Conservative Vote", subtitle="Full Blais Model No Union")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
 ggsave(here("Plots", "sector_conservative_1968_2019_3.png"))
 
 #Join all parties and plot sector coefficients
@@ -1253,226 +1253,226 @@ ndp_models_complete9 %>%
 ggsave(here("Plots", "M9_quebec_sector_all_parties.png"))
 
 #-------------------------------------------------------------------------------------------------
-
-#### M10 Blais Replication Extension (with Abortion) ####
-table(ces.out$election, ces.out$abortion)
-
-ces.out %>% 
-  #filter out elections missing key variables
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1997 & election!=2000 & election!=2004 & election!=2006 & election!=2008 & election!=2011 & election!=2015 & election!=2019) %>%
-  #Nest by election
-  nest(variables=-election) %>% 
-  #create the model variable
-  mutate(model=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector+abortion, data=x)),
-         #tidy that model variable 
-         tidied=map(model, tidy), 
-         #add party name variable
-         vote=rep('NDP', nrow(.)))->ndp_models_complete10
-
-ces.out %>% 
-  #filter out elections missing key variables
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1997 & election!=2000 & election!=2004 & election!=2006 & election!=2008 & election!=2011 & election!=2015 & election!=2019) %>%
-  #Nest by election
-  nest(variables=-election) %>% 
-  #create the model variable
-  mutate(model=map(variables, function(x) lm(conservative~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector+abortion, data=x)), 
-         #tidy that model variable 
-         tidied=map(model, tidy),
-         #add party name variable
-         #this is still in the mutate function above
-         #It makes the variable vote equal to the repetition rep() of the term 'conservaive', the number of rows nrow() of the dataframe that is fed to it. 
-         vote=rep('Conservative', nrow(.))  
-  )->conservative_models_complete10
-
-ces.out %>% 
-  #filter out elections missing key variables
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1997 & election!=2000 & election!=2004 & election!=2006 & election!=2008 & election!=2011 & election!=2015 & election!=2019) %>%
-  #Nest by election
-  nest(variables=-election) %>% 
-  #create the model variable
-  mutate(model=map(variables, function(x) lm(liberal~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector+abortion, data=x)), 
-         #tidy that model variable 
-         tidied=map(model, tidy),
-         #add party name variable
-         vote=rep('Liberal', nrow(.))  
-  )->liberal_models_complete10
-
-stargazer(ndp_models_complete10$model, 
-          type="html", 
-          out=here("Tables", "NDP_Models_abortion_1984_1993_8.html"),
-          column.labels=c("1984", "1988", "1993"), 
-          #set the cutoffs for one star to be 0.05
-          star.cutoffs=c(0.05), 
-          title="NDP Models 1984-1993 with Abortion",
-          #print some notes to show when the table is constructed
-          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
-
-stargazer(liberal_models_complete10$model, 
-          type="html", 
-          out=here("Tables", "liberal_Models_abortion_1984_1993_8.html"),
-          column.labels=c("1984", "1988", "1993"),  
-          #set the cutoffs for one star to be 0.05
-          star.cutoffs=c(0.05), 
-          title="Liberal Models 1984-1993 with Abortion",
-          #print some notes to show when the table is constructed
-          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
-
-stargazer(conservative_models_complete10$model, 
-          type="html", 
-          out=here("Tables", "conservative_Models_abortion_1984_1993_8.html"),
-          column.labels=c("1984", "1988", "1993"), 
-          #set the cutoffs for one star to be 0.05
-          star.cutoffs=c(0.05), 
-          title="Conservative Models 1984-1993 with Abortion",
-          #print some notes to show when the table is constructed
-          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
-
-#### Blais Plots ####
-# Set theme
-theme_set(theme_bw())
-ndp_models_complete10 %>% 
-  unnest(tidied) %>% 
-  filter(term=="abortion") %>% 
-  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Abortion on NDP Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
-ggsave(here("Plots", "abortion_ndp_1968_2019_10.png"))
-
-liberal_models_complete10 %>% 
-  unnest(tidied) %>% 
-  filter(term=="abortion") %>% 
-  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Abortion on Liberal Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
-ggsave(here("Plots", "abortion_liberal_1968_2019_10.png"))
-
-conservative_models_complete8 %>% 
-  unnest(tidied) %>% 
-  filter(term=="abortion") %>% 
-  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Abortion on Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
-ggsave(here("Plots", "abortion_conservative_1968_2019_10.png"))
-
-#Join all parties and plot sector coefficients
-ndp_models_complete10 %>% 
-  #bind liberal models to ndp models
-  bind_rows(., liberal_models_complete10) %>% 
-  #add conservative models to liberal models
-  bind_rows(., conservative_models_complete10) %>%
-  #unnest the tidied models so the spread out one row for each coefficient
-  unnest(tidied) %>% 
-  #only keep the coefficients for sector and abortion
-  filter(term=="sector"| term=="abortion") %>% 
-  mutate(term=Recode(term, "'abortion'='Abortion'; 'sector'='Sector'")) %>% 
-  #plot x=election, y=estimate, differentiate the parties by color, and set alpha (transparency) to vary by the variable term
-  #I'm setting the union_both category of term to be the reference category, this will make it transparaent. I only figured this out after running this once.
-  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "Sector")))+
-  #make it a point plot
-  geom_point()+
-  #add titles
-  labs(title="OLS Coefficients of Abortion on Party Vote", alpha="Variable", color="Vote", x="Election", y="Estimate")+
-  #add errorbars, width=0 so that it is just a vertical line
-  #ymin =estimate -1.96*standard aerror, ymax = estimate+1.96* standard error
-  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
-  #Set the y-axis limits to -0.2 and 0.2
-  ylim(c(-0.2,0.2))+
-  #modify the color scale specifying the colors of the points to be blue red and orange
-  scale_color_manual(values=c("blue", "red", "orange"))+
-  #panel this by vote with one panel per party
-  facet_grid(rows=vars(vote), switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
-
-#save 
-ggsave(here("Plots", "M10_abortion_all_parties.png"))
-
-#------------------------------------------------------------------------------------------------
-#### M11 Blais Replication Extension (with Abortion:Sector interaction) ####
-table(ces$election, ces$abortion)
-
-ces.out %>% 
-  #filter out elections missing key variables
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1997 & election!=2000 & election!=2004 & election!=2006 & election!=2008 & election!=2011 & election!=2015 & election!=2019) %>%
-  #Nest by election
-  nest(variables=-election) %>% 
-  #create the model variable
-  mutate(model=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector+abortion+abortion:sector, data=x)),
-         #tidy that model variable 
-         tidied=map(model, tidy), 
-         #add party name variable
-         vote=rep('NDP', nrow(.)))->ndp_models_complete11
-
-ces.out %>% 
-  #filter out elections missing key variables
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1997 & election!=2000 & election!=2004 & election!=2006 & election!=2008 & election!=2011 & election!=2015 & election!=2019) %>%
-  #Nest by election
-  nest(variables=-election) %>% 
-  #create the model variable
-  mutate(model=map(variables, function(x) lm(conservative~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector+abortion+abortion:sector, data=x)), 
-         #tidy that model variable 
-         tidied=map(model, tidy),
-         #add party name variable
-         #this is still in the mutate function above
-         #It makes the variable vote equal to the repetition rep() of the term 'conservaive', the number of rows nrow() of the dataframe that is fed to it. 
-         vote=rep('Conservative', nrow(.))  
-  )->conservative_models_complete11
-
-ces.out %>% 
-  #filter out elections missing key variables
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1997 & election!=2000 & election!=2004 & election!=2006 & election!=2008 & election!=2011 & election!=2015 & election!=2019) %>%
-  #Nest by election
-  nest(variables=-election) %>% 
-  #create the model variable
-  mutate(model=map(variables, function(x) lm(liberal~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector+abortion+abortion:sector, data=x)), 
-         #tidy that model variable 
-         tidied=map(model, tidy),
-         #add party name variable
-         vote=rep('Liberal', nrow(.))  
-  )->liberal_models_complete11
-
-stargazer(ndp_models_complete11$model, 
-          type="html", 
-          out=here("Tables", "NDP_Models_abortion_int_1968_2019_11.html"),
-          column.labels=c("1984", "1988", "1993"), 
-          #set the cutoffs for one star to be 0.05
-          star.cutoffs=c(0.05), 
-          title="NDP Models 1984-1993 Abortion:Sector interaction",
-          #print some notes to show when the table is constructed
-          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
-
-stargazer(liberal_models_complete11$model, 
-          type="html", 
-          out=here("Tables", "liberal_Models_abortion_int_1968_2019_11.html"),
-          column.labels=c("1984", "1988", "1993"),  
-          #set the cutoffs for one star to be 0.05
-          star.cutoffs=c(0.05), 
-          title="Liberal Models 1984-1993 Abortion:Sector interaction",
-          #print some notes to show when the table is constructed
-          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
-
-stargazer(conservative_models_complete11$model, 
-          type="html", 
-          out=here("Tables", "conservative_Models_abortion_int_1968_2019_11.html"),
-          column.labels=c("1984", "1988", "1993"), 
-          #set the cutoffs for one star to be 0.05
-          star.cutoffs=c(0.05), 
-          title="Conservative Models 1984-1993 Abortion:Sector interaction",
-          #print some notes to show when the table is constructed
-          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
-
-#### Blais Plots ####
-# Set theme
-theme_set(theme_bw())
-ndp_models_complete11 %>% 
-  unnest(tidied) %>% 
-  filter(term=="abortion:sector") %>% 
-  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Abortion:Sector on NDP Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
-ggsave(here("Plots", "abortion_sector_ndp_1968_2019_11.png"))
-
-liberal_models_complete11 %>% 
-  unnest(tidied) %>% 
-  filter(term=="abortion:sector") %>% 
-  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Abortion:Sector on Liberal Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
-ggsave(here("Plots", "abortion_sector_liberal_1968_2019_11.png"))
-
-conservative_models_complete11 %>% 
-  unnest(tidied) %>% 
-  filter(term=="abortion:sector") %>% 
-  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Abortion:Sector on Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
-ggsave(here("Plots", "abortion_sector_conservative_1968_2019_11.png"))
+# 
+# #### M10 Blais Replication Extension (with Abortion) ####
+# table(ces.out$election, ces.out$abortion)
+# 
+# ces.out %>% 
+#   #filter out elections missing key variables
+#   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1997 & election!=2000 & election!=2004 & election!=2006 & election!=2008 & election!=2011 & election!=2015 & election!=2019) %>%
+#   #Nest by election
+#   nest(variables=-election) %>% 
+#   #create the model variable
+#   mutate(model=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector+abortion, data=x)),
+#          #tidy that model variable 
+#          tidied=map(model, tidy), 
+#          #add party name variable
+#          vote=rep('NDP', nrow(.)))->ndp_models_complete10
+# 
+# ces.out %>% 
+#   #filter out elections missing key variables
+#   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1997 & election!=2000 & election!=2004 & election!=2006 & election!=2008 & election!=2011 & election!=2015 & election!=2019) %>%
+#   #Nest by election
+#   nest(variables=-election) %>% 
+#   #create the model variable
+#   mutate(model=map(variables, function(x) lm(conservative~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector+abortion, data=x)), 
+#          #tidy that model variable 
+#          tidied=map(model, tidy),
+#          #add party name variable
+#          #this is still in the mutate function above
+#          #It makes the variable vote equal to the repetition rep() of the term 'conservaive', the number of rows nrow() of the dataframe that is fed to it. 
+#          vote=rep('Conservative', nrow(.))  
+#   )->conservative_models_complete10
+# 
+# ces.out %>% 
+#   #filter out elections missing key variables
+#   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1997 & election!=2000 & election!=2004 & election!=2006 & election!=2008 & election!=2011 & election!=2015 & election!=2019) %>%
+#   #Nest by election
+#   nest(variables=-election) %>% 
+#   #create the model variable
+#   mutate(model=map(variables, function(x) lm(liberal~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector+abortion, data=x)), 
+#          #tidy that model variable 
+#          tidied=map(model, tidy),
+#          #add party name variable
+#          vote=rep('Liberal', nrow(.))  
+#   )->liberal_models_complete10
+# 
+# stargazer(ndp_models_complete10$model, 
+#           type="html", 
+#           out=here("Tables", "NDP_Models_abortion_1984_1993_8.html"),
+#           column.labels=c("1984", "1988", "1993"), 
+#           #set the cutoffs for one star to be 0.05
+#           star.cutoffs=c(0.05), 
+#           title="NDP Models 1984-1993 with Abortion",
+#           #print some notes to show when the table is constructed
+#           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+# 
+# stargazer(liberal_models_complete10$model, 
+#           type="html", 
+#           out=here("Tables", "liberal_Models_abortion_1984_1993_8.html"),
+#           column.labels=c("1984", "1988", "1993"),  
+#           #set the cutoffs for one star to be 0.05
+#           star.cutoffs=c(0.05), 
+#           title="Liberal Models 1984-1993 with Abortion",
+#           #print some notes to show when the table is constructed
+#           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+# 
+# stargazer(conservative_models_complete10$model, 
+#           type="html", 
+#           out=here("Tables", "conservative_Models_abortion_1984_1993_8.html"),
+#           column.labels=c("1984", "1988", "1993"), 
+#           #set the cutoffs for one star to be 0.05
+#           star.cutoffs=c(0.05), 
+#           title="Conservative Models 1984-1993 with Abortion",
+#           #print some notes to show when the table is constructed
+#           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+# 
+# #### Blais Plots ####
+# # Set theme
+# theme_set(theme_bw())
+# ndp_models_complete10 %>% 
+#   unnest(tidied) %>% 
+#   filter(term=="abortion") %>% 
+#   ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Abortion on NDP Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+# ggsave(here("Plots", "abortion_ndp_1968_2019_10.png"))
+# 
+# liberal_models_complete10 %>% 
+#   unnest(tidied) %>% 
+#   filter(term=="abortion") %>% 
+#   ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Abortion on Liberal Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+# ggsave(here("Plots", "abortion_liberal_1968_2019_10.png"))
+# 
+# conservative_models_complete8 %>% 
+#   unnest(tidied) %>% 
+#   filter(term=="abortion") %>% 
+#   ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Abortion on Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+# ggsave(here("Plots", "abortion_conservative_1968_2019_10.png"))
+# 
+# #Join all parties and plot sector coefficients
+# ndp_models_complete10 %>% 
+#   #bind liberal models to ndp models
+#   bind_rows(., liberal_models_complete10) %>% 
+#   #add conservative models to liberal models
+#   bind_rows(., conservative_models_complete10) %>%
+#   #unnest the tidied models so the spread out one row for each coefficient
+#   unnest(tidied) %>% 
+#   #only keep the coefficients for sector and abortion
+#   filter(term=="sector"| term=="abortion") %>% 
+#   mutate(term=Recode(term, "'abortion'='Abortion'; 'sector'='Sector'")) %>% 
+#   #plot x=election, y=estimate, differentiate the parties by color, and set alpha (transparency) to vary by the variable term
+#   #I'm setting the union_both category of term to be the reference category, this will make it transparaent. I only figured this out after running this once.
+#   ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "Sector")))+
+#   #make it a point plot
+#   geom_point()+
+#   #add titles
+#   labs(title="OLS Coefficients of Abortion on Party Vote", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+#   #add errorbars, width=0 so that it is just a vertical line
+#   #ymin =estimate -1.96*standard aerror, ymax = estimate+1.96* standard error
+#   geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+#   #Set the y-axis limits to -0.2 and 0.2
+#   ylim(c(-0.2,0.2))+
+#   #modify the color scale specifying the colors of the points to be blue red and orange
+#   scale_color_manual(values=c("blue", "red", "orange"))+
+#   #panel this by vote with one panel per party
+#   facet_grid(rows=vars(vote), switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+# 
+# #save 
+# ggsave(here("Plots", "M10_abortion_all_parties.png"))
+# 
+# #------------------------------------------------------------------------------------------------
+# #### M11 Blais Replication Extension (with Abortion:Sector interaction) ####
+# table(ces$election, ces$abortion)
+# 
+# ces.out %>% 
+#   #filter out elections missing key variables
+#   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1997 & election!=2000 & election!=2004 & election!=2006 & election!=2008 & election!=2011 & election!=2015 & election!=2019) %>%
+#   #Nest by election
+#   nest(variables=-election) %>% 
+#   #create the model variable
+#   mutate(model=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector+abortion+abortion:sector, data=x)),
+#          #tidy that model variable 
+#          tidied=map(model, tidy), 
+#          #add party name variable
+#          vote=rep('NDP', nrow(.)))->ndp_models_complete11
+# 
+# ces.out %>% 
+#   #filter out elections missing key variables
+#   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1997 & election!=2000 & election!=2004 & election!=2006 & election!=2008 & election!=2011 & election!=2015 & election!=2019) %>%
+#   #Nest by election
+#   nest(variables=-election) %>% 
+#   #create the model variable
+#   mutate(model=map(variables, function(x) lm(conservative~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector+abortion+abortion:sector, data=x)), 
+#          #tidy that model variable 
+#          tidied=map(model, tidy),
+#          #add party name variable
+#          #this is still in the mutate function above
+#          #It makes the variable vote equal to the repetition rep() of the term 'conservaive', the number of rows nrow() of the dataframe that is fed to it. 
+#          vote=rep('Conservative', nrow(.))  
+#   )->conservative_models_complete11
+# 
+# ces.out %>% 
+#   #filter out elections missing key variables
+#   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1997 & election!=2000 & election!=2004 & election!=2006 & election!=2008 & election!=2011 & election!=2015 & election!=2019) %>%
+#   #Nest by election
+#   nest(variables=-election) %>% 
+#   #create the model variable
+#   mutate(model=map(variables, function(x) lm(liberal~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector+abortion+abortion:sector, data=x)), 
+#          #tidy that model variable 
+#          tidied=map(model, tidy),
+#          #add party name variable
+#          vote=rep('Liberal', nrow(.))  
+#   )->liberal_models_complete11
+# 
+# stargazer(ndp_models_complete11$model, 
+#           type="html", 
+#           out=here("Tables", "NDP_Models_abortion_int_1968_2019_11.html"),
+#           column.labels=c("1984", "1988", "1993"), 
+#           #set the cutoffs for one star to be 0.05
+#           star.cutoffs=c(0.05), 
+#           title="NDP Models 1984-1993 Abortion:Sector interaction",
+#           #print some notes to show when the table is constructed
+#           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+# 
+# stargazer(liberal_models_complete11$model, 
+#           type="html", 
+#           out=here("Tables", "liberal_Models_abortion_int_1968_2019_11.html"),
+#           column.labels=c("1984", "1988", "1993"),  
+#           #set the cutoffs for one star to be 0.05
+#           star.cutoffs=c(0.05), 
+#           title="Liberal Models 1984-1993 Abortion:Sector interaction",
+#           #print some notes to show when the table is constructed
+#           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+# 
+# stargazer(conservative_models_complete11$model, 
+#           type="html", 
+#           out=here("Tables", "conservative_Models_abortion_int_1968_2019_11.html"),
+#           column.labels=c("1984", "1988", "1993"), 
+#           #set the cutoffs for one star to be 0.05
+#           star.cutoffs=c(0.05), 
+#           title="Conservative Models 1984-1993 Abortion:Sector interaction",
+#           #print some notes to show when the table is constructed
+#           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+# 
+# #### Blais Plots ####
+# # Set theme
+# theme_set(theme_bw())
+# ndp_models_complete11 %>% 
+#   unnest(tidied) %>% 
+#   filter(term=="abortion:sector") %>% 
+#   ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Abortion:Sector on NDP Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+# ggsave(here("Plots", "abortion_sector_ndp_1968_2019_11.png"))
+# 
+# liberal_models_complete11 %>% 
+#   unnest(tidied) %>% 
+#   filter(term=="abortion:sector") %>% 
+#   ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Abortion:Sector on Liberal Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+# ggsave(here("Plots", "abortion_sector_liberal_1968_2019_11.png"))
+# 
+# conservative_models_complete11 %>% 
+#   unnest(tidied) %>% 
+#   filter(term=="abortion:sector") %>% 
+#   ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Abortion:Sector on Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+# ggsave(here("Plots", "abortion_sector_conservative_1968_2019_11.png"))
 
 # #Join all parties and plot sector coefficients
 # ndp_models_complete9 %>% 
