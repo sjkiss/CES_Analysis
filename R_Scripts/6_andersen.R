@@ -92,7 +92,18 @@ stargazer(andersen_model1, type="html", out=here("Tables", "andersen_model1.html
 ###Model 2 - Andersen replication (by Quebec) - just occupation
 
 ces %>% 
-  filter(quebec==1)
+  group_by(election) %>% 
+  filter(quebec==1 & election==1965|
+           election==1968|
+           election==1972|
+           election==1974|
+           election==1979|
+           election==1980|
+           election==1984|
+           election==1988|
+           election==1993|
+           election==1997|
+           election==2004) ->ces.out
   andersen_model2<-multinom(formula = left_right2~ as.factor(occupation2)+as.factor(election), data = ces.out)
 
 summary(andersen_model2)
@@ -103,6 +114,18 @@ stargazer(andersen_model2, type="html", out=here("Tables", "andersen_model2.html
 ###Model 3 - Andersen replication (by Region)
 
 ces %>% 
+  group_by(election) %>% 
+  filter(election==1965|
+           election==1968|
+           election==1972|
+           election==1974|
+           election==1979|
+           election==1980|
+           election==1984|
+           election==1988|
+           election==1993|
+           election==1997|
+           election==2004) ->ces.out
   andersen_model3<-multinom(formula = left_right ~ as.factor(occupation2)+age+male+as.factor(religion)+degree+as.factor(election)+as.factor(region), data = ces.out)
 
 summary(andersen_model3)
@@ -113,7 +136,18 @@ stargazer(andersen_model3, type="html", out=here("Tables", "andersen_model3.html
 ###Model 4 - Andersen replication (by Quebec)
 
 ces %>% 
-  filter(quebec==1)
+  group_by(election) %>% 
+  filter(quebec==1 & election==1965|
+           election==1968|
+           election==1972|
+           election==1974|
+           election==1979|
+           election==1980|
+           election==1984|
+           election==1988|
+           election==1993|
+           election==1997|
+           election==2004) ->ces.out
   andersen_model4<-multinom(formula = left_right2~ as.factor(occupation2)+age+male+as.factor(religion)+degree+as.factor(election), data = ces.out)
 
 summary(andersen_model4)
