@@ -460,6 +460,6 @@ val_labels(ces$vote)<-c(Conservative=2,  Liberal=1, NDP=3)
 ###
 #This command calls the file 2_diagnostics.R
 source("R_scripts/3_recode_diagnostics.R", echo=T)
-source("R_scripts/4_make_models.R", echo=T)
+#source("R_scripts/4_make_models.R", echo=T)
 
 

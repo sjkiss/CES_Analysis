@@ -4,4 +4,5 @@
 .Ruserdata
 /Data/*.sav
 /income_quintiles/*.DS_Store
+/R_Scripts/simon_toy.R
 .DS_Store
