@@ -149,19 +149,19 @@ ndp_models_complete1 %>%
   unnest(tidied) %>% 
   filter(term=="sector") %>% 
   ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on NDP Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
-ggsave(here("Plots", "sector_ndp_1968_2019_1.png"))
+#ggsave(here("Plots", "sector_ndp_1968_2019_1.png"))
 
 liberal_models_complete1 %>% 
   unnest(tidied) %>% 
   filter(term=="sector") %>% 
   ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on Liberal Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
-ggsave(here("Plots", "sector_liberal_1968_2019_1.png"))
+#ggsave(here("Plots", "sector_liberal_1968_2019_1.png"))
 
 conservative_models_complete1 %>% 
   unnest(tidied) %>% 
   filter(term=="sector") %>% 
   ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
-ggsave(here("Plots", "sector_conservative_1968_2019_1.png"))
+#ggsave(here("Plots", "sector_conservative_1968_2019_1.png"))
 
 #Join all parties and plot sector coefficients
 ndp_models_complete1 %>% 
@@ -653,19 +653,19 @@ ndp_models_complete5 %>%
   unnest(tidied) %>% 
   filter(term=="union_both:sector") %>% 
   ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of union:sector interaction on NDP Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
-ggsave(here("Plots", "union_sector_ndp_1968_2019_5.png"))
+#ggsave(here("Plots", "union_sector_ndp_1968_2019_5.png"))
 
 liberal_models_complete5 %>% 
   unnest(tidied) %>% 
   filter(term=="union_both:sector") %>% 
   ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of union:sector interaction on Liberal Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
-ggsave(here("Plots", "union_sector_liberal_1968_2019_5.png"))
+#ggsave(here("Plots", "union_sector_liberal_1968_2019_5.png"))
 
 conservative_models_complete5 %>% 
   unnest(tidied) %>% 
   filter(term=="union_both:sector") %>% 
   ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of union:sector interaction on Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
-ggsave(here("Plots", "union_sector_conservative_1968_2019_5.png"))
+#ggsave(here("Plots", "union_sector_conservative_1968_2019_5.png"))
 
 #Join all parties and plot sector coefficients
 ndp_models_complete5 %>% 
@@ -998,7 +998,19 @@ ndp_models_complete7 %>%
   scale_color_manual(values=c("blue", "red", "orange"))+
   #panel this by vote with one panel per party
   facet_grid(rows=vars(vote), switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
-
+# ndp_models_complete1
+# ndp_models_complete7
+# ndp_models_complete6%>%
+#   unnest(tidied)%>%
+#   filter(term=="degree")->no_int
+# 
+# ndp_models_complete7%>%
+#   unnest(tidied)%>%
+#   filter(term=="degree:sector")->int
+# bind_rows(no_int, int)%>%
+#   ggplot(., aes(x=election, y=estimate, col=term))+geom_point()+
+# int
+# no_int
 #save 
 ggsave(here("Plots", "M7_degree_sector_all_parties.png"))
 
@@ -1130,7 +1142,7 @@ ggsave(here("Plots", "M8_income_sector_all_parties.png"))
 
 #------------------------------------------------------------------------------------------------
 #### M9 Blais Replication Extension (including 2019)(Quebec only) ####
-table(ces.$election, ces$quebec)
+table(ces$election, ces$quebec)
 
 ces %>% 
   #filter out elections missing key variables and keep only Quebec
