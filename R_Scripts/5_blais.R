@@ -2081,7 +2081,7 @@ ggsave(here("Plots", "NDP_Voters_Working_Class_Percent.png"))
 
 # Percent of NDP Voters Union Households
 ces %>% 
-  group_by(election, vote, union) %>% 
+  group_by(election, vote, union_both) %>% 
   summarize(n=n()) %>% 
   mutate(pct=n/sum(n)) %>%
   filter(union_both==1 & vote==3) %>% 
