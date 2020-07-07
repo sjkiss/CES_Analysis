@@ -403,7 +403,11 @@ degree_holder %>%
 
 #Here is the plotting with vertical errorbars
 degree_holder %>% 
-  ggplot(., aes(x=Election, y=predicted))+geom_point()+geom_errorbar(width=0, aes(ymin=conf.low, ymax=conf.high)) 
+  ggplot(., aes(x=Election, y=predicted))+geom_point()+geom_errorbar(width=0, aes(ymin=conf.low, ymax=conf.high))+
+  labs(title="Predicted Probability of voting NDP for degree holders") 
+
+#save
+ggsave(here("Plots", "M6_degree_NDP_vote.png"))
 
 #So that's it. 
 
@@ -493,7 +497,8 @@ degree_holder %>%
 
 #Here is the plotting with vertical errorbars
 degree_holder %>% 
-  ggplot(., aes(x=Election, y=predicted))+geom_point()+geom_errorbar(width=0, aes(ymin=conf.low, ymax=conf.high)) 
+  ggplot(., aes(x=Election, y=predicted))+geom_point()+geom_errorbar(width=0, aes(ymin=conf.low, ymax=conf.high))+
+  labs(title="Predicted Probability of voting Liberal for degree holders") 
 
 #save
 ggsave(here("Plots", "M6_degree_Liberal_vote.png"))
@@ -553,7 +558,7 @@ out %>%
 ggsave(here("Plots", "M6_difference_degree_Liberal_vote.png"))
 
 #------------------------------------------------------------------------------------------------
-<<<<<<< HEAD
+
 #### M6 Blais Replication Extension (including 2019) - for Conservative Degree ####
 
 #start with the table of models
@@ -571,10 +576,10 @@ conservative_models_complete6$model %>%
 nrow(out)# There are 30 rows, 15 elections plus two predicted values, (non public sector and public sector) for each election. 
 #If you want, you can specify particular values
 #So for example, we could only select the predicted probabilities for public sector workers. 
-ndp_models_complete6$model %>% 
+conservative_models_complete6$model %>% 
   map_dfr(., ggpredict, terms='degree[1]')->degree_holder
 #Or we could select the predicted probabilities for private sector
-ndp_models_complete6$model %>% 
+conservative_models_complete6$model %>% 
   map_dfr(., ggpredict, terms='degree[0]')->no_degree
 #Note how the rows change
 nrow(degree_holder)
@@ -587,7 +592,11 @@ degree_holder %>%
 
 #Here is the plotting with vertical errorbars
 degree_holder %>% 
-  ggplot(., aes(x=Election, y=predicted))+geom_point()+geom_errorbar(width=0, aes(ymin=conf.low, ymax=conf.high)) 
+  ggplot(., aes(x=Election, y=predicted))+geom_point()+geom_errorbar(width=0, aes(ymin=conf.low, ymax=conf.high))+
+  labs(title="Predicted Probability of voting Conservative for degree holders") 
+
+#save
+ggsave(here("Plots", "M6_degree_Conservative_vote.png")) 
 
 #So that's it. 
 
