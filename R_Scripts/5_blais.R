@@ -302,7 +302,7 @@ ndp_models_complete2 %>%
   #  mutate(term=Recode(term, "'female:sector'='Female_Sector'; 'female'='Female'")) %>% 
   #plot x=election, y=estimate, differentiate the parties by color, and set alpha (transparency) to vary by the variable term
   #I'm setting the union_both category of term to be the reference category, this will make it transparaent. I only figured this out after running this once.
-  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "Female")))+
+  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "female")))+
   #make it a point plot
   geom_point()+
   #add titles
@@ -538,7 +538,7 @@ ggsave(here("Plots", "workingclass_sector_liberal_1968_2019_4.png"))
 conservative_models_complete4 %>% 
   unnest(tidied) %>% 
   filter(term=="working_class:sector") %>% 
-  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Working Class:Sector interaction on Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Working Class:Sector interaction on Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-1,1))
 ggsave(here("Plots", "workingclass_sector_conservative_1968_2019_4.png"))
 
 #Join all parties and plot sector coefficients
@@ -554,7 +554,7 @@ ndp_models_complete4 %>%
   #  mutate(term=Recode(term, "'working_class:sector'='working class:Sector'; 'working_class'='working class'")) %>% 
   #plot x=election, y=estimate, differentiate the parties by color, and set alpha (transparency) to vary by the variable term
   #I'm setting the union_both category of term to be the reference category, this will make it transparaent. I only figured this out after running this once.
-  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "working class")))+
+  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "working_class")))+
   #make it a point plot
   geom_point()+
   #add titles

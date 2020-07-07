@@ -553,6 +553,7 @@ out %>%
 ggsave(here("Plots", "M6_difference_degree_Liberal_vote.png"))
 
 #------------------------------------------------------------------------------------------------
+<<<<<<< HEAD
 #### M6 Blais Replication Extension (including 2019) - for Conservative Degree ####
 
 #start with the table of models
@@ -684,6 +685,8 @@ female %>%
 out
 nrow(out)
 #We still need to add in the elections, but this is a little trickier, because we need to have 1968, 1968, 1972, 1972, etc. 
+=======
+>>>>>>> a26f1eb1beb118ade43c813c12b5d75a4db518de
 
 out %>% 
   #we just use the rep() command with the each=2 argument
@@ -1067,12 +1070,71 @@ degree_sector$model %>%
   mutate(election=rep(degree_sector$election, each=4)) %>% 
   ggplot(., aes(x=election, y=predicted, col=as.factor(x)))+facet_grid(~group)+geom_point()+labs(title="Marginal Effect of Degree and Sector on vote for Liberals, 1968, 2019")
 
+#### M7 Blais Replication Extension (including 2019)(Degree:Sector interaction) ####
 
+<<<<<<< HEAD
+=======
+ces.out %>% 
+  #filter out 1965 and 1972 because we don't have sector variables
+  filter(election!=1965& election!=1972) %>% 
+  #nest the data frames by election year
+  nest(-election) %>% 
+  #fit one model per election
+  #mutate adds the variable interaction model as a column
+  #it contains the results of mapping onto the data variable the function lm(ndp~sector+degree+sector+sector:degree)
+  #note our interaction term here is sector:degree
+  mutate(model=map(data, function(x) lm(ndp~sector+degree+sector:degree, data=x))) %>% 
+  mutate(tidied=map(model, tidy)) ->degree_sector
+degree_sector
+#Check what we have
+head(degree_sector)
+#Install margins package - https://www.rdocumentation.org/packages/margins/versions/0.3.23
+#remotes::install_github('leeper/margins')
+library("margins")
+#I dug around and using margins is an issue with this style of using list-columns but there is a solution
+# https://github.com/leeper/margins/issues/94
+#map2 passes two *different* arguments to a function and applies it to each element specified 
+#So, we mutate the degree_sector adding average marginal effects (we call them marginals)
+#And we pass the model variable (interaction_model) to margins() and we pass the data variable (data) to margins()
+degree_sector %>% 
+  mutate(marginals = map2(model, data, ~ summary(margins(.x, data = .y))))->degree_sector
+#
+degree_sector
+
+####Finding Significant Interactions ####
+#We can unnest the tidied column and find interaction terms with p < 0.05
+degree_sector %>% 
+  unnest(tidied) %>%  
+  filter(term=="sector:degree"& p.value< 0.05)## There are four elections where there is a significant interaction between sector and degree. Two of them happen in the most recent years.
+
+#We can plot the marginal ames
+#But 
+# Take the marginals variable that contains all the marginals
+#save in out
+degree_sector$marginals ->out
+#View to see what has happened
+out  
+#bind them together
+bind_rows(out)->out
+#view to see what has happened
+out
+#add in election variable
+out %>%
+  #we take it from degree_sector (we made it above)
+  #repeate degree_Sector$election, repeating each item twice (each =2)
+  mutate(election=rep(degree_sector$election, each=2))->out
+out
+#now plot the degree and sector 
+out %>% 
+ggplot(., aes(x=election, y=AME))+facet_grid(~factor)+geom_point()+geom_errorbar(width=0, aes(ymin=lower, ymax=upper))+labs(title="Average Marginal Effects of Sector and Degree on Voting for NDP 1968-2019")
+
+>>>>>>> a26f1eb1beb118ade43c813c12b5d75a4db518de
 #Normally, I would do something like this in ggeffects package, but I don't quite know technically what ggeffects returns. 
 #start with wherever th emodels are stored
 degree_sector$model %>% 
   #use map to apply a function to each item in degree_sector$model
   #the function is ggeffect and we want to get basically all effects, so we specify sector[0, 1] (private and public ) and non-degree and degree
+<<<<<<< HEAD
   map(., ggpredict, terms=c('sector[0,1]', 'degree[0,1]')) %>% 
   bind_rows() %>% 
   #add election, we need to specify each=4 because ther eare four combinations of effects
@@ -1080,6 +1142,13 @@ degree_sector$model %>%
   rename(Sector=x)%>%
   ggplot(., aes(x=as.numeric(election), y=predicted, col=as.factor(Sector)))+
   facet_grid(~group)+geom_point()+labs(title="Predicted Probabilities of Degree and Sector on vote for Liberals, 1968, 2019")+geom_smooth(method="lm", se=F)
+=======
+  map(., ggeffect, terms=c('sector[0,1]', 'degree[0,1]')) %>% 
+  bind_rows() %>% 
+  #add election, we need to specify each=4 because ther eare four combinations of effects
+  mutate(election=rep(degree_sector$election, each=4)) %>% 
+ggplot(., aes(x=election, y=predicted, col=as.factor(x)))+facet_grid(~group)+geom_point()+labs(title="Marginal Effect of Degree and Sector on vote for NDP, 1968, 2019")
+>>>>>>> a26f1eb1beb118ade43c813c12b5d75a4db518de
 
 #save
 ggsave(here("Plots", "M7_degree_sector_probabilities_Liberal_vote.png"))
