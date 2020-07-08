@@ -62,10 +62,10 @@ select(non_charter_language, working_class, no_religion, sector, catholic, union
 summary()
 
 ###Count missing values
-ces %>% 
-  group_by(election) %>% 
-  summarise_all(function(x) sum(is.na(x))) %>% 
-  View()
+# ces %>% 
+#   group_by(election) %>% 
+#   summarise_all(function(x) sum(is.na(x))) %>% 
+#   View()
 
 #------------------------------------------------------------------------------------------------
 
