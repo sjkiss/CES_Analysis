@@ -457,11 +457,17 @@ library(car)
 ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
 ces$liberal<-Recode(ces$vote, "1=1; 2:5=0; NA=NA")
 ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
+ces$green<-Recode(ces$vote, "0:4=0; 5=1; NA=NA")
+ces$bloc<-Recode(ces$vote, "0:3=0; 4=1; 5=0; NA=NA")
 
 ### Value labels often go missing in the creation of the ces data frame
 ### assign value labels
 val_labels(ces$sector)<-c(Private=0, Public=1)
 val_labels(ces$degree)<-c(No_Degree=0, Degree=1)
+val_labels(ces$female)<-c(Male=0, Female=1)
+val_labels(ces$quebec)<-c(ROC=0, Quebec=1)
+val_labels(ces$region2)<-c(Quebec=0, Atlantic=1, Ontario=2, West=3)
+val_labels(ces$income)<-c(Low=1, Second=2, Middle=3, Fourth=4, High=5)
 
 val_labels(ces$vote)<-c(Conservative=2,  Liberal=1, NDP=3)
 table(ces79$sector)

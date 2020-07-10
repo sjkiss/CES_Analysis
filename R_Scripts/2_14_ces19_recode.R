@@ -124,9 +124,13 @@ val_labels(ces19phone$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4
 val_labels(ces19phone$vote)
 table(ces19phone$vote)
 
-#recode Occupation (p52) ***To be recoded later***
+#recode Occupation (p52 to NOC)
 look_for(ces19phone, "occupation")
-
+ces19phone$occupation<-Recode(ces19phone$NOC, "0:1000=2; 1100:1199=1; 2100:3300=1; 4100:6399=1; 1200:1400=3; 6400:6800=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
+val_labels(ces19phone$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+#checks
+val_labels(ces19phone$occupation)
+table(ces19phone$occupation)
 
 #recode Income (q70r)
 look_for(ces19phone, "income")
