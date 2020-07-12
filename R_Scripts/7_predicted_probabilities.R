@@ -614,7 +614,8 @@ out %>%
 ggsave(here("Plots", "M1_difference_females_Conservative_vote.png"))
 
 
-
+#-----------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------------------
 #### M7 Blais Replication Extension (including 2019)(Degree:Sector interaction) for NDP ####
 
@@ -639,11 +640,12 @@ ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   #point plot
   geom_point()+
   #Set a title
-  labs(title="Difference in PP of voting NDP\nfor Public Sector Workers\nDegree and Non-Degree Holders, 1968, 2019")+
+  labs(title="Difference in PP of voting NDP\nfor Public Sector Workers\nDegree and Non-Degree Holders, 1968-2019")+
   geom_smooth(method="loess", se=F)
 
 #save
-ggsave(here("Plots", "M7_degree_sector_probabilities_NDP_vote.png", width = 10, height = 5, units = "in"))
+ggsave(here("Plots", "M7_degree_sector_probabilities_NDP_vote.png"))
+#ggsave("M7_degree_sector_probabilities_NDP_vote.png", width=10, height=5)
 
 #-----------------------------------------------------------------------------------------------
 #### M7 Blais Replication Extension (including 2019)(Degree:Sector interaction) for Liberals ####
@@ -661,7 +663,7 @@ liberal_models_complete7$model %>%
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
-  labs(title="Difference in PP of voting Liberal\nfor Public Sector Workers\nDegree and Non-Degree Holders, 1968, 2019")+
+  labs(title="Difference in PP of voting Liberal\nfor Public Sector Workers\nDegree and Non-Degree Holders, 1968-2019")+
   geom_smooth(method="loess", se=F)
 
 #save
@@ -684,7 +686,7 @@ conservative_models_complete7$model %>%
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
-  labs(title="Difference in PP of voting Conservative\nfor Public Sector Workers\nDegree and Non-Degree Holders, 1968, 2019")+
+  labs(title="Difference in PP of voting Conservative\nfor Public Sector Workers\nDegree and Non-Degree Holders, 1968-2019")+
   geom_smooth(method="loess", se=F)
 
 #save
@@ -708,7 +710,7 @@ ndp_models_complete2$model %>%
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
-  labs(title="Difference in PP of voting NDP\nfor Public Sector Workers\nMales vs Females, 1968, 2019")+
+  labs(title="Difference in PP of voting NDP\nfor Public Sector Workers\nMales vs Females, 1968-2019")+
   geom_smooth(method="loess", se=F)
 
 #save
@@ -730,7 +732,7 @@ liberal_models_complete2$model %>%
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
-  labs(title="Difference in PP of voting Liberal\nfor Public Sector Workers\nMales vs Females, 1968, 2019")+
+  labs(title="Difference in PP of voting Liberal\nfor Public Sector Workers\nMales vs Females, 1968-2019")+
   geom_smooth(method="loess", se=F)
 
 #save
@@ -752,7 +754,7 @@ conservative_models_complete2$model %>%
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
-  labs(title="Difference in PP of voting Conservative\nfor Public Sector Workers\nMales vs Females, 1968, 2019")+
+  labs(title="Difference in PP of voting Conservative\nfor Public Sector Workers\nMales vs Females, 1968-2019")+
   geom_smooth(method="loess", se=F)
 
 #save
@@ -776,7 +778,7 @@ ndp_models_complete15$model %>%
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
-  labs(title="Difference in PP of voting NDP\nfor Public Sector Workers\nQuebecois vs ROC, 1968, 2019")+
+  labs(title="Difference in PP of voting NDP\nfor Public Sector Workers\nQuebecois vs ROC, 1968-2019")+
   geom_smooth(method="loess", se=F)
 
 #save
@@ -798,7 +800,7 @@ liberal_models_complete15$model %>%
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
-  labs(title="Difference in PP of voting Liberal\nfor Public Sector Workers\nQuebecois vs ROC, 1968, 2019")+
+  labs(title="Difference in PP of voting Liberal\nfor Public Sector Workers\nQuebecois vs ROC, 1968-2019")+
   geom_smooth(method="loess", se=F)
 
 #save
@@ -820,7 +822,7 @@ conservative_models_complete15$model %>%
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
-  labs(title="Difference in PP of voting Conservative\nfor Public Sector Workers\nQuebecois vs ROC, 1968, 2019")+
+  labs(title="Difference in PP of voting Conservative\nfor Public Sector Workers\nQuebecois vs ROC, 1968-2019")+
   geom_smooth(method="loess", se=F)
 
 #save
