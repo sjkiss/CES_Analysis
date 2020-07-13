@@ -632,7 +632,7 @@ ndp_models_complete7$model %>%
   bind_rows() %>% 
   #add election, we need to specify each=4 because there, are four combinations of effects
   mutate(election=rep(ndp_models_complete7$election, each=4),
-         Sector=Recode(x, "0='Private'; 1='Public'"))  %>% 
+         Sector=as_factor(x)) %>% 
   #Plot x=election, y=predicted probabilities, change colour based on x which is sector
 ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   #create two panels by degree and non-degree holders
@@ -659,7 +659,7 @@ liberal_models_complete7$model %>%
   map(., ggpredict, terms=c('sector', 'degree[0,1]')) %>% 
   bind_rows() %>% 
   mutate(election=rep(liberal_models_complete7$election, each=4),
-         Sector=Recode(x, "0='Private'; 1='Public'"))  %>% 
+           Sector=as_factor(x)) %>% 
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
@@ -682,7 +682,7 @@ conservative_models_complete7$model %>%
   map(., ggpredict, terms=c('sector', 'degree[0,1]')) %>% 
   bind_rows() %>% 
   mutate(election=rep(conservative_models_complete7$election, each=4),
-         Sector=Recode(x, "0='Private'; 1='Public'"))  %>% 
+            Sector=as_factor(x)) %>% 
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
@@ -706,7 +706,7 @@ ndp_models_complete2$model %>%
   map(., ggpredict, terms=c('sector', 'female[0,1]')) %>% 
   bind_rows() %>% 
   mutate(election=rep(ndp_models_complete2$election, each=4),
-         Sector=Recode(x, "0='Private'; 1='Public'"))  %>% 
+            Sector=as_factor(x)) %>% 
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
@@ -728,7 +728,7 @@ liberal_models_complete2$model %>%
   map(., ggpredict, terms=c('sector', 'female[0,1]')) %>% 
   bind_rows() %>% 
   mutate(election=rep(liberal_models_complete2$election, each=4),
-         Sector=Recode(x, "0='Private'; 1='Public'"))  %>% 
+           Sector=as_factor(x)) %>% 
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
@@ -750,7 +750,7 @@ conservative_models_complete2$model %>%
   map(., ggpredict, terms=c('sector', 'female[0,1]')) %>% 
   bind_rows() %>% 
   mutate(election=rep(conservative_models_complete2$election, each=4),
-         Sector=Recode(x, "0='Private'; 1='Public'"))  %>% 
+           Sector=as_factor(x)) %>% 
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
@@ -774,7 +774,7 @@ ndp_models_complete15$model %>%
   map(., ggpredict, terms=c('sector', 'quebec[0,1]')) %>% 
   bind_rows() %>% 
   mutate(election=rep(ndp_models_complete15$election, each=4),
-         Sector=Recode(x, "0='Private'; 1='Public'"))  %>% 
+           Sector=as_factor(x)) %>% 
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
@@ -796,7 +796,7 @@ liberal_models_complete15$model %>%
   map(., ggpredict, terms=c('sector', 'quebec[0,1]')) %>% 
   bind_rows() %>% 
   mutate(election=rep(liberal_models_complete15$election, each=4),
-         Sector=Recode(x, "0='Private'; 1='Public'"))  %>% 
+           Sector=as_factor(x)) %>% 
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+
@@ -818,7 +818,7 @@ conservative_models_complete15$model %>%
   map(., ggpredict, terms=c('sector', 'quebec[0,1]')) %>% 
   bind_rows() %>% 
   mutate(election=rep(conservative_models_complete15$election, each=4),
-         Sector=Recode(x, "0='Private'; 1='Public'"))  %>% 
+        Sector=as_factor(x)) %>% 
   ggplot(., aes(x=as.numeric(election), y=predicted, col=Sector))+
   facet_grid(~group)+
   geom_point()+

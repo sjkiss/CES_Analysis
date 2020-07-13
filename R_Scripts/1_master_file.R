@@ -386,9 +386,13 @@ names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988',
 names(ces.list)
 table(ces.list[["1984"]]$union_both)
 #Start with the list
+library(haven)
+#Start with the data frame
 ces.list %>% 
-  #Bind the rows, making a new variable called survey that will be populated with the names of the list items
-  bind_rows(., .id="election") ->ces
+  #WE have to zap the value labels (get rid of them to enable row b inding)
+  map(., zap_labels) %>% 
+  #bind rows creating id variable "election"
+  bind_rows(., .id="election")->ces
 #Do a summary
 summary(ces)
 #Check the names
