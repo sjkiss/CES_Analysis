@@ -168,8 +168,8 @@ ces0411 %>%
 nrow(ces06)
 #### CES08
 # Do not use Panel respondents
-ces0411 %>% 
-  filter(str_detect(ces0411$survey, "PES08")&str_detect(ces0411$survey, "Panel", negate=T))->ces08
+# ces0411 %>% 
+#   filter(str_detect(ces0411$survey, "PES08")&str_detect(ces0411$survey, "Panel", negate=T))->ces08
 ## Use Panel Respondents
 ### CES08
 ces0411 %>% 
@@ -179,8 +179,8 @@ ces0411 %>%
 # ces0411 %>% 
 #   filter(survey=="New RDD_2011 CPS11 PES11" | survey=="New RDD_2011 CPS11" | survey=="New RDD_2011 CPS11 PES11 MBS11" | survey=="New RDD_2011 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 CPS06 CPS11 PES11" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 MBS04 CPS06 CPS11 PES11" | survey=="CPS04 PES04 MBS04 CPS06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 CPS06 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 CPS06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 MBS04 CPS06 CPS11 PES11 MBS11 WBS11")->ces11
 # Do not use Panel respondents
-ces0411 %>% 
-  filter(str_detect(ces0411$survey, "PES11")&str_detect(ces0411$survey, "Panel", negate=T))->ces11
+# ces0411 %>% 
+#   filter(str_detect(ces0411$survey, "PES11")&str_detect(ces0411$survey, "Panel", negate=T))->ces11
 
 #Use Panel respondents
 ces0411 %>% 
@@ -387,10 +387,15 @@ names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988',
 names(ces.list)
 table(ces.list[["1984"]]$union_both)
 ces.list[["1984"]]
-#Start with the list
+
+library(haven)
+#Start with the data frame
 ces.list %>% 
-  #Bind the rows, making a new variable called survey that will be populated with the names of the list items
-  bind_rows(., .id="election") ->ces
+  #WE have to zap the value labels (get rid of them to enable row b inding)
+  map(., zap_labels) %>% 
+  #bind rows creating id variable "election"
+  bind_rows(., .id="election")->ces
+
 #Do a summary
 summary(ces)
 #Check the names
