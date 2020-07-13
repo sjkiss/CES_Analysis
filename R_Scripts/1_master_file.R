@@ -11,6 +11,7 @@ table(ces68$var323, ces68$var379)
 table(ces68$var379, ces68$union_both)
 table(ces74$size)
 table(ces68$var379)
+ces19phone$immigration
 look_for(ces68, "marital")
 ##### SPLITTING THE 1979-1980 FILE
 table(ces7980$male80)
