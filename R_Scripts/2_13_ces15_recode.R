@@ -22,15 +22,21 @@ table(ces15phone$union)
 ces15phone %>% 
   mutate(union_both=case_when(
     PES15_93==1 | PES15_94==1 ~ 1,
-    PES15_93==5 | PES15_94==5 ~ 0,
+    PES15_93==5 & PES15_94==5 ~ 0,
     PES15_93==8 & PES15_94==8 ~ NA_real_,
     PES15_93==9 & PES15_94==9 ~ NA_real_,
+    TRUE ~ 0,
   ))->ces15phone
 
 val_labels(ces15phone$union_both)<-c(None=0, Union=1)
 #checks
 val_labels(ces15phone$union_both)
+table(ces15phone$union_both, useNA="ifany")
+table(ces15phone$PES15_93, ces15phone$union_both, useNA="ifany")
+table(ces15phone$PES15_93, ces15phone$PES15_94, useNA="ifany")
 table(ces15phone$union_both)
+table(ces15phone$PES15_93, ces15phone$union_both, useNA="ifany")
+table(ces15phone$PES15_94, ces15phone$union_both, useNA="ifany")
 
 #recode Education (CPS15_79)
 look_for(ces15phone, "education")
@@ -82,7 +88,7 @@ table(ces15phone$language)
 #recode Non-charter Language (CPS15_90)
 look_for(ces15phone, "language")
 ces15phone$non_charter_language<-Recode(ces15phone$CPS15_90, "1:5=0; 8:64=1; 65=0; 95:97=1; else=NA")
-val_labels(ces15phone$non_charter_language15)<-c(Charter=0, Non_Charter=1)
+val_labels(ces15phone$non_charter_language)<-c(Charter=0, Non_Charter=1)
 #checks
 val_labels(ces15phone$non_charter_language)
 table(ces15phone$non_charter_language)

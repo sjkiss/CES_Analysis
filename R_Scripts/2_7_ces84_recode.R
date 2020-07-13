@@ -104,17 +104,20 @@ look_for(ces84, "employment")
 
 ces84 %>% 
   mutate(sector=case_when(
+    #what does your company do (government)
     VAR530==13 ~1,
+    # VAR530<13~0,
+    #     VAR524 >1 ~ 0,
+    #assume these are teachers and nurses
       VAR526> 2710 & VAR526 < 2800 ~ 1,
     VAR526> 3129 & VAR526 < 3136 ~ 1,
-    VAR524 >1 ~ 0,
-    VAR530==99 ~NA_real_ ,
+ #   VAR530==99 ~NA_real_ ,
+ #all else gets as per Blais' footnote (reading between the lines)
     TRUE ~ 0
   ))->ces84
-ces84$VAR524
-ces84$VAR530
-table(ces84$VAR524, ces84$sector, useNA='ifany')
-table(ces84$VAR524, ces84$VAR530, useNA="ifany")
+
+table(as_factor(ces84$VAR524), ces84$sector, useNA='ifany')
+table(as_factor(ces84$VAR524), as_factor(ces84$VAR530), useNA="ifany")
 val_labels(ces84$sector)<-c(Private=0, Public=1)
 ces84$sector
 #checks

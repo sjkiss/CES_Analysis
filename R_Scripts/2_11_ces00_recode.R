@@ -102,7 +102,8 @@ ces00 %>%
     cpsm7==8 ~NA_real_ ,
   ))->ces00
 
-ces00$sector<-Recode(ces00$cpsm7, "3:7=1; 0:1=0; else=NA")
+#ces00$sector2<-Recode(ces00$cpsm7, "3:7=1; 0:1=0; else=NA")
+
 val_labels(ces00$sector)<-c(Private=0, Public=1)
 #checks
 val_labels(ces00$sector)
@@ -164,3 +165,7 @@ val_labels(ces00$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, 
 #checks
 val_labels(ces00$income)
 table(ces00$income)
+look_for(ces00, "noc")
+look_for(ces00, "employment")
+look_for(ces00, "career")
+ces00$bycat_15

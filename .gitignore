@@ -5,3 +5,4 @@
 /Data/*.sav
 /income_quintiles/*.DS_Store
 .DS_Store
+R_Scripts/simon_toy.R
