@@ -87,7 +87,6 @@ library(stargazer)
 
 stargazer(andersen1qc, type="html", out=here("Tables", "andersen1qc.html"), title="Multinomial Logistic Regression of Left Vote, QC")
 stargazer(andersen1roc, type="html", out=here("Tables", "andersen1roc.html"), title="Multinomial Logistic Regression of NDP Vote, ROC")
-table(ces$vote2, ces$election)
 
 #### Produce Figure 7.1 ####
 #This is how Andersen does it; seems unwieldy 
@@ -165,7 +164,7 @@ roc_models_2019 %>%
   filter(response.level!="Green") %>% 
   #PLot as line plot 
   ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In ROC")
-
+ggsave(here("Plots", "class_voting_roc_2019.png"), width=8, height=3)
 #Now QC 2019
 ces %>% 
   filter(election!=2000 &quebec==1) %>% 
@@ -184,6 +183,7 @@ qc_models_2019 %>%
   filter(response.level!="Green") %>% 
   #PLot as line plot 
   ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In QCC")
+ggsave(here("Plots", "class_voting_qc_2019.png"), width=8, height=3)
 
 #### Replicate Table 7.3 Exactly ####
 

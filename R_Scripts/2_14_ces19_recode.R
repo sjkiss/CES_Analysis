@@ -126,7 +126,16 @@ table(ces19phone$vote)
 
 #recode Occupation (p52) ***To be recoded later***
 look_for(ces19phone, "occupation")
-
+ces19phone %>% 
+  filter(as.numeric(NOC)<1100)
+ces19phone$occupation<-Recode(as.numeric(ces19phone$NOC), "0:1099=2; 1100:1199=1; 2100:3300=1; 
+                              4100:6399=1; 1200:1400=3; 
+                              6400:6800=3; 3400:3500=3; 7200:7399=4; 
+                              7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
+val_labels(ces19phone$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+#checks
+val_labels(ces19phone$occupation)
+table(ces19phone$occupation)
 
 #recode Income (q70r)
 look_for(ces19phone, "income")
@@ -135,3 +144,41 @@ val_labels(ces19phone$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middl
 #checks
 val_labels(ces19phone$income)
 table(ces19phone$income)
+
+#recode Immigration sentiment (p22_a, p22_b, p22_c) into an index 0-1
+#1 = pro-immigration sentiment 0 = anti-immigration sentiment
+look_for(ces19phone, "immigr")
+ces19phone$immigration_economy<-Recode(ces19phone$p22_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA")
+val_labels(ces19phone$immigration_economy)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
+#checks
+val_labels(ces19phone$immigration_economy)
+table(ces19phone$immigration_economy)
+
+ces19phone$immigration_culture<-Recode(ces19phone$p22_b, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+val_labels(ces19phone$immigration_culture)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
+#checks
+val_labels(ces19phone$immigration_culture)
+table(ces19phone$immigration_culture)
+
+ces19phone$immigration_crime<-Recode(ces19phone$p22_c, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+val_labels(ces19phone$immigration_crime)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
+#checks
+val_labels(ces19phone$immigration_crime)
+table(ces19phone$immigration_crime)
+
+#Combine the 3 immigration variables and divide by 3
+ces19phone$immigration2<-(ces19phone$immigration_economy + ces19phone$immigration_culture + ces19phone$immigration_crime)
+table(ces19phone$immigration2)
+ces19phone$immigration<-(ces19phone$immigration2 /3)
+table(ces19phone$immigration)
+
+#Calculate Cronbach's alpha
+library(psych)
+
+ces19phone %>% 
+  select(immigration_economy:immigration_crime) %>% 
+  alpha(.)
+
+ces19phone %>% 
+  select(p22_a:p22_c) %>% 
+  alpha(.)

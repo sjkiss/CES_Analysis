@@ -469,8 +469,14 @@ ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
 val_labels(ces$sector)<-c(Private=0, Public=1)
 val_labels(ces$vote)<-c(Conservative=2,  Liberal=1, NDP=3, Bloc=4, Green=5)
 
-####
-
+#### Check of occupation
+ces %>% 
+  filter(election>2008) %>% 
+  filter(is.na(occupation)==F) %>% 
+  ggplot(., aes(x=election, group=as.factor(occupation), fill=as.factor(occupation)))+geom_bar(position="dodge", stat="count")
+ces19phone %>% 
+  filter(as.numeric(NOC)<1100)
+table(ces19phone$occupation)
 ###
 #This command calls the file 2_diagnostics.R
 #source("R_scripts/3_recode_diagnostics.R", echo=T)
