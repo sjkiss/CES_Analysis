@@ -84,9 +84,19 @@ table(ces$vote2)
     andersen1roc<-multinom(vote2 ~ occupation2+as.factor(election), data = subset(ces.out, quebec!=1))
 
 library(stargazer)
+#The command add.lines adds output into the stargazer table
+    #The number of observations is stored in the number of fitted values in the model
+nrow(andersen1qc$fitted.values)
+#nobs vector
+nobs_andersen1qc<-c("N", rep(nrow(andersen1qc$fitted.values), 2))
+nobs_andersen1roc<-c("N", rep(nrow(andersen1roc$fitted.values), 2))
 
-stargazer(andersen1qc, type="html", out=here("Tables", "andersen1qc.html"), title="Multinomial Logistic Regression of Left Vote, QC")
-stargazer(andersen1roc, type="html", out=here("Tables", "andersen1roc.html"), title="Multinomial Logistic Regression of NDP Vote, ROC")
+#Check
+nobs_andersen1qc
+#add in 
+
+stargazer(andersen1qc, type="html", out=here("Tables", "andersen1qc.html"), title="Multinomial Logistic Regression of Left Vote, QC", add.lines=list(nobs_andersen1qc))
+stargazer(andersen1roc, type="html", out=here("Tables", "andersen1roc.html"), title="Multinomial Logistic Regression of NDP Vote, ROC", add.lines=list(nobs_andersen1roc))
 
 #### Produce Figure 7.1 ####
 #This is how Andersen does it; seems unwieldy 
@@ -105,7 +115,7 @@ ces %>%
 
 #First Quebec
 #For some reason ggpredict fails to produce standard errors, which I think we would like to produce margins of errors
-
+library(ggeffects)
 ces %>% 
   filter(election!=2000& election<2006 &quebec==1) %>% 
   nest(-election) %>% 
@@ -163,7 +173,7 @@ roc_models_2019 %>%
   #filter in only probability of voting for left
   filter(response.level!="Green") %>% 
   #PLot as line plot 
-  ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In ROC")
+  ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In ROC")+theme(axis.text.x=element_text(angle=90))
 ggsave(here("Plots", "class_voting_roc_2019.png"), width=8, height=3)
 #Now QC 2019
 ces %>% 
@@ -182,7 +192,7 @@ qc_models_2019 %>%
   #filter in only probability of voting for left
   filter(response.level!="Green") %>% 
   #PLot as line plot 
-  ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In QCC")
+  ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In QCC")+theme(axis.text.x=element_text(angle=90))
 ggsave(here("Plots", "class_voting_qc_2019.png"), width=8, height=3)
 
 #### Replicate Table 7.3 Exactly ####

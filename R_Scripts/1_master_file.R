@@ -481,5 +481,5 @@ table(ces19phone$occupation)
 #This command calls the file 2_diagnostics.R
 #source("R_scripts/3_recode_diagnostics.R", echo=T)
 #source("R_scripts/4_make_models.R", echo=T)
-
+source("R_scripts/6_andersen.R", echo=T)
 
