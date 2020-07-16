@@ -19,6 +19,7 @@ ces$occupation2<-Recode(ces$occupation, "4:5='Working_Class'; 3='Routine Non_Man
 table(ces$occupation, ces$occupation2)
 #I think Andersen has the Conservatives set as the reference category. 
 ces$vote
+table(as_factor(ces$vote))
 ces$vote2<-Recode(as.factor(ces$vote), "0=NA; ;1='Liberal' ; 2='Conservative' ; 3:4='Left' ; 5='Green'", levels=c('Conservative', 'Liberal', 'Left', 'Green'))
 table(ces$vote2)
 levels(ces$vote2)
@@ -64,8 +65,7 @@ ces %>%
 ##Count missing values
 ces %>% 
   group_by(election) %>% 
-  summarise_all(function(x) sum(is.na(x))) %>% 
-  View()
+  summarise_all(function(x) sum(is.na(x))) 
 
 #------------------------------------------------------------------------------------------------------------
 library(nnet)
@@ -153,7 +153,7 @@ roc_models %>%
   #filter in only probability of voting for left
   filter(response.level!="Green") %>% 
   #PLot as line plot 
-  ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In QC\nLeft Vote")
+  ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In ROC\nLeft Vote")
 
 #### Extend Figure 7.1 to 2019 ####
 #Make ROC Models to 2019
