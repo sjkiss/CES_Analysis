@@ -467,7 +467,19 @@ ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
 ### Value labels often go missing in the creation of the ces data frame
 ### assign value labels
 val_labels(ces$sector)<-c(Private=0, Public=1)
-val_labels(ces$vote)<-c(Conservative=2,  Liberal=1, NDP=3)
+val_labels(ces$vote)<-c(Conservative=2, Liberal=1, NDP=3)
+val_labels(ces$male)<-c(Female=0, Male=1)
+val_labels(ces$union_both)<-c(None=0, Union=1)
+val_labels(ces$degree)<-c(nodegree=0, degree=1)
+val_labels(ces$region)<-c(Atlantic=1, Ontario=2, West=3)
+val_labels(ces$quebec)<-c(Other=0, Quebec=1)
+val_labels(ces$religion)<-c(None=0, Catholic=1, Protestant=2, Other=3)
+val_labels(ces$language)<-c(French=0, English=1)
+val_labels(ces$non_charter_language)<-c(Charter=0, Non_Charter=1)
+val_labels(ces$employment)<-c(Unemployed=0, Employed=1)
+val_labels(ces$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+val_labels(ces$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+val_labels(ces$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
 
 ####
 

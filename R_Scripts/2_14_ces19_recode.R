@@ -55,7 +55,7 @@ look_for(ces19phone, "age")
 # ces19phone$age<-ces19phone$age
 # summary(ces19phone$age)
 # #check
-# table(ces19phone$age)
+table(ces19phone$age)
 
 #recode Religion (q62)
 look_for(ces19phone, "relig")
@@ -140,7 +140,7 @@ val_labels(ces19phone$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middl
 val_labels(ces19phone$income)
 table(ces19phone$income)
 
-#recode Immigration sentiment (p22_a, p22_b, p22_c) into an index 0-1
+#recode Immigration sentiment (p22_a, p22_b, p22_c, q39) into an index 0-1
 #1 = pro-immigration sentiment 0 = anti-immigration sentiment
 look_for(ces19phone, "immigr")
 ces19phone$immigration_economy<-Recode(ces19phone$p22_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA")
@@ -161,19 +161,79 @@ val_labels(ces19phone$immigration_crime)<-c(Negative=0, Somewhat_negative=0.25, 
 val_labels(ces19phone$immigration_crime)
 table(ces19phone$immigration_crime)
 
-#Combine the 3 immigration variables and divide by 3
-ces19phone$immigration2<-(ces19phone$immigration_economy + ces19phone$immigration_culture + ces19phone$immigration_crime)
-table(ces19phone$immigration2)
-ces19phone$immigration<-(ces19phone$immigration2 /3)
+ces19phone$immigration_rate<-Recode(ces19phone$q39, "1=1; 2=0; 3=0.5; else=NA")
+val_labels(ces19phone$immigration_rate)<-c(Less=0, Same=0.5, More=1)
+#checks
+val_labels(ces19phone$immigration_rate)
+table(ces19phone$immigration_rate)
+
+#recode Minorities sentiment (p21_a, p35_a) into an index 0-1 
+#Realize now that the first one is any minority whereas the second one is racial minorities so just using 2nd one
+#1 = pro-racial minority sentiment 0 = anti-racial minority sentiment
+look_for(ces19phone, "minor")
+#ces19phone$minorities_culture<-Recode(ces19phone$p21_a, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#val_labels(ces19phone$minorities_culture)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
+#checks
+#val_labels(ces19phone$minorities_culture)
+#table(ces19phone$minorities_culture)
+
+ces19phone$minorities_help<-Recode(ces19phone$p35_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA")
+val_labels(ces19phone$minorities_help)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
+#checks
+val_labels(ces19phone$minorities_help)
+table(ces19phone$minorities_help)
+
+#Combine the 4 immigration variables and divide by 4
+ces19phone$immigration4<-(ces19phone$immigration_economy + ces19phone$immigration_culture + ces19phone$immigration_crime + ces19phone$immigration_rate)
+table(ces19phone$immigration4)
+ces19phone$immigration<-(ces19phone$immigration4 /4)
 table(ces19phone$immigration)
 
 #Calculate Cronbach's alpha
 library(psych)
 
 ces19phone %>% 
-  select(immigration_economy:immigration_crime) %>% 
+  select(immigration_economy:immigration_rate) %>% 
   alpha(.)
 
+## Or Create a 5 variable immigration/racial minority sentiment index by dividing by 5
+ces19phone$immigration5<-(ces19phone$immigration_economy + ces19phone$immigration_culture + ces19phone$immigration_crime + ces19phone$immigration_rate + ces19phone$minorities_help)
+table(ces19phone$immigration5)
+ces19phone$immigration2<-(ces19phone$immigration5 /5)
+table(ces19phone$immigration2)
+
+#Calculate Cronbach's alpha
+library(psych)
+
 ces19phone %>% 
-  select(p22_a:p22_c) %>% 
+  select(immigration_economy:minorities_help) %>% 
   alpha(.)
+
+#recode Previous Vote (q60)
+look_for(ces19phone, "party did you vote")
+ces19phone$past_vote<-Recode(ces19phone$q60, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; else=NA")
+val_labels(ces19phone$past_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19phone$past_vote)
+table(ces19phone$past_vote)
+
+#recode Jagmeet Singh (q22)
+look_for(ces19phone, "Singh")
+ces19phone$Singh<-Recode(ces19phone$q22, "-6=NA; -8=NA; -9=NA")
+#checks
+table(ces19phone$Singh)
+ces19phone$Jagmeet_Singh<-(ces19phone$Singh /100)
+table(ces19phone$Jagmeet_Singh)
+
+#recode Environment (q27_b)
+look_for(ces19phone, "enviro")
+ces19phone$environment<-Recode(ces19phone$q27_b, "3=0.5; 1=1; 2=0; else=NA")
+val_labels(ces19phone$environment)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
+#checks
+val_labels(ces19phone$environment)
+table(ces19phone$environment)
+
+#recode Age2 (0-1 variable)
+ces19phone$age2<-(ces19phone$age /100)
+#checks
+table(ces19phone$age2)
