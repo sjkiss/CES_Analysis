@@ -1,0 +1,116 @@
+---
+title: ""
+author: ""
+date: "28/07/2020"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,results="markup",  warning=F, message=F)
+library(tidyverse)
+library(labelled)
+library(here)
+```
+Load the data
+```{r load-data}
+##load recoded ces files
+load(here("Data", "recoded_cesdata.Rdata"))
+
+```
+
+This is just a bare-bones recode of the union variables. 
+
+```{r}
+#just check the 04s
+ces0411 %>%
+  mutate(union_both04=case_when(
+    ces04_CPS_S6A==1 | ces04_CPS_S6B==1 ~ 1,
+    ces04_CPS_S6A==5 ~ 0,
+    ces04_CPS_S6B==5 ~ 0,
+    TRUE ~ NA_real_
+  #   ces04_CPS_S6A==8 & ces04_CPS_S6B==8 ~ NA_real_,
+  #   ces04_CPS_S6A==9 & ces04_CPS_S6B==9 ~ NA_real_,
+  #   ces06_CPS_S6A==1 | ces06_CPS_S6B==1 & ces04_rtype1==1 ~ 1,
+  #   ces06_CPS_S6A==5 & ces04_rtype1==1 ~ 0,
+  #   ces06_CPS_S6B==5 & ces04_rtype1==1 ~ 0,
+  ))->ces0411
+```
+
+Now we just filter only the respondents who took the PES04 and print. 
+
+
+```{r results="asis"}
+library(flextable)
+ces0411 %>% 
+  filter(str_detect(ces0411$survey, "PES04")) %>% 
+  #select employment status, respondent union, household union variables
+  select(ces04_CPS_S4, ces04_CPS_S6A, ces04_CPS_S6B, union_both04) %>% 
+  #gtroup by each one
+  group_by(ces04_CPS_S4, ces04_CPS_S6A,ces04_CPS_S6B, union_both04) %>% 
+  #count the numbers in each group
+  summarize(n=n()) %>% 
+  #turn to factors for the value labels
+  as_factor() %>% 
+  #print the table in a pretty way
+  knitr::kable(., caption="Employment status, respondent union, household union and combined union counts")
+
+
+```
+
+Now as we found, there were a bunch of ces04 people who were reinterviewed in ces06 and we tried this trick of using their ces06 union status and applying it to ces04. But most people in ces04 who were NA on the union variables were actually retired. We can just look at what happened to them in this table that shows ces04 employment status, by ces06 union variables (respondent and household.)
+
+```{r results="asis"}
+#take the data
+ces0411 %>% 
+  #filter only people who took ces06
+  filter(str_detect(ces0411$survey, "PES06")) %>% 
+  #Select the ces04_rtype1, the ces04 employment status variable and the CES06 UNION VARIABLES
+  select(ces04_rtype1, ces04_CPS_S4, ces06_CPS_S6A, ces06_CPS_S6B, union_both04) %>% 
+#Group
+  group_by(ces04_rtype1, ces04_CPS_S4, ces06_CPS_S6A, ces06_CPS_S6B) %>% 
+  #count
+  summarize(n=n()) %>% 
+as_factor() %>% 
+  knitr::kable(., caption="CES04 survey status, 04 employment status, 06 Respondent union and 06 household union counts")
+```
+Let's just see the differences between the stripped down recode and your recode.
+
+```{r matts-recode}
+
+ces0411 %>%
+  mutate(union_both042=case_when(
+    ces04_CPS_S6A==1 | ces04_CPS_S6B==1 ~ 1,
+    ces04_CPS_S6A==5 ~ 0,
+    ces04_CPS_S6B==5 ~ 0,
+    ces04_CPS_S6A==8 & ces04_CPS_S6B==8 ~ NA_real_,
+    ces04_CPS_S6A==9 & ces04_CPS_S6B==9 ~ NA_real_,
+    ces06_CPS_S6A==1 | ces06_CPS_S6B==1 & ces04_rtype1==1 ~ 1,
+    ces06_CPS_S6A==5 & ces04_rtype1==1 ~ 0,
+    ces06_CPS_S6B==5 & ces04_rtype1==1 ~ 0,
+  ))->ces0411
+```
+
+```{r table-both, results="asis"}
+
+#count the stripped down recode
+knitr::kable(table(ces0411$union_both04), caption="Frequency of union_both with stripped down recode")
+#count your recode
+knitr::kable(table(ces0411$union_both042), caption="Frequency of union_both with your 06 recodes")
+```
+So there are about 400 extra cases , but where did these 400 cases come from?
+```{r}
+
+ces0411 %>% 
+  select(ces04_rtype1, ces04_CPS_S4, union_both04, union_both042) %>% 
+  group_by(ces04_rtype1, ces04_CPS_S4, union_both04, union_both042) %>% 
+  summarize(n=n()) %>% 
+  #filtering out those with missing values on union_both042 for readability
+  filter(is.na(union_both042)==F) %>% 
+  as_factor() %>% 
+  knitr::kable(., caption="CES04 survey status, 04 employment status, combined union with stripped down code and Matt's 06 to 04 recode")
+```
+
+
+So by far most of these cases (393) came from people who had an NA on their CPS04_rtype1, so we're not even sure they took part in  CPS04, which is why they are also NA on the 2004 self-employment question, but their union06 variable response has been added to their union04. So I don't think this is very good.
+
