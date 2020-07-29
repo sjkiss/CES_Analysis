@@ -20,13 +20,16 @@ ces19phone$region3<-Recode(as.factor(ces19phone$region), "1='East' ; 2='Ontario'
 levels(ces19phone$region3)
 table(ces19phone$region3)
 
-------------------------------------------------------------------------------------------------------------------------------------
+
 
 #### 2019 Models ####
 #Model basic with controls
+
 modelROC<-glm(ndp~region3+working_class+union_both+age+male+sector, data=ces19phone, family="binomial")
+
 ces19phone %>% 
   filter(quebec==1)->ces.out
+
 modelQC<-glm(ndp~working_class+union_both+age+male+sector, data=ces.out, family="binomial")
 summary(modelROC)
 summary(modelQC)
@@ -53,7 +56,7 @@ ces19phone %>%
   filter(quebec==1)->ces.out
 model3QC<-glm(ndp~working_class+union_both+age+male+sector+environment, data=ces.out, family="binomial")
 summary(model3ROC)
-summary(model33QC)
+summary(model3QC)
 
 #M4 with immigration
 model4ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration, data=ces19phone, family="binomial")

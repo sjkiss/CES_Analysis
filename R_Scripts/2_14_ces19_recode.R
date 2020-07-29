@@ -162,57 +162,58 @@ table(ces19phone$income)
 #recode Immigration sentiment (p22_a, p22_b, p22_c, q39) into an index 0-1
 #1 = pro-immigration sentiment 0 = anti-immigration sentiment
 look_for(ces19phone, "immigr")
-ces19phone$immigration_economy<-Recode(ces19phone$p22_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA")
-val_labels(ces19phone$immigration_economy)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
+ces19phone$immigration_economy<-Recode(ces19phone$p22_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA", as.numeric=T)
+#val_labels(ces19phone$immigration_economy)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
 #checks
-val_labels(ces19phone$immigration_economy)
+#val_labels(ces19phone$immigration_economy)
 table(ces19phone$immigration_economy)
 
-ces19phone$immigration_culture<-Recode(ces19phone$p22_b, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
-val_labels(ces19phone$immigration_culture)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
+ces19phone$immigration_culture<-Recode(ces19phone$p22_b, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
+#val_labels(ces19phone$immigration_culture)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
 #checks
-val_labels(ces19phone$immigration_culture)
-table(ces19phone$immigration_culture)
+#val_labels(ces19phone$immigration_culture)
+#table(ces19phone$immigration_culture)
 
-ces19phone$immigration_crime<-Recode(ces19phone$p22_c, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
-val_labels(ces19phone$immigration_crime)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
+ces19phone$immigration_crime<-Recode(ces19phone$p22_c, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
+#val_labels(ces19phone$immigration_crime)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
 #checks
-val_labels(ces19phone$immigration_crime)
+#val_labels(ces19phone$immigration_crime)
 table(ces19phone$immigration_crime)
 
-ces19phone$immigration_rate<-Recode(ces19phone$q39, "1=1; 2=0; 3=0.5; else=NA")
-val_labels(ces19phone$immigration_rate)<-c(Less=0, Same=0.5, More=1)
+ces19phone$immigration_rate<-Recode(ces19phone$q39, "1=1; 2=0; 3=0.5; else=NA", as.numeric=T)
+#val_labels(ces19phone$immigration_rate)<-c(Less=0, Same=0.5, More=1)
 #checks
-val_labels(ces19phone$immigration_rate)
+#val_labels(ces19phone$immigration_rate)
 table(ces19phone$immigration_rate)
 
 #recode Minorities sentiment (p21_a, p35_a) into an index 0-1 
 #Realize now that the first one is any minority whereas the second one is racial minorities so just using 2nd one
 #1 = pro-racial minority sentiment 0 = anti-racial minority sentiment
 look_for(ces19phone, "minor")
-#ces19phone$minorities_culture<-Recode(ces19phone$p21_a, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+ces19phone$minorities_culture<-Recode(ces19phone$p21_a, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
 #val_labels(ces19phone$minorities_culture)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
 #checks
 #val_labels(ces19phone$minorities_culture)
 #table(ces19phone$minorities_culture)
 
-ces19phone$minorities_help<-Recode(ces19phone$p35_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA")
-val_labels(ces19phone$minorities_help)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
+ces19phone$minorities_help<-Recode(ces19phone$p35_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA", as.numeric=T)
+
 #checks
-val_labels(ces19phone$minorities_help)
-table(ces19phone$minorities_help)
+#val_labels(ces19phone$minorities_help)
+#table(ces19phone$minorities_help)
 
 #Combine the 4 immigration variables and divide by 4
 ces19phone$immigration4<-(ces19phone$immigration_economy + ces19phone$immigration_culture + ces19phone$immigration_crime + ces19phone$immigration_rate)
 table(ces19phone$immigration4)
 ces19phone$immigration<-(ces19phone$immigration4 /4)
-table(ces19phone$immigration)
+#Check distribution of immigration
+qplot(ces19phone$immigration, geom="histogram")
 
 #Calculate Cronbach's alpha
 library(psych)
 
 ces19phone %>% 
-  select(immigration_economy:immigration_rate) %>% 
+  select(immigration_economy, immigration_culture, immigration_crime, immigration_rate) %>% 
   alpha(.)
 
 ## Or Create a 5 variable immigration/racial minority sentiment index by dividing by 5
@@ -225,7 +226,7 @@ table(ces19phone$immigration2)
 library(psych)
 
 ces19phone %>% 
-  select(immigration_economy:minorities_help) %>% 
+  select(immigration_economy, immigration_economy, immigration_culture, immigration_crime, immigration_rate, minorities_help) %>% 
   alpha(.)
 
 #recode Previous Vote (q60)
