@@ -32,8 +32,8 @@ table(ces19phone$region3)
 
 #Turn income into factor with Middle as reference
 ces19phone$income3<-Recode(as.factor(ces19phone$income), "1='Low_Income' ; 2:4='Middle_Income' ; 5='High_Income'", levels=c('Low_Income', 'Middle_Income', 'High_Income'))
-#levels(ces19phone$income3)
-#table(ces19phone$income3)
+levels(ces19phone$income3)
+table(ces19phone$income3)
 
 #Other dummies
 ces19phone$low_income<-Recode(ces19phone$income, "2:5=0; 1=1")
@@ -105,281 +105,217 @@ table(ces19phone$ndp)
 table(ces19phone$bloc)
 table(ces19phone$green)
 
+#Split QC out into ces19.qc
+ces19phone %>% 
+  filter(quebec==1)->ces19.qc
+ces19phone %>% 
+  filter(quebec!=1)->ces19.roc
+
 #--------------------------------------------------------------------------------------------------------
 
-#### Block recursive models ####
+#### 2019 Block recursive models ####
 
 #Model 1 - income as 3 level factor
 #NDP
-ndp_model1ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+as.factor(income3), data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-ndp_model1QC<-glm(ndp~working_class+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+as.factor(income3), data=ces.out, family="binomial")
+ndp_model1ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+as.factor(income3), data=ces19.roc, family="binomial")
+ndp_model1QC<-glm(ndp~working_class+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+as.factor(income3), data=ces19.qc, family="binomial")
 summary(ndp_model1ROC)
 summary(ndp_model1QC)
 
 #Liberal
-lib_model1ROC<-glm(liberal~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+as.factor(income3), data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-lib_model1QC<-glm(liberal~working_class+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+as.factor(income3), data=ces.out, family="binomial")
+lib_model1ROC<-glm(liberal~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+as.factor(income3), data=ces19.roc, family="binomial")
+lib_model1QC<-glm(liberal~working_class+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+as.factor(income3), data=ces19.qc, family="binomial")
 summary(lib_model1ROC)
 summary(lib_model1QC)
 
 #Conservative
-con_model1ROC<-glm(conservative~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+as.factor(income3), data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-con_model1QC<-glm(conservative~working_class+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+as.factor(income3), data=ces.out, family="binomial")
+con_model1ROC<-glm(conservative~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+as.factor(income3), data=ces19.roc, family="binomial")
+con_model1QC<-glm(conservative~working_class+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+as.factor(income3), data=ces19.qc, family="binomial")
 summary(con_model1ROC)
 summary(con_model1QC)
 
 #Model 2 - low and high income quintiles
 #NDP
-ndp_model2ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-ndp_model2QC<-glm(ndp~working_class+union_both+young+old+male+degree+language+foreign, data=ces.out, family="binomial")
+ndp_model2ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, data=ces19.roc, family="binomial")
+ndp_model2QC<-glm(ndp~working_class+union_both+young+old+male+degree+language+foreign, data=ces19.qc, family="binomial")
 summary(ndp_model2ROC)
 summary(ndp_model2QC)
 
 #Liberal
-lib_model2ROC<-glm(liberal~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-lib_model2QC<-glm(liberal~working_class+union_both+young+old+male+degree+language+foreign, data=ces.out, family="binomial")
+lib_model2ROC<-glm(liberal~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, data=ces19.roc, family="binomial")
+lib_model2QC<-glm(liberal~working_class+union_both+young+old+male+degree+language+foreign, data=ces19.qc, family="binomial")
 summary(lib_model2ROC)
 summary(lib_model2QC)
 
 #Conservative
-con_model2ROC<-glm(conservative~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-con_model2QC<-glm(conservative~working_class+union_both+young+old+male+degree+language+foreign, data=ces.out, family="binomial")
+con_model2ROC<-glm(conservative~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, data=ces19.roc, family="binomial")
+con_model2QC<-glm(conservative~working_class+union_both+young+old+male+degree+language+foreign, data=ces19.qc, family="binomial")
 summary(con_model2ROC)
 summary(con_model2QC)
 
 #Bloc
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-bloc_model2QC<-glm(bloc~working_class+union_both+young+old+male+degree+language+foreign, data=ces.out, family="binomial")
+bloc_model2QC<-glm(bloc~working_class+union_both+young+old+male+degree+language+foreign, data=ces19.qc, family="binomial")
 summary(bloc_model2QC)
 
 #Model 3 - Political Orientations
 #NDP
-ndp_model3ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-ndp_model3QC<-glm(ndp~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, data=ces.out, family="binomial")
+ndp_model3ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, data=ces19.roc, family="binomial")
+ndp_model3QC<-glm(ndp~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, data=ces19.qc, family="binomial")
 summary(ndp_model3ROC)
 summary(ndp_model3QC)
 
 #Liberal
-lib_model3ROC<-glm(liberal~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-lib_model3QC<-glm(liberal~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, data=ces.out, family="binomial")
+lib_model3ROC<-glm(liberal~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, data=ces19.roc, family="binomial")
+lib_model3QC<-glm(liberal~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, data=ces19.qc, family="binomial")
 summary(lib_model3ROC)
 summary(lib_model3QC)
 
 #Conservative
-con_model3ROC<-glm(conservative~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-con_model3QC<-glm(conservative~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, data=ces.out, family="binomial")
+con_model3ROC<-glm(conservative~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, data=ces19.roc, family="binomial")
+con_model3QC<-glm(conservative~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, data=ces19.qc, family="binomial")
 summary(con_model3ROC)
 summary(con_model3QC)
 
 #Bloc
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-bloc_model3QC<-glm(bloc~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, data=ces.out, family="binomial")
+bloc_model3QC<-glm(bloc~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, data=ces19.qc, family="binomial")
 summary(bloc_model3QC)
 
 #Model 4 - Partisanship
 #NDP
-ndp_model4ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-ndp_model4QC<-glm(ndp~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id, data=ces.out, family="binomial")
+ndp_model4ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id, data=ces19.roc, family="binomial")
+ndp_model4QC<-glm(ndp~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id, data=ces19.qc, family="binomial")
 summary(ndp_model4ROC)
 summary(ndp_model4QC)
 
 #Liberal
-lib_model4ROC<-glm(liberal~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+liberal_id, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-lib_model4QC<-glm(liberal~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+liberal_id, data=ces.out, family="binomial")
+lib_model4ROC<-glm(liberal~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+liberal_id, data=ces19.roc, family="binomial")
+lib_model4QC<-glm(liberal~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+liberal_id, data=ces19.qc, family="binomial")
 summary(lib_model4ROC)
 summary(lib_model4QC)
 
 #Conservative
-con_model4ROC<-glm(conservative~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+conservative_id, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-con_model4QC<-glm(conservative~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+conservative_id, data=ces.out, family="binomial")
+con_model4ROC<-glm(conservative~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+conservative_id, data=ces19.roc, family="binomial")
+con_model4QC<-glm(conservative~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+conservative_id, data=ces19.qc, family="binomial")
 summary(con_model4ROC)
 summary(con_model4QC)
 
 #Bloc
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-bloc_model4QC<-glm(bloc~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+bloc_id, data=ces.out, family="binomial")
+bloc_model4QC<-glm(bloc~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+bloc_id, data=ces19.qc, family="binomial")
 summary(bloc_model4QC)
 
 #Model 5 - Economic Perceptions
 #NDP
-ndp_model5ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+personal_retrospective+national_retrospective, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-ndp_model5QC<-glm(ndp~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+personal_retrospective+national_retrospective, data=ces.out, family="binomial")
+ndp_model5ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+personal_retrospective+national_retrospective, data=ces19.roc, family="binomial")
+ndp_model5QC<-glm(ndp~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+personal_retrospective+national_retrospective, data=ces19.qc, family="binomial")
 summary(ndp_model5ROC)
 summary(ndp_model5QC)
 
 #Liberal
-lib_model5ROC<-glm(liberal~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+liberal_id+personal_retrospective+national_retrospective, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-lib_model5QC<-glm(liberal~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+liberal_id+personal_retrospective+national_retrospective, data=ces.out, family="binomial")
+lib_model5ROC<-glm(liberal~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+liberal_id+personal_retrospective+national_retrospective, data=ces19.roc, family="binomial")
+lib_model5QC<-glm(liberal~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+liberal_id+personal_retrospective+national_retrospective, data=ces19.qc, family="binomial")
 summary(lib_model5ROC)
 summary(lib_model5QC)
 
 #Conservative
-con_model5ROC<-glm(conservative~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+conservative_id+personal_retrospective+national_retrospective, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-con_model5QC<-glm(conservative~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+conservative_id+personal_retrospective+national_retrospective, data=ces.out, family="binomial")
+con_model5ROC<-glm(conservative~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+conservative_id+personal_retrospective+national_retrospective, data=ces19.roc, family="binomial")
+con_model5QC<-glm(conservative~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+conservative_id+personal_retrospective+national_retrospective, data=ces19.qc, family="binomial")
 summary(con_model5ROC)
 summary(con_model5QC)
 
 #Bloc
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-bloc_model5QC<-glm(bloc~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+bloc_id+personal_retrospective+national_retrospective, data=ces.out, family="binomial")
+bloc_model5QC<-glm(bloc~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+bloc_id+personal_retrospective+national_retrospective, data=ces19.qc, family="binomial")
 summary(bloc_model5QC)
 
 #Model 6 - Policy Issues
 #NDP
-ndp_model6ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-ndp_model6QC<-glm(ndp~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, data=ces.out, family="binomial")
+ndp_model6ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, data=ces19.roc, family="binomial")
+ndp_model6QC<-glm(ndp~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, data=ces19.qc, family="binomial")
 summary(ndp_model6ROC)
 summary(ndp_model6QC)
 
 #Liberal
-lib_model6ROC<-glm(liberal~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+liberal_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-lib_model6QC<-glm(liberal~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+liberal_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, data=ces.out, family="binomial")
+lib_model6ROC<-glm(liberal~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+liberal_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, data=ces19.roc, family="binomial")
+lib_model6QC<-glm(liberal~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+liberal_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, data=ces19.qc, family="binomial")
 summary(lib_model6ROC)
 summary(lib_model6QC)
 
 #Conservative
-con_model6ROC<-glm(conservative~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+conservative_id+personal_retrospective+immigration_rate+national_retrospective+environment+redistribution+defence, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-con_model6QC<-glm(conservative~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, data=ces.out, family="binomial")
+con_model6ROC<-glm(conservative~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+conservative_id+personal_retrospective+immigration_rate+national_retrospective+environment+redistribution+defence, data=ces19.roc, family="binomial")
+con_model6QC<-glm(conservative~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, data=ces19.qc, family="binomial")
 summary(con_model6ROC)
 summary(con_model6QC)
 
 #Bloc
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-bloc_model6QC<-glm(bloc~+working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, data=ces.out, family="binomial")
+bloc_model6QC<-glm(bloc~+working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, data=ces19.qc, family="binomial")
 summary(bloc_model6QC)
 
 #Model 7 - Leadership
 #NDP
-ndp_model7ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-ndp_model7QC<-glm(ndp~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces.out, family="binomial")
+ndp_model7ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19, data=ces19.roc, family="binomial")
+ndp_model7QC<-glm(ndp~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces19.qc, family="binomial")
 summary(ndp_model7ROC)
 summary(ndp_model7QC)
 
 #Liberal
-lib_model7ROC<-glm(liberal~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+liberal_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-lib_model7QC<-glm(liberal~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+liberal_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces.out, family="binomial")
+lib_model7ROC<-glm(liberal~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+liberal_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19, data=ces19.roc, family="binomial")
+lib_model7QC<-glm(liberal~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+liberal_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces19.qc, family="binomial")
 summary(lib_model7ROC)
 summary(lib_model7QC)
 
 #Conservative
-con_model7ROC<-glm(conservative~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+conservative_id+personal_retrospective+immigration_rate+national_retrospective+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-con_model7QC<-glm(conservative~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces.out, family="binomial")
+con_model7ROC<-glm(conservative~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+conservative_id+personal_retrospective+immigration_rate+national_retrospective+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19, data=ces19.roc, family="binomial")
+con_model7QC<-glm(conservative~working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces19.qc, family="binomial")
 summary(con_model7ROC)
 summary(con_model7QC)
 
 #Bloc
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-bloc_model7QC<-glm(bloc~+working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces.out, family="binomial")
+bloc_model7QC<-glm(bloc~+working_class+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces19.qc, family="binomial")
 summary(bloc_model7QC)
 
 #Model 8 - Block1: using working_class2 variable instead
 #NDP
-ndp_model8ROC<-glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-ndp_model8QC<-glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign, data=ces.out, family="binomial")
+ndp_model8ROC<-glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, data=ces19.roc, family="binomial")
+ndp_model8QC<-glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign, data=ces19.qc, family="binomial")
 summary(ndp_model8ROC)
 summary(ndp_model8QC)
 
 #Liberal
-lib_model8ROC<-glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-lib_model8QC<-glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign, data=ces.out, family="binomial")
+lib_model8ROC<-glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, data=ces19.roc, family="binomial")
+lib_model8QC<-glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign, data=ces19.qc, family="binomial")
 summary(lib_model8ROC)
 summary(lib_model8QC)
 
 #Conservative
-con_model8ROC<-glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-con_model8QC<-glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign, data=ces.out, family="binomial")
+con_model8ROC<-glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, data=ces19.roc, family="binomial")
+con_model8QC<-glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign, data=ces19.qc, family="binomial")
 summary(con_model8ROC)
 summary(con_model8QC)
 
 #Bloc
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-bloc_model8QC<-glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign, data=ces.out, family="binomial")
+bloc_model8QC<-glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign, data=ces19.qc, family="binomial")
 summary(bloc_model8QC)
 
 #Model 9 - Block6: using working_class2 variable instead
 #NDP
-ndp_model9ROC<-glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-ndp_model9QC<-glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces.out, family="binomial")
+ndp_model9ROC<-glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19, data=ces19.roc, family="binomial")
+ndp_model9QC<-glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces19.qc, family="binomial")
 summary(ndp_model9ROC)
 summary(ndp_model9QC)
 
 #Liberal
-lib_model9ROC<-glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+liberal_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-lib_model9QC<-glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+liberal_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces.out, family="binomial")
+lib_model9ROC<-glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+liberal_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19, data=ces19.roc, family="binomial")
+lib_model9QC<-glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+liberal_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces19.qc, family="binomial")
 summary(lib_model9ROC)
 summary(lib_model9QC)
 
 #Conservative
-con_model9ROC<-glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+conservative_id+personal_retrospective+immigration_rate+national_retrospective+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-con_model9QC<-glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces.out, family="binomial")
+con_model9ROC<-glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+conservative_id+personal_retrospective+immigration_rate+national_retrospective+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19, data=ces19.roc, family="binomial")
+con_model9QC<-glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces19.qc, family="binomial")
 summary(con_model9ROC)
 summary(con_model9QC)
 
 #Bloc
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-bloc_model9QC<-glm(bloc~+working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces.out, family="binomial")
+bloc_model9QC<-glm(bloc~+working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+Justin_Trudeau19+Andrew_Scheer19+Jagmeet_Singh19+Francois_Blanchet19, data=ces19.qc, family="binomial")
 summary(bloc_model9QC)
 
 #Model comparison

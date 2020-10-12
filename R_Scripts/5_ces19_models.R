@@ -174,68 +174,68 @@ summary(model21ROC)
 summary(model21QC)
 
 #M22 with immigration rate
-model22ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration_rate, data=ces19phone, family="binomial")
+model22ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration_rate, data=ces19.roc, family="binomial")
 
 model22QC<-glm(ndp~working_class+union_both+age+male+sector+immigration_rate, data=ces19.qc, family="binomial")
 summary(model22ROC)
 summary(model22QC)
 
 #M23 basic model with degree
-model23ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree, data=ces19phone, family="binomial")
+model23ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree, data=ces19.roc, family="binomial")
 
 model23QC<-glm(ndp~working_class+union_both+age+male+sector+degree, data=ces19.qc, family="binomial")
 summary(model23ROC)
 summary(model23QC)
 
 #M24 basic model with income
-model24ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+income, data=ces19phone, family="binomial")
+model24ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+income, data=ces19.roc, family="binomial")
 
 model24QC<-glm(ndp~working_class+union_both+age+male+sector+income, data=ces19.qc, family="binomial")
 summary(model24ROC)
 summary(model24QC)
 
 #M25 basic model with community size
-model25ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+size, data=ces19phone, family="binomial")
+model25ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+size, data=ces19.roc, family="binomial")
 
 model25QC<-glm(ndp~working_class+union_both+age+male+sector+size, data=ces19.qc, family="binomial")
 summary(model25ROC)
 summary(model25QC)
 
 #M26 basic model with foreign-born status
-model26ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+foreign, data=ces19phone, family="binomial")
+model26ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+foreign, data=ces19.roc, family="binomial")
 model26QC<-glm(ndp~working_class+union_both+age+male+sector+foreign, data=ces19.qc, family="binomial")
 summary(model26ROC)
 summary(model26QC)
 
 #M27 basic model with Age2 (coded as 0-1)
-model27ROC<-glm(ndp~region3+working_class+union_both+age2+male+sector, data=ces19phone, family="binomial")
+model27ROC<-glm(ndp~region3+working_class+union_both+age2+male+sector, data=ces19.roc, family="binomial")
 model27QC<-glm(ndp~working_class+union_both+age2+male+sector, data=ces19.qc, family="binomial")
 summary(model27ROC)
 summary(model27QC)
 
 #M28 basic model with no_relgiion
-model28ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+no_religion, data=ces19phone, family="binomial")
+model28ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+no_religion, data=ces19.roc, family="binomial")
 
 model28QC<-glm(ndp~working_class+union_both+age+male+sector+no_religion, data=ces19.qc, family="binomial")
 summary(model28ROC)
 summary(model28QC)
 
 #M29 Full controls model
-model29ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree+income+size+foreign+no_religion, data=ces19phone, family="binomial")
+model29ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree+income+size+foreign+no_religion, data=ces19.roc, family="binomial")
 
 model29QC<-glm(ndp~working_class+union_both+age+male+sector+degree+income+size+foreign+no_religion, data=ces19.qc, family="binomial")
 summary(model29ROC)
 summary(model29QC)
 
 #M30 basic model with left-right ideology
-model30ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+ideology, data=ces19phone, family="binomial")
+model30ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+ideology, data=ces19.roc, family="binomial")
 
 model30QC<-glm(ndp~working_class+union_both+age+male+sector+ideology, data=ces19.qc, family="binomial")
 summary(model30ROC)
 summary(model30QC)
 
 #M31 Income as factor
-model31ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree+as.factor(income)+foreign+no_religion, data=ces19phone, family="binomial")
+model31ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree+as.factor(income)+foreign+no_religion, data=ces19.roc, family="binomial")
 
 model31QC<-glm(ndp~working_class+union_both+age+male+sector+degree+as.factor(income)+foreign+no_religion, data=ces19.qc, family="binomial")
 summary(model31ROC)
@@ -256,21 +256,21 @@ summary(model33QC)
 
 #M34-M36 Basic class models
 #M34 NDP vs Right
-  model34ROC<-glm(ndp_vs_right~working_class3+union_both+income+degree+sector, data=ces19.roc, family="binomial")
-  model34QC<-glm(ndp_vs_right~working_class3+union_both+income+degree+sector, data=ces19.qc, family="binomial")
+model34ROC<-glm(ndp_vs_right~working_class3+union_both+income+degree+sector, data=ces19.roc, family="binomial")
+model34QC<-glm(ndp_vs_right~working_class3+union_both+income+degree+sector, data=ces19.qc, family="binomial")
 summary(model34ROC)
 summary(model34QC)
 
 #M35 NDP vs Liberal
-  model35ROC<-glm(ndp_vs_liberal~working_class3+union_both+income+degree+sector, data=ces19.roc, family="binomial")
-  model35QC<-glm(ndp_vs_liberal~working_class3+union_both+income+degree+sector, data=ces19.qc, family="binomial")
+model35ROC<-glm(ndp_vs_liberal~working_class3+union_both+income+degree+sector, data=ces19.roc, family="binomial")
+model35QC<-glm(ndp_vs_liberal~working_class3+union_both+income+degree+sector, data=ces19.qc, family="binomial")
 summary(model35ROC)
 summary(model35QC)
 
 #M36 Basic Class Model with self-employed carved out
 model36ALL<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces19phone, family="binomial")
-  model36ROC<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces19.roc, family="binomial")
-  model36QC<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces19.qc, family="binomial")
+model36ROC<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces19.roc, family="binomial")
+model36QC<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces19.qc, family="binomial")
 summary(model36ALL)
 summary(model36ROC)
 summary(model36QC)
@@ -407,7 +407,7 @@ ces19phone$immigration
 
 ces19phone %>%
   #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
-#  filter(!is.na(occupation4)) %>%
+  #  filter(!is.na(occupation4)) %>%
   select(occupation4, Jagmeet_Singh, immigration, redistribution, environment, ideology) %>% 
   group_by(occupation4) %>%
   summarise_at(vars(Jagmeet_Singh, immigration, redistribution, environment, ideology), mean, na.rm=T)
@@ -416,23 +416,23 @@ library(kableExtra)
 
 ces19phone %>%
   #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
-#  filter(!is.na(occupation4)) %>%
+  #  filter(!is.na(occupation4)) %>%
   select(occupation4, Jagmeet_Singh, immigration, redistribution, environment, minorities_help) %>% 
   group_by(occupation4) %>%
   summarise_at(vars(Jagmeet_Singh, immigration, redistribution, environment, minorities_help), mean, na.rm=T) %>% 
   #Convert this to a data frame for printing
   as.data.frame() %>% 
   #summary=F tells stargazer to print the raw data, not summary statistics, digits=2 tells it to round to 2 digits
-stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Class attitudes 2019.html"))
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Class attitudes 2019.html"))
 
 ## This is maybe useful, but ideally, I find it more useful to always graph this stuff. 
 ces19phone %>%
   #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
-#  filter(!is.na(occupation4)) %>%
+  #  filter(!is.na(occupation4)) %>%
   #Select the variables for graphing
   select(occupation4, Jagmeet_Singh, Justin_Trudeau, Andrew_Scheer, immigration, redistribution, environment) %>%
   #they are currently in a wide format, reduce it to long format with pivot_longer
- pivot_longer(-occupation4,values_to=c("Score"), names_to=c("Variable")) %>% 
+  pivot_longer(-occupation4,values_to=c("Score"), names_to=c("Variable")) %>% 
   #Now form groups for each class category and each variable
   group_by(occupation4, Variable) %>% 
   #Now summarize those groups, creating the average score, the count of cases n(), the standard deviation, the standard error
@@ -776,7 +776,7 @@ ces19phone %>%
   summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
   as.data.frame() %>% 
   stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro-redistribution Working Class Vote 2019.html"))
-  
+
 #-------------------------------------------------------------------------------------------------
 
 #### Leader/party ratings overall ####
