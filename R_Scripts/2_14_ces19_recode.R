@@ -414,31 +414,33 @@ val_labels(ces19phone$address_issue)<-c(Other=0, Liberal=1, Conservative=2, NDP=
 val_labels(ces19phone$address_issue)
 table(ces19phone$address_issue)
 
-#recode Market Liberalism (p20_a and p20_f)
+#recode Market Liberalism (p20_a and p20_f and/or p44)
 look_for(ces19phone, "leave")
 look_for(ces19phone, "blame")
 ces19phone$market1<-Recode(ces19phone$p20_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
 ces19phone$market2<-Recode(ces19phone$p20_f, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
+ces19phone$market3<-Recode(ces19phone$p44, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
 #val_labels(ces19phone$market1)<-c(Strongly_disagree=0, Somewhat_disagree=0.25, Neither=0.5, Somewhat_agree=0.75, Strongly_agree=1)
 #checks
 table(ces19phone$market1)
 table(ces19phone$market2)
+table(ces19phone$market3)
 
 ces19phone %>% 
   rowwise() %>% 
   mutate(market_liberalism=mean(
-    c_across(market1:market2)
+    c_across(market1:market2:market3)
     , na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
-  select(c('market1', 'market2', 'market_liberalism')) %>% 
+  select(c('market1', 'market2', 'market3', 'market_liberalism')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na>0, na<3)
 #Scale Averaging 
 ces19phone %>% 
   rowwise() %>% 
   mutate(market_liberalism=mean(
-    c_across(c('market1', 'market2')), na.rm=T  
+    c_across(c('market1', 'market2', 'market3')), na.rm=T  
   )) %>% 
   ungroup()->ces19phone
 
@@ -451,12 +453,12 @@ table(ces19phone$market_liberalism, useNA="ifany")
 
 #Calculate Cronbach's alpha
 ces19phone %>% 
-  select(market1, market2) %>% 
+  select(market1, market2, market3) %>% 
   alpha(.)
 #For some reason the cronbach's alpha doesn't work here. 
 #Check correlation
 ces19phone %>% 
-  select(market1, market2) %>% 
+  select(market1, market2, market3) %>% 
   cor(., use="complete.obs")
 #Weakly correlated, but correlated
 

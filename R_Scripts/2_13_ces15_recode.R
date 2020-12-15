@@ -424,31 +424,34 @@ val_labels(ces15phone$manage_economy)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=
 val_labels(ces15phone$manage_economy)
 table(ces15phone$manage_economy)
 
-#recode Market Liberalism (PES15_22 and PES15_49)
+#recode Market Liberalism (PES15_22 and PES15_49 and/or PES15_4)
 look_for(ces15phone, "leave")
 look_for(ces15phone, "blame")
+look_for(ces15phone, "rich")
 ces15phone$market1<-Recode(ces15phone$PES15_22, "1=1; 3=0.75; 8=0.5; 5=0.25; 7=0; else=NA", as.numeric=T)
 ces15phone$market2<-Recode(ces15phone$PES15_49, "1=1; 3=0.75; 8=0.5; 5=0.25; 7=0; else=NA", as.numeric=T)
+ces15phone$market3<-Recode(ces15phone$PES15_41, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA", as.numeric=T)
 #val_labels(ces15phone$market1)<-c(Strongly_disagree=0, Somewhat_disagree=0.25, Neither=0.5, Somewhat_agree=0.75, Strongly_agree=1)
 #checks
 table(ces15phone$market1, useNA="ifany")
 table(ces15phone$market2, useNA="ifany")
+table(ces15phone$market3, useNA="ifany")
 
 ces15phone %>% 
   rowwise() %>% 
   mutate(market_liberalism=mean(
-    c_across(market1:market2)
+    c_across(market1:market2:market3)
     , na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
-  select(c('market1', 'market2', 'market_liberalism')) %>% 
+  select(c('market1', 'market2', 'market3', 'market_liberalism')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na>0, na<3)
 #Scale Averaging 
 ces15phone %>% 
   rowwise() %>% 
   mutate(market_liberalism=mean(
-    c_across(c('market1', 'market2')), na.rm=T  
+    c_across(c('market1', 'market2', 'market3',)), na.rm=T  
   )) %>% 
   ungroup()->ces15phone
 ces15phone %>% 
@@ -458,7 +461,10 @@ ces15phone %>%
 qplot(ces15phone$market_liberalism, geom="histogram")
 table(ces15phone$market_liberalism, useNA="ifany")
 
-
+#Calculate Cronbach's alpha
+ces15phone %>% 
+  select(market1, market2, market3) %>% 
+  psych::alpha(.)
 
 #recode Moral Traditionalism (PES15_26, PES15_43, PES15_16)
 look_for(ces15phone, "women")
@@ -608,14 +614,13 @@ ces15phone %>%
     CPS15_85==32~1,
     CPS15_85==34~0,
     CPS15_85==37~0,
-    CPS15_85==38~0,
+    CPS15_85==38~1,
   CPS15_85==39~1,
     CPS15_85==40~0,
     CPS15_85==41~0,
     CPS15_85==42~0,
     CPS15_85==43~0,
     CPS15_85==44~0,
-    CPS15_85==45~0,
     CPS15_85==45~1,
     CPS15_85==47~0,
     CPS15_85==48~0,
@@ -624,7 +629,7 @@ ces15phone %>%
     CPS15_85==51~1,
     CPS15_85==52~1,
     CPS15_85==53~0,
-    CPS15_85==54~0,
+    CPS15_85==54~1,
     CPS15_85==55~0,
     CPS15_85==56~0,
   CPS15_85==57~0,
