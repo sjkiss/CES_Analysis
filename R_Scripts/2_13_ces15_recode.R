@@ -17,7 +17,6 @@ val_labels(ces15phone$union)<-c(None=0, Union=1)
 val_labels(ces15phone$union)
 table(ces15phone$union)
 
-
 #recode Union Combined (PES15_93 and PES15_94)
 ces15phone %>% 
   mutate(union_both=case_when(
@@ -26,9 +25,6 @@ ces15phone %>%
     PES15_93==8 & PES15_94==8 ~ NA_real_,
     PES15_93==9 & PES15_94==9 ~ NA_real_,
   ))->ces15phone
-
-
-
 
 val_labels(ces15phone$union_both)<-c(None=0, Union=1)
 #checks
@@ -459,13 +455,11 @@ ces15phone %>%
 qplot(ces15phone$market_liberalism, geom="histogram")
 table(ces15phone$market_liberalism, useNA="ifany")
 
-
-
 #recode Moral Traditionalism (PES15_26, PES15_43, PES15_16)
 look_for(ces15phone, "women")
 look_for(ces15phone, "gays")
-ces15phone$moral1<-Recode(ces15phone$PES15_26, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
-ces15phone$moral2<-Recode(ces15phone$PES15_43, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA", as.numeric=T)
+ces15phone$moral_1<-Recode(ces15phone$PES15_26, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+ces15phone$moral_2<-Recode(ces15phone$PES15_43, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA", as.numeric=T)
 
 # moral traditionalism3
 # There is a way easier way to do this. 
@@ -473,23 +467,23 @@ ces15phone$moral2<-Recode(ces15phone$PES15_43, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1;
 # I noticed you set the DK to 50. That's neat. I had never thought about that. 
 
 #First rescale this from 0 to 1
-ces15phone$moral3<-Recode(ces15phone$PES15_16, "998=50; 999=NA", as.numeric=T)
+ces15phone$moral_3<-Recode(ces15phone$PES15_16, "998=50; 999=NA", as.numeric=T)
 #table to check
-table(ces15phone$moral3)
+table(ces15phone$moral_3)
 #Rescale to 0 and 1 by dividing by 100
-ces15phone$moral3<-ces15phone$moral3/100
+ces15phone$moral_3<-ces15phone$moral_3/100
 #Redverse
-ces15phone$moral3<-reverse.code(-1, ces15phone[,'moral3'])
+ces15phone$moral_3<-reverse.code(-1, ces15phone[,'moral_3'])
 
 #Scale Averaging 
 ces15phone %>% 
   rowwise() %>% 
   mutate(moral_traditionalism=mean(
-    c_across(c('moral1', 'moral2', 'moral3')), na.rm=T  
+    c_across(c('moral_1', 'moral_2', 'moral_3')), na.rm=T  
   )) %>% 
   ungroup()->ces15phone
 ces15phone %>% 
-  select(starts_with("moral")) %>% 
+  select(starts_with("moral_")) %>% 
   summary()
 #Check distribution of moral_traditionalism
 qplot(ces15phone$moral_traditionalism, geom="histogram")
@@ -497,7 +491,7 @@ table(ces15phone$moral_traditionalism, useNA="ifany")
 
 #Calculate Cronbach's alpha
 ces15phone %>% 
-  select(moral1, moral2, moral3) %>% 
+  select(moral_1, moral_2, moral_3) %>% 
   psych::alpha(.)
 
 #recode Political Disaffection (PES15_48)
@@ -646,3 +640,117 @@ ces15phone %>%
 val_labels(ces15phone$vismin)<-c('Visible Minority'=1, 'Non Visible Minority'=0)
 
 table(ces15phone$CPS15_85, ces15phone$vismin, useNA = "ifany")
+
+#recode Immigration (PES15_28)
+look_for(ces15phone, "imm")
+ces15phone$immigration_rates<-Recode(ces15phone$PES15_28, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces15phone$immigration_rates)
+
+#recode Environment (MBS15_C14)
+look_for(ces15phone, "env")
+ces15phone$enviro<-Recode(ces15phone$MBS15_C14, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
+#checks
+table(ces15phone$enviro)
+
+#recode Capital Punishment (MBS15_H2)
+look_for(ces15phone, "death")
+ces15phone$death_penalty<-Recode(ces15phone$MBS15_H2, "1=1; 2=0; 8=0.5; else=NA")
+#checks
+table(ces15phone$death_penalty)
+
+#recode Crime (MBS15_I5)
+look_for(ces15phone, "crime")
+ces15phone$crime<-Recode(ces15phone$MBS15_I5, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+#checks
+table(ces15phone$crime)
+
+#recode Gay Rights (PES15_29)
+look_for(ces15phone, "gays")
+ces15phone$gay_rights<-Recode(ces15phone$PES15_29, "1=0; 5=1; 8=0.5; else=NA")
+#checks
+table(ces15phone$gay_rights)
+
+#recode Abortion (MBS15_H3)
+look_for(ces15phone, "abort")
+ces15phone$abortion<-Recode(ces15phone$MBS15_H3, "1=1; 2=0; 8=0.5; else=NA")
+#checks
+table(ces15phone$abortion)
+
+#recode Lifestyle (MBS15_C6)
+look_for(ces15phone, "lifestyle")
+ces15phone$lifestyles<-Recode(ces15phone$MBS15_C6, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+#checks
+table(ces15phone$lifestyles)
+
+#recode Stay Home (PES15_26)
+look_for(ces15phone, "home")
+ces15phone$stay_home<-Recode(ces15phone$PES15_26, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces15phone$stay_home)
+
+#recode Marriage Children (MBS15_I4)
+look_for(ces15phone, "children")
+ces15phone$marriage_children<-Recode(ces15phone$MBS15_I4, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+#checks
+table(ces15phone$marriage_children)
+
+#recode Values (MBS15_C8)
+look_for(ces15phone, "traditional")
+ces15phone$values<-Recode(ces15phone$MBS15_C8, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+#checks
+table(ces15phone$values)
+
+#recode Morals (MBS15_C7)
+look_for(ces15phone, "moral")
+ces15phone$morals<-Recode(ces15phone$MBS15_C7, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
+#checks
+table(ces15phone$morals)
+
+#recode Moral Trad (abortion, lifestyles, stay home, values, marriage childen, morals)
+ces15phone$trad1<-ces15phone$abortion
+ces15phone$trad2<-ces15phone$lifestyles
+ces15phone$trad3<-ces15phone$stay_home
+ces15phone$trad4<-ces15phone$values
+ces15phone$trad5<-ces15phone$marriage_children
+ces15phone$trad6<-ces15phone$morals
+table(ces15phone$trad1)
+table(ces15phone$trad2)
+table(ces15phone$trad3)
+table(ces15phone$trad4)
+table(ces15phone$trad5)
+table(ces15phone$trad6)
+
+ces15phone %>% 
+  rowwise() %>% 
+  mutate(traditionalism=mean(
+    c_across(trad1:trad6)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'traditionalism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces15phone %>% 
+  rowwise() %>% 
+  mutate(traditionalism=mean(
+    c_across(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6')), na.rm=T  
+  )) %>% 
+  ungroup()->ces15phone
+
+ces15phone %>% 
+  select(starts_with("trad")) %>% 
+  summary()
+#Check distribution of traditionalism
+qplot(ces15phone$traditionalism, geom="histogram")
+table(ces15phone$traditionalism, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces15phone %>% 
+  select(trad1, trad2, trad3, trad4, trad5, trad6) %>% 
+  alpha(.)
+#Check correlation
+ces15phone %>% 
+  select(trad1, trad2, trad3, trad4, trad5, trad6) %>% 
+  cor(., use="complete.obs")

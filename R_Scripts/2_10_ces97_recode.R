@@ -184,3 +184,175 @@ val_labels(ces97$pro_redistribution)<-c(Non_Pro=0, Pro=1)
 #checks
 val_labels(ces97$pro_redistribution)
 table(ces97$pro_redistribution)
+
+#recode Market Liberalism (cpsf6 and pese19)
+look_for(ces97, "private")
+look_for(ces97, "blame")
+ces97$market1<-Recode(ces97$cpsf6, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+ces97$market2<-Recode(ces97$pese19, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces97$market1)
+table(ces97$market2)
+
+ces97 %>% 
+  rowwise() %>% 
+  mutate(market_liberalism=mean(
+    c_across(market1:market2)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('market1', 'market2', 'market_liberalism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces97 %>% 
+  rowwise() %>% 
+  mutate(market_liberalism=mean(
+    c_across(c('market1', 'market2')), na.rm=T  
+  )) %>% 
+  ungroup()->ces97
+
+ces97 %>% 
+  select(starts_with("market")) %>% 
+  summary()
+#Check distribution of market_liberalism
+qplot(ces97$market_liberalism, geom="histogram")
+table(ces97$market_liberalism, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces97 %>% 
+  select(market1, market2) %>% 
+  alpha(.)
+#Check correlation
+ces97 %>% 
+  select(market1, market2) %>% 
+  cor(., use="complete.obs")
+
+#recode Immigration (cpsj18)
+look_for(ces97, "imm")
+ces97$immigration_rates<-Recode(ces97$cpsj18, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces97$immigration_rates)
+
+#recode Environment (mbsa6)
+look_for(ces97, "env")
+ces97$enviro<-Recode(ces97$mbsa6, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
+#checks
+table(ces97$enviro)
+
+#recode Capital Punishment (pese13)
+look_for(ces97, "punish")
+ces97$death_penalty<-Recode(ces97$pese13, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA")
+#checks
+table(ces97$death_penalty)
+
+#recode Crime (cpsa2g)
+look_for(ces97, "crime")
+ces97$crime<-Recode(ces97$cpsa2g, "1=1; 2=0.5; 3=0; 8=0.5; else=NA")
+#checks
+table(ces97$crime)
+
+#recode Gay Rights (mbsg3)
+look_for(ces97, "homo")
+ces97$gay_rights<-Recode(ces97$mbsg3, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
+#checks
+table(ces97$gay_rights)
+
+#recode Abortion (pese5a pese5b pese5c)
+look_for(ces97, "abort")
+ces97 %>% 
+  mutate(abortion=case_when(
+    pese5a==3 ~0,
+    pese5a==1 ~1,
+    pese5a==2 ~0.5,
+    pese5a==8 ~0.5,
+    pese5b==3 ~1,
+    pese5b==2 ~0,
+    pese5b==1 ~0.5,
+    pese5b==8 ~0.5,
+    pese5c==2 ~1,
+    pese5c==1 ~0,
+    pese5c==3 ~0.5,
+    pese5c==8 ~0.5,
+  ))->ces97
+#checks
+table(ces97$abortion)
+
+#recode Lifestyle (mbsa7)
+look_for(ces97, "lifestyle")
+ces97$lifestyles<-Recode(ces97$mbsa7, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+#checks
+table(ces97$lifestyles)
+
+#recode Stay Home (cpsf3)
+look_for(ces97, "home")
+ces97$stay_home<-Recode(ces97$cpsf3, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces97$stay_home)
+
+#recode Marriage Children (cpsf2)
+look_for(ces97, "children")
+ces97$marriage_children<-Recode(ces97$cpsf2, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces97$marriage_children)
+
+#recode Values (mbsa9)
+look_for(ces97, "traditional")
+ces97$values<-Recode(ces97$mbsa9, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+#checks
+table(ces97$values)
+
+#recode Morals (mbsa8)
+look_for(ces97, "moral")
+ces97$morals<-Recode(ces97$mbsa8, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
+#checks
+table(ces97$morals)
+
+#recode Moral Traditionalism (abortion, lifestyles, stay home, values, marriage childen, morals)
+ces97$trad1<-ces97$abortion
+ces97$trad2<-ces97$lifestyles
+ces97$trad3<-ces97$stay_home
+ces97$trad4<-ces97$values
+ces97$trad5<-ces97$marriage_children
+ces97$trad6<-ces97$morals
+table(ces97$trad1)
+table(ces97$trad2)
+table(ces97$trad3)
+table(ces97$trad4)
+table(ces97$trad5)
+table(ces97$trad6)
+
+ces97 %>% 
+  rowwise() %>% 
+  mutate(traditionalism=mean(
+    c_across(trad1:trad6)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'traditionalism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces97 %>% 
+  rowwise() %>% 
+  mutate(traditionalism=mean(
+    c_across(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6')), na.rm=T 
+  )) %>% 
+  ungroup()->ces97
+
+ces97 %>% 
+  select(starts_with("trad")) %>% 
+  summary()
+#Check distribution of traditionalism
+qplot(ces97$traditionalism, geom="histogram")
+table(ces97$traditionalism, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces97 %>% 
+  select(trad1, trad2, trad3, trad4, trad5, trad6) %>% 
+  alpha(.)
+#Check correlation
+ces97 %>% 
+  select(trad1, trad2, trad3, trad4, trad5, trad6) %>% 
+  cor(., use="complete.obs")

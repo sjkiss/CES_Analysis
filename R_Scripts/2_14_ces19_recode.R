@@ -465,35 +465,35 @@ ces19phone %>%
 #recode Moral Traditionalism (p35_b, p20_e,  p35_c)
 look_for(ces19phone, "women")
 look_for(ces19phone, "gays")
-ces19phone$moral1<-Recode(ces19phone$p20_e, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
-ces19phone$moral2<-Recode(ces19phone$p35_b, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
-ces19phone$moral3<-Recode(as.numeric(ces19phone$p35_c), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
-#val_labels(ces19phone$moral1)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
+ces19phone$moral_1<-Recode(ces19phone$p20_e, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
+ces19phone$moral_2<-Recode(ces19phone$p35_b, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
+ces19phone$moral_3<-Recode(as.numeric(ces19phone$p35_c), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
+#val_labels(ces19phone$moral_1)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
 #checks
-table(ces19phone$moral1)
-table(ces19phone$moral2)
-table(ces19phone$moral3)
+table(ces19phone$moral_1)
+table(ces19phone$moral_2)
+table(ces19phone$moral_3)
 ces19phone %>% 
   names()
 ces19phone %>% 
   rowwise() %>% 
   mutate(moral_traditionalism=mean(
-    c_across(moral1:moral3)
+    c_across(moral_1:moral_3)
     , na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
-  select(c('moral1', 'moral2', 'moral3', 'moral_traditionalism')) %>% 
+  select(c('moral_1', 'moral_2', 'moral_3', 'moral_traditionalism')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na>0, na<4)
 #Scale Averaging 
 ces19phone %>% 
   rowwise() %>% 
   mutate(moral_traditionalism=mean(
-    c_across(c('moral1', 'moral2', 'moral3')), na.rm=T  
+    c_across(c('moral_1', 'moral_2', 'moral_3')), na.rm=T  
   )) %>% 
   ungroup()->ces19phone
 ces19phone %>% 
-  select(starts_with("moral")) %>% 
+  select(starts_with("moral_")) %>% 
   summary()
 #Check distribution of moral_traditionalism
 qplot(ces19phone$moral_traditionalism, geom="histogram")
@@ -501,7 +501,7 @@ table(ces19phone$moral_traditionalism, useNA="ifany")
 
 #Calculate Cronbach's alpha
 ces19phone %>% 
-  select(moral1, moral2, moral3) %>% 
+  select(moral_1, moral_2, moral_3) %>% 
   alpha(.)
 
 #recode Political Disaffection (p20_i and p20_n)
@@ -664,4 +664,40 @@ table(ces19phone$mip, useNA="ifany")
 source(here('R_Scripts/2_14_ces_19_vismin_recode.R'))
 
 
-  
+#recode Immigration (q39)
+look_for(ces19phone, "admit")
+ces19phone$immigration_rates<-Recode(ces19phone$q39, "1=0; 2=1; 3=0.5; -9=0.5; else=NA", as.numeric=T)
+#checks
+table(ces19phone$immigration_rates)
+
+#recode Environment (q27_b) (spending question)
+look_for(ces19phone, "env")
+ces19phone$enviro<-Recode(ces19phone$q27_b, "1=0; 2=1; 3=0.5; -9=0.5; else=NA")
+#checks
+table(ces19phone$enviro)
+
+#recode Capital Punishment (Missing)
+
+#recode Crime (q27_c) (spending question)
+look_for(ces19phone, "crime")
+ces19phone$crime<-Recode(ces19phone$q27_c, "1=1; 2=0; 3=0.5; -9=0.5; else=NA")
+#checks
+table(ces19phone$crime)
+
+#recode Gay Rights (p35_c) (should do more question)
+look_for(ces19phone, "gays")
+ces19phone$gay_rights<-Recode(ces19phone$p35_c, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA")
+#checks
+table(ces19phone$gay_rights)
+
+#recode Abortion (missing)
+
+#recode Stay Home (p20_e)
+look_for(ces19phone, "women")
+ces19phone$stay_home<-Recode(ces19phone$p20_e, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA")
+#checks
+table(ces19phone$stay_home)
+
+#recode Moral Trad (abortion, lifestyles, stay home, values, marriage childen, morals)
+ces19phone$traditionalism<-ces19phone$stay_home
+table(ces19phone$traditionalism)
