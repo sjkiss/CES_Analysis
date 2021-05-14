@@ -141,7 +141,7 @@ table(ces88$occupation3)
 #recode Income (n19)
 look_for(ces88, "income")
 ces88$income<-Recode(ces88$n19, "1:2=1; 3=2; 4=3; 5:6=4; 7:9=5; else=NA")
-val_labels(ces88$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces88$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 #checks
 val_labels(ces88$income)
 table(ces88$income)
@@ -149,6 +149,8 @@ table(ces88$income)
 #recode Market Liberalism (qc13 and qc2) (Left-Right)
 look_for(ces88, "profit")
 look_for(ces88, "regulation")
+ces88$qc13
+ces88$qc2
 ces88$market1<-Recode(ces88$qc13, "1=1; 2=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
 ces88$market2<-Recode(ces88$qc2, "1=1; 2=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
 #checks
@@ -184,7 +186,7 @@ table(ces88$market_liberalism, useNA="ifany")
 library(psych)
 ces88 %>% 
   select(market1, market2) %>% 
-  alpha(.)
+  psych::alpha(.)
 #Check correlation
 ces88 %>% 
   select(market1, market2) %>% 
@@ -193,11 +195,15 @@ ces88 %>%
 #recode Redistribution (xk2 and qc16) (Right-Left)
 look_for(ces88, "wealth")
 look_for(ces88, "poor")
+ces88$xk2
+table(ces88$xk2, useNA = "ifany")
+table(ces88$qc16, useNA="ifany")
+val_labels(ces88$xk2)
 ces88$redistro1<-Recode(ces88$xk2, "1=1; 3=0.5; 5=0; 8=0.5; else=NA", as.numeric=T)
 ces88$redistro2<-Recode(ces88$qc16, "1=1; 2=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
 #checks
-table(ces88$redistro1)
-table(ces88$redistro2)
+table(ces88$redistro1, ces88$xk2)
+table(ces88$redistro2, ces88$qc16)
 
 ces88 %>% 
   rowwise() %>% 
@@ -227,7 +233,7 @@ table(ces88$redistribution, useNA="ifany")
 #Calculate Cronbach's alpha
 ces88 %>% 
   select(redistro1, redistro2) %>% 
-  alpha(.)
+  psych::alpha(.)
 #Check correlation
 ces88 %>% 
   select(redistro1, redistro2) %>% 
@@ -242,18 +248,19 @@ table(ces88$pro_redistribution)
 
 #recode Immigration (l5, qf2, gf10) (Left-Right)
 look_for(ces88, "imm")
+ces88$l5
 ces88$immigration_rates<-Recode(ces88$l5, "1=0; 3=0.5; 5=1; 8=0.5; else=NA", as.numeric=T)
 ces88$immigration_better<-Recode(ces88$qf2, "1=0; 2=1; 8=0.5; else=NA", as.numeric=T)
 ces88$immigration_encourage<-Recode(ces88$qf10, "1=0; 2=1; 8=0.5; else=NA", as.numeric=T)
 #checks
-table(ces88$immigration_rates)
-table(ces88$immigration_better)
-table(ces88$immigration_encourage)
+table(ces88$immigration_rates, ces88$l5 , useNA = "ifany" )
+table(ces88$immigration_better, ces88$qf2 , useNA = "ifany" )
+table(ces88$immigration_encourage, ces88$qf10 , useNA = "ifany" )
 
 ces88 %>% 
   rowwise() %>% 
   mutate(immigration=mean(
-    c_across(immigration_rate:immigration_encourage)
+    c_across(immigration_rates:immigration_encourage)
     , na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
@@ -278,7 +285,7 @@ table(ces88$immigration, useNA="ifany")
 #Calculate Cronbach's alpha
 ces88 %>% 
   select(immigration_rates, immigration_better, immigration_encourage) %>% 
-  alpha(.)
+  psych::alpha(.)
 #Check correlation
 ces88 %>% 
   select(immigration_rates, immigration_better, immigration_encourage) %>% 
@@ -288,17 +295,27 @@ ces88 %>%
 look_for(ces88, "env")
 ces88$enviro<-Recode(ces88$qf9, "1=0; 2=1; 8=0.5; else=NA")
 #checks
-table(ces88$enviro)
+table(ces88$enviro, ces88$qf9) #No one had 8
 
 #recode Capital Punishment (qf1) (Left-Right)
 look_for(ces88, "punish")
+ces88$qf1
 ces88$death_penalty<-Recode(ces88$qf1, "1=0; 2=1; 8=0.5; else=NA")
 #checks
-table(ces88$death_penalty)
+table(ces88$death_penalty, ces88$qf1)
 
 #recode Crime (qh11) (Left-Right)
 look_for(ces88, "crime")
-ces88$crime<-Recode(ces88$qh11, "1=1; 2=0.9; 3=0.8; 4=0.7; 5=0.6; 6=0.5; 7=0.4; 8=0.3; 9=0.2; 10=0.1; 11:12=0; else=NA")
+#remotes::install_github('sjkiss/skpersonal')
+ces88$crime<-skpersonal::revScale(as.numeric(ces88$qh11), reverse=T)
+
+table(ces88$crime, ces88$qh11 , useNA = "ifany" )
+summary(ces88$qh11)
+#ces88$crime<-Recode(ces88$qh11, "1=1; 2=0.9; 3=0.8; 4=0.7; 5=0.6; 6=0.5; 7=0.4; 8=0.3; 9=0.2; 10=0.1; 11:12=0; else=NA")
+ces88$qh11
+
+ces88$qh11
+var_label(ces88$qh11)
 #checks
 table(ces88$crime)
 
@@ -362,7 +379,8 @@ table(ces88$traditionalism, useNA="ifany")
 #Calculate Cronbach's alpha
 ces88 %>% 
   select(trad1, trad2) %>% 
-  alpha(.)
+  psych::alpha(.)
+
 #Check correlation
 ces88 %>% 
   select(trad1, trad2) %>% 

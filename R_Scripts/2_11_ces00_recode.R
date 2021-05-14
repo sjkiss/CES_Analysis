@@ -351,13 +351,10 @@ ces00 %>%
   #mutate is what we use to transform a variable
   #across, works, well, across a bunch of columns that are sepcified in the brackets
   #num_range combines the prefix in the quotes with the numbers after the comma,
-  #Then we say to specify that it everything should be converted to numeric
-  mutate(across(num_range('trad', 1:6), as.numeric))->ces00
+  #Then we say to specify that it everything should have values removed
+  mutate(across(num_range('trad', 1:6), remove_val_labels))->ces00
 
-#Now check....
-ces00 %>% 
-  select(num_range('trad', 1:6)) %>% 
-  map(., class)
+
 
 ces00 %>% 
   mutate(traditionalism=mean(c_across(trad1:trad6), na.rm=T ))->out
@@ -390,3 +387,4 @@ ces00 %>%
 ces00 %>% 
   select(trad1, trad2, trad3, trad4, trad5, trad6) %>% 
   cor(., use="complete.obs")
+
