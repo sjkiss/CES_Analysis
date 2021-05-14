@@ -1,7 +1,7 @@
 #File to Recode 1993 CES Data 
 #load data
 data("ces93")
-
+#### gender#### 
 #recode Gender (CPSRGEN)
 look_for(ces93, "gender")
 ces93$male<-Recode(ces93$CPSRGEN, "1=1; 5=0")
@@ -9,10 +9,11 @@ val_labels(ces93$male)<-c(Female=0, Male=1)
 #checks
 val_labels(ces93$male)
 table(ces93$male)
-
+#### union #### 
 #recode Union Household (CPSJOB6)
 look_for(ces93, "union")
-ces93$union<-Recode(ces93$CPSJOB6, "1=1; 5=0; else=NA")
+class(ces93$CPSJOB6)
+ces93$union<-car::Recode(ces93$CPSJOB6, "1=1; 5=0; else=NA")
 val_labels(ces93$union)<-c(None=0, Union=1)
 #checks
 val_labels(ces93$union)
@@ -23,7 +24,7 @@ ces93$union_both<-ces93$union
 #checks
 val_labels(ces93$union_both)
 table(ces93$union_both)
-
+####education  #### 
 #recode Education (CPSO3)
 look_for(ces93, "education")
 ces93 %>% 
@@ -45,7 +46,7 @@ val_labels(ces93$degree)<-c(nodegree=0, degree=1)
 #checks
 val_labels(ces93$degree)
 table(ces93$degree)
-
+####region  #### 
 #recode Region (CPSPROV)
 look_for(ces93, "province")
 ces93$region<-Recode(ces93$CPSPROV, "0:3=1; 5=2; 6:9=3; 4=NA")
@@ -53,7 +54,7 @@ val_labels(ces93$region)<-c(Atlantic=1, Ontario=2, West=3)
 #checks
 val_labels(ces93$region)
 table(ces93$region)
-
+#### quebec#### 
 #recode Quebec (CPSPROV)
 look_for(ces93, "province")
 ces93$quebec<-Recode(ces93$CPSPROV, "0:3=0; 5:9=0; 4=1")
@@ -61,14 +62,14 @@ val_labels(ces93$quebec)<-c(Other=0, Quebec=1)
 #checks
 val_labels(ces93$quebec)
 table(ces93$quebec)
-
+#### age#### 
 #recode Age (CPSAGE)
 look_for(ces93, "age")
 ces93$yob<-Recode(ces93$CPSAGE, "9997:9999=NA")
 ces93$age<-1993-ces93$yob
 #check
 table(ces93$age)
-
+#### religion #### 
 #recode Religion (CPSO9)
 look_for(ces93, "relig")
 ces93$religion<-Recode(ces93$CPSO9, "97=0; 2=1; 1=2; 3:5=3; else=NA")
@@ -76,15 +77,18 @@ val_labels(ces93$religion)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 #checks
 val_labels(ces93$religion)
 table(ces93$religion)
-
+#### language#### 
 #recode Language (PESLANG)
 look_for(ces93, "language")
-ces93$language<-Recode(ces93$PESLANG, "'E'=1; 'F'=0; else=NA")
+
+#val_labels(ces93$PESLANG)<-NULL
+ces93$language<-Recode(as.character(ces93$PESLANG), "'E'=1; 'F'=0; else=NA")
 val_labels(ces93$language)<-c(French=0, English=1)
+
 #checks
 val_labels(ces93$language)
 table(ces93$language)
-
+#### non-charter language#### 
 #recode Non-charter Language (CPSO16 and REFN16)
 look_for(ces93, "language")
 ces93 %>% 
@@ -98,15 +102,16 @@ val_labels(ces93$non_charter_language)<-c(Charter=0, Non_Charter=1)
 #checks
 val_labels(ces93$non_charter_language)
 table(ces93$non_charter_language)
-
+#### employment#### 
 #recode Employment (CPSJOB1)
 look_for(ces93, "employment")
+
 ces93$employment<-Recode(ces93$CPSJOB1, "2:7=0; 1=1; else=NA")
 val_labels(ces93$employment)<-c(Unemployed=0, Employed=1)
 #checks
 val_labels(ces93$employment)
 table(ces93$employment)
-
+#### sector#### 
 #recode Sector (CPSJOB5 & CPSJOB1)
 look_for(ces93, "sector")
 ces93 %>% 
@@ -124,7 +129,7 @@ val_labels(ces93$sector)<-c(Private=0, Public=1)
 #checks
 val_labels(ces93$sector)
 table(ces93$sector)
-
+####party id #### 
 #recode Party ID (PESL1)
 look_for(ces93, "identification")
 ces93$party_id<-Recode(ces93$PESL1, "1=1; 2=2; 3=3; 4=2; 5:6=0; else=NA")
@@ -132,7 +137,7 @@ val_labels(ces93$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces93$party_id)
 table(ces93$party_id)
-
+#### vote#### 
 #recode Vote (PESA4)
 look_for(ces93, "vote")
 ces93$vote<-Recode(ces93$PESA4, "1=2; 2=1; 3=3; 5=4; 4=2; else=NA")
@@ -140,7 +145,7 @@ val_labels(ces93$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Gre
 #checks
 val_labels(ces93$vote)
 table(ces93$vote)
-
+#### occupation#### 
 #recode Occupation (CPSPINPR)
 look_for(ces93, "occupation")
 look_for(ces93, "pinporr")
@@ -159,7 +164,7 @@ val_labels(ces93$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3
 #checks
 val_labels(ces93$occupation3)
 table(ces93$occupation3)
-
+####income #### 
 #recode Income (CPSO18 and CPSO18A)
 look_for(ces93, "income")
 ces93 %>% 
@@ -180,10 +185,11 @@ val_labels(ces93$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, 
 #checks
 val_labels(ces93$income)
 table(ces93$income)
-
+#### redistribution#### 
 #recode Redistribution (MBSA8)
 look_for(ces93, "rich")
 val_labels(ces93$MBSA8)
+table(ces93$MBSA8, useNA = "ifany")
 ces93$redistribution<-Recode(ces93$MBSA8, "; 1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
 #val_labels(ces93$redistribution)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
 #checks
@@ -196,3 +202,201 @@ val_labels(ces93$pro_redistribution)<-c(Non_Pro=0, Pro=1)
 #checks
 val_labels(ces93$pro_redistribution)
 table(ces93$pro_redistribution)
+
+#recode Market Liberalism (PESE15 and MBSA)
+look_for(ces93, "private")
+look_for(ces93, "blame")
+table(ces93$PESE15, useNA = "ifany")
+ces93$market1<-Recode(ces93$PESE15, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+ces93$market2<-Recode(ces93$MBSA2, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+#checks
+table(ces93$market1, ces93$PESE15, useNA = "ifany" )
+table(ces93$market2, ces93$MBSA2 , useNA = "ifany" )
+
+#The code below only works if we remove the value labels.
+#very annoying; i have filed a bug request
+
+val_labels(ces93$market1)<-NULL
+val_labels(ces93$market2)<-NULL
+#This does not work for some reason!
+ces93 %>% 
+  rowwise() %>% 
+  mutate(market_liberalism=mean(
+  c_across(market1:market2))) -> out
+
+
+out %>% 
+  ungroup() %>% 
+  select(c('market1', 'market2', 'market_liberalism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces93 %>% 
+  rowwise() %>% 
+  mutate(market_liberalism=mean(
+    c_across(c('market1', 'market2')), na.rm=T  
+  )) %>% 
+  ungroup()->ces93
+
+ces93 %>% 
+  select(starts_with("market")) %>% 
+  summary()
+#Check distribution of market_liberalism
+qplot(ces93$market_liberalism, geom="histogram")
+table(ces93$market_liberalism, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces93 %>% 
+  select(market1, market2) %>% 
+  psych::alpha(.)
+#Check correlation
+ces93 %>% 
+  select(market1, market2) %>% 
+  cor(., use="complete.obs")
+
+#recode Immigration (CPSG5)
+look_for(ces93, "imm")
+ces93$immigration_rates<-Recode(ces93$CPSG5, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces93$immigration_rates, useNA = "ifany")
+
+#recode Environment (MBSA12)
+look_for(ces93, "env")
+table(ces93$MBSA12, useNA = "ifany")
+ces93$enviro<-Recode(ces93$MBSA12, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
+#checks
+table(ces93$enviro, useNA = "ifany")
+
+#recode Capital Punishment (CPSG7C)
+look_for(ces93, "punish")
+table(ces93$CPSG7C, useNA = "ifany")
+ces93$death_penalty<-Recode(ces93$CPSG7C, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA")
+#checks
+table(ces93$death_penalty, useNA = "ifany")
+
+#recode Crime (PESE15B)
+look_for(ces93, "crime")
+table(ces93$PESE15B)
+ces93$crime<-Recode(ces93$PESE15B, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces93$crime, useNA = "ifany")
+
+#recode Gay Rights (CPSG7B)
+look_for(ces93, "homo")
+table(ces93$CPSG7B)
+ces93$gay_rights<-Recode(ces93$CPSG7B, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA")
+#checks
+table(ces93$gay_rights,  useNA = "ifany")
+
+#recode Abortion (CPSG6A CPSG6B CPSG6C) 
+look_for(ces93, "abort")
+table(ces93$CPSG6A)
+ces93 %>% 
+  mutate(abortion=case_when(
+    CPSG6A==3 ~0,
+    CPSG6A==1 ~1,
+    CPSG6A==2 ~0.5,
+    CPSG6A==8 ~0.5,
+    CPSG6B==3 ~1,
+    CPSG6B==2 ~0,
+    CPSG6B==1 ~0.5,
+    CPSG6B==8 ~0.5,
+    CPSG6C==2 ~1,
+    CPSG6C==1 ~0,
+    CPSG6C==3 ~0.5,
+    CPSG6C==8 ~0.5,
+  ))->ces93
+#checks
+table(ces93$abortion, useNA = "ifany")
+
+#recode Censorship (MBSA15)
+look_for(ces93, "porn")
+ces93$censorship<-Recode(ces93$MBSA15, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+#checks
+table(ces93$censorship, useNA = "ifany")
+
+#recode Stay Home (CPSG7A)
+look_for(ces93, "home")
+ces93$stay_home<-Recode(ces93$CPSG7A, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces93$stay_home,useNA = "ifany")
+
+#recode Marriage Children (CPSG7E)
+look_for(ces93, "children")
+ces93$marriage_children<-Recode(ces93$CPSG7E, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces93$marriage_children, useNA = "ifany")
+
+#recode Values (MBSA17)
+look_for(ces93, "traditional")
+table(ces93$MBSA17)
+ces93$values<-Recode(ces93$MBSA17, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+#checks
+table(ces93$values, useNA = "ifany")
+
+#recode Individualism (MBSA7)
+look_for(ces93, "individual")
+ces93$individualism<-Recode(ces93$MBSA7, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+#checks
+table(ces93$individualism)
+
+#recode Moral Traditionalism (abortion, censorship, stay home, values, marriage childen, individualism)
+ces93$trad1<-ces93$abortion
+ces93$trad2<-ces93$censorship
+ces93$trad3<-ces93$stay_home
+ces93$trad4<-ces93$values
+ces93$trad5<-ces93$marriage_children
+ces93$trad6<-ces93$individualism
+table(ces93$trad1, useNA = "ifany")
+table(ces93$trad2, useNA = "ifany")
+table(ces93$trad3, useNA = "ifany")
+table(ces93$trad4, useNA = "ifany")
+table(ces93$trad5, useNA = "ifany")
+table(ces93$trad6, useNA = "ifany")
+
+#Remove value labels
+#Start with the data frame
+ces93 %>% 
+  #Mutate at is a way of transforming variables *in place*. 
+  #Using the vars() argument inside mutate_at lets you select which variables you want to transform
+  #then you provide the transformation
+  #In this case, we are selecting trad1 through trad6 and providing the function remove_value_labels
+  #Then resaving the data frame back as ces93
+  mutate(across(num_range('trad', 1:6), remove_val_labels))->ces93
+
+ces93 %>% 
+  rowwise() %>% 
+  mutate(traditionalism=mean(
+    c_across(trad1:trad6)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'traditionalism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces93 %>% 
+  rowwise() %>% 
+  mutate(traditionalism=mean(
+    c_across(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6')), na.rm=T 
+  )) %>% 
+  ungroup()->ces93
+
+ces93 %>% 
+  select(starts_with("trad")) %>% 
+  summary()
+#Check distribution of traditionalism
+qplot(ces93$traditionalism, geom="histogram")
+table(ces93$traditionalism, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces93 %>% 
+  select(trad1, trad2, trad3, trad4, trad5, trad6) %>% 
+  psych::alpha(.)
+#Check correlation
+ces93 %>% 
+  select(trad1, trad2, trad3, trad4, trad5, trad6) %>% 
+  cor(., use="complete.obs")
+

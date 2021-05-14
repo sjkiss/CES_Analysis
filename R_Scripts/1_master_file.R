@@ -262,6 +262,22 @@ ces04 %>%
   rename(redistribution=redistribution04)->ces04
 ces04 %>% 
   rename(pro_redistribution=pro_redistribution04)->ces04
+ces04 %>% 
+  rename(market_liberalism=market_liberalism04)->ces04
+ces04 %>% 
+  rename(traditionalism=traditionalism04)->ces04
+ces04 %>% 
+  rename(immigration_rates=immigration_rates04)->ces04
+ces04 %>% 
+  rename(enviro=enviro04)->ces04
+ces04 %>% 
+  rename(death_penalty=death_penalty04)->ces04
+ces04 %>% 
+  rename(crime=crime04)->ces04
+ces04 %>% 
+  rename(gay_rights=gay_rights04)->ces04
+ces04 %>% 
+  rename(abortion=abortion04)->ces04
 table(ces04$survey, ces04$non_charter_language)
 
 #### Rename CES06 ####
@@ -301,6 +317,22 @@ ces06 %>%
   rename(redistribution=redistribution06)->ces06
 ces06 %>% 
   rename(pro_redistribution=pro_redistribution06)->ces06
+ces06 %>% 
+  rename(market_liberalism=market_liberalism06)->ces06
+ces06 %>% 
+  rename(traditionalism=traditionalism06)->ces06
+ces06 %>% 
+  rename(immigration_rates=immigration_rates06)->ces06
+ces06 %>% 
+  rename(enviro=enviro06)->ces06
+ces06 %>% 
+  rename(death_penalty=death_penalty06)->ces06
+ces06 %>% 
+  rename(crime=crime06)->ces06
+ces06 %>% 
+  rename(gay_rights=gay_rights06)->ces06
+ces06 %>% 
+  rename(abortion=abortion06)->ces06
 table(ces06$survey, ces06$non_charter_language)
 
 #### Rename CES08 ####
@@ -340,6 +372,22 @@ ces08 %>%
   rename(redistribution=redistribution08)->ces08
 ces08 %>% 
   rename(pro_redistribution=pro_redistribution08)->ces08
+ces08 %>% 
+  rename(market_liberalism=market_liberalism08)->ces08
+ces08 %>% 
+  rename(traditionalism=traditionalism08)->ces08
+ces08 %>% 
+  rename(immigration_rates=immigration_rates08)->ces08
+ces08 %>% 
+  rename(enviro=enviro08)->ces08
+ces08 %>% 
+  rename(death_penalty=death_penalty08)->ces08
+ces08 %>% 
+  rename(crime=crime08)->ces08
+ces08 %>% 
+  rename(gay_rights=gay_rights08)->ces08
+ces08 %>% 
+  rename(abortion=abortion08)->ces08
 table(ces08$survey, ces08$non_charter_language)
 
 #### Rename CES11 ####
@@ -379,6 +427,22 @@ ces11 %>%
   rename(redistribution=redistribution11)->ces11
 ces11 %>% 
   rename(pro_redistribution=pro_redistribution11)->ces11
+ces11 %>% 
+  rename(market_liberalism=market_liberalism11)->ces11
+ces11 %>% 
+  rename(traditionalism=traditionalism11)->ces11
+ces11 %>% 
+  rename(immigration_rates=immigration_rates11)->ces11
+ces11 %>% 
+  rename(enviro=enviro11)->ces11
+ces11 %>% 
+  rename(death_penalty=death_penalty11)->ces11
+ces11 %>% 
+  rename(crime=crime11)->ces11
+ces11 %>% 
+  rename(gay_rights=gay_rights11)->ces11
+ces11 %>% 
+  rename(abortion=abortion11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -464,7 +528,9 @@ ces %>%
           "income", 
           "non_charter_language", 
           "occupation3",
-          "election", "size", "redistribution", "pro_redistribution") )-> ces
+          "election", "size", "redistribution", "pro_redistribution",
+          "market_liberalism", "traditionalism", "immigration_rates", "enviro", "death_penalty", 
+          "crime", "gay_rights", "abortion", ) )-> ces
 ##
 
 library(stringr)

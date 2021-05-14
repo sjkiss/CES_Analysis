@@ -312,9 +312,12 @@ m2.qc.weight<-svyglm(ndp~working_class4+union_both+income+degree+sector+age+male
 #Compare m2 v.
 stargazer(m2.all, m2.all.weight, m2.roc, m2.roc.weight, m2.qc, m2.qc.weight, column.labels = c('CAN', 'CAN', 'ROC', 'ROC','QC', 'QC'), out=here("Tables", "class_demographic_controls_weighted_unweighted.html"),type="html")
 
-
 #Print complete models
 stargazer(m1.all, m1.roc, m1.qc, m2.all, m2.roc, m2.qc, type="html", out=here("Tables", "basic_class_models1.html"), column.labels = rep(c("CAN", "ROC", "QC"),2))
+
+#Calculate odds ratio
+m2.all$coefficients
+exp(m2.all$coefficients)
 
 #### Comparing ces15 and ces19 Block Recursive Models ####
 
