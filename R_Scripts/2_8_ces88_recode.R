@@ -307,14 +307,19 @@ table(ces88$death_penalty, ces88$qf1)
 #recode Crime (qh11) (Left-Right)
 look_for(ces88, "crime")
 #remotes::install_github('sjkiss/skpersonal')
+#library(skpersonal)
+ces88$qh11
+
 ces88$crime<-skpersonal::revScale(as.numeric(ces88$qh11), reverse=T)
 
+summary(ces88$crime)
 table(ces88$crime, ces88$qh11 , useNA = "ifany" )
 summary(ces88$qh11)
 #ces88$crime<-Recode(ces88$qh11, "1=1; 2=0.9; 3=0.8; 4=0.7; 5=0.6; 6=0.5; 7=0.4; 8=0.3; 9=0.2; 10=0.1; 11:12=0; else=NA")
 ces88$qh11
 
 ces88$qh11
+
 var_label(ces88$qh11)
 #checks
 table(ces88$crime)
