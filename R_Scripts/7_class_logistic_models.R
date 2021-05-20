@@ -1,7 +1,6 @@
 #### Class logistic models 1979-2019 ####
 
 #Run master file to load up data
-
 library(stargazer)
 library(broom)
 library(nnet)
@@ -32,7 +31,9 @@ table(ces$working_class4)
 #Let's put the Occupation variables in order
 ces$occupation2<-fct_relevel(ces$occupation2, "Managers", "Professionals", "Routine_Nonmanual", 'Working_Class')
 ces$occupation4<-fct_relevel(ces$occupation4, "Managers", "Self-Employed", "Professionals", "Routine_Nonmanual", 'Working_Class')
+table(ces$occupation, ces$election)
 table(ces$occupation2, ces$election)
+table(ces$occupation3, ces$election)
 table(ces$occupation4, ces$election)
 
 #Turn region into factor with East as reference case
@@ -42,20 +43,52 @@ table(ces$region3)
 
 #Recode low income
 ces$low_income<-Recode(ces$income, "1=1; 2:5=0; else=NA")
-table(ces$low_income)
+table(ces$low_income, ces$election)
 
-#Recode high moral traditionalism=authoritarian
-table(ces19phone$moral_traditionalism)
-ces19phone$authoritarian<-Recode(ces19phone$moral_traditionalism, "0.38:1=1; 0:3.75=0; else=NA")
-table(ces19phone$authoritarian)
-table(ces15phone$moral_traditionalism)
-ces15phone$authoritarian<-Recode(ces15phone$moral_traditionalism, "0.38:1=1; 0:3.75=0; else=NA")
-table(ces15phone$authoritarian)
+#Recode market liberalism = pro_market
+table(ces$market_liberalism, ces$election)
+ces$pro_market<-Recode(ces$market_liberalism, "0:0.375=0; 0.625:1=1; else=NA")
+table(ces$pro_market, ces$election)
 
-#Party voting
-ces19phone$bloc<-Recode(ces19phone$vote, "4=1; 0:3=0; 5=0; else=NA")
-ces19phone$green<-Recode(ces19phone$vote, "5=1; 0:4=0; else=NA")
-ces$other<-Recode(ces$vote, "4:5=1; 0=1; 1:3=0; else=NA")
+#Recode moral traditionalism = authoritarian
+table(ces$traditionalism, ces$election)
+ces$authoritarian<-Recode(ces$traditionalism, "0:0.49=0; 0.51:1=1; else=NA")
+table(ces$authoritarian, ces$election)
+
+#Recode immigration rates = anti_immigrant
+table(ces$immigration_rates, ces$election)
+ces$anti_immigrant<-Recode(ces$immigration_rates, "0=0; 1=1; else=NA")
+table(ces$anti_immigrant, ces$election)
+
+#Recode enviro = anti_enviro
+table(ces$enviro, ces$election)
+ces$anti_enviro<-Recode(ces$enviro, "0:0.25=0; 0.75:1=1; else=NA")
+table(ces$anti_enviro, ces$election)
+
+#Recode gay_rights = anti_gay
+table(ces$gay_rights, ces$election)
+ces$anti_gay<-Recode(ces$gay_rights, "0:0.25=0; 0.75:1=1; else=NA")
+table(ces$anti_gay, ces$election)
+
+#Recode abortion = anti_abortion
+table(ces$abortion, ces$election)
+ces$anti_abortion<-Recode(ces$abortion, "0:0.25=0; 0.75:1=1; else=NA")
+table(ces$anti_abortion, ces$election)
+
+#Recode crime = tough_crime
+table(ces$crime, ces$election)
+ces$tough_crime<-Recode(ces$crime, "0:0.46=0; 0.54:1=1; else=NA")
+table(ces$tough_crime, ces$election)
+
+#Recode death_penalty = capital_punishment
+table(ces$death_penalty, ces$election)
+ces$capital_punishment<-Recode(ces$death_penalty, "0:0.25=0; 0.75:1=1; else=NA")
+table(ces$capital_punishment, ces$election)
+
+#Recode redistribution = anti-redistribution
+table(ces$redistribution, ces$election)
+ces$anti_redistribution<-Recode(ces$redistribution, "0:0.5=1; 0.75:1=0; else=NA")
+table(ces$anti_redistribution, ces$election)
 
 #By election
 summary(ces)
@@ -67,7 +100,7 @@ ces %>%
   View()
 
 #------------------------------------------------------------------------------------------------
-
+#### NDP vs Libs/Right Models ####
 #M1 NDP vs Right ROC
 ces %>% 
   filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
@@ -160,7 +193,7 @@ table(ces19phone$working_class)
 
 #M1 NDP ROC
 ces %>% 
-  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
   mutate(model=map(variables, function(x) glm(ndp~income+degree+sector+union_both+working_class2+redistribution, data=x, family="binomial")),
          tidied=map(model, tidy), 
@@ -168,7 +201,7 @@ ces %>%
 
 #M1 NDP QC
 ces %>% 
-  filter(quebec==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  filter(quebec==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
   mutate(model=map(variables, function(x) glm(ndp~income+degree+sector+union_both+working_class2+redistribution, data=x, family="binomial")),
          tidied=map(model, tidy), 
@@ -176,7 +209,7 @@ ces %>%
 
 #M1 Con ROC
 ces %>% 
-  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
   mutate(model=map(variables, function(x) glm(conservative~income+degree+sector+union_both+working_class2+redistribution, data=x, family="binomial")),
          tidied=map(model, tidy), 
@@ -184,7 +217,7 @@ ces %>%
 
 #M1 Con QC
 ces %>% 
-  filter(quebec==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  filter(quebec==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
   mutate(model=map(variables, function(x) glm(conservative~income+degree+sector+union_both+working_class2+redistribution, data=x, family="binomial")),
          tidied=map(model, tidy), 
@@ -192,7 +225,7 @@ ces %>%
 
 #M2 NDP ROC WC interaction
 ces %>% 
-  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
   mutate(model=map(variables, function(x) glm(ndp~income+degree+sector+union_both+working_class2+redistribution+working_class2:redistribution, data=x, family="binomial")),
          tidied=map(model, tidy), 
@@ -200,7 +233,7 @@ ces %>%
 
 #M2 NDP QC WC interaction
 ces %>% 
-  filter(quebec==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  filter(quebec==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
   mutate(model=map(variables, function(x) glm(ndp~income+degree+sector+union_both+working_class2+redistribution+working_class2:redistribution, data=x, family="binomial")),
          tidied=map(model, tidy), 
@@ -208,7 +241,7 @@ ces %>%
 
 #M2 Con ROC WC interaction
 ces %>% 
-  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
   mutate(model=map(variables, function(x) glm(conservative~income+degree+sector+union_both+working_class2+redistribution+working_class2:redistribution, data=x, family="binomial")),
          tidied=map(model, tidy), 
@@ -216,20 +249,20 @@ ces %>%
 
 #M2 Con QC WC interaction
 ces %>% 
-  filter(quebec==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  filter(quebec==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
   mutate(model=map(variables, function(x) glm(conservative~income+degree+sector+union_both+working_class2+redistribution+working_class2:redistribution, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Conservative', nrow(.)))->conservative_QC_redistribution_models_2
 
-stargazer(ndp_ROC_redistribution_models_1$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "NDP_ROC_redistribution_models_1.html"))
-stargazer(ndp_QC_redistribution_models_1$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "NDP_QC_redistribution_models_1.html"))
-stargazer(conservative_ROC_redistribution_models_1$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_ROC_redistribution_models_1.html"))
-stargazer(conservative_QC_redistribution_models_1$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_QC_redistribution_models_1.html"))
-stargazer(ndp_ROC_redistribution_models_2$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "NDP_ROC_redistribution_inter_models_2.html"))
-stargazer(ndp_QC_redistribution_models_2$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "NDP_QC_redistribution_inter_models_2.html"))
-stargazer(conservative_ROC_redistribution_models_2$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_ROC_redistribution_inter_models_2.html"))
-stargazer(conservative_QC_redistribution_models_2$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_QC_redistribution_inter_models_2.html"))
+stargazer(ndp_ROC_redistribution_models_1$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "NDP_ROC_redistribution_models_1.html"))
+stargazer(ndp_QC_redistribution_models_1$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "NDP_QC_redistribution_models_1.html"))
+stargazer(conservative_ROC_redistribution_models_1$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_ROC_redistribution_models_1.html"))
+stargazer(conservative_QC_redistribution_models_1$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_QC_redistribution_models_1.html"))
+stargazer(ndp_ROC_redistribution_models_2$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "NDP_ROC_redistribution_inter_models_2.html"))
+stargazer(ndp_QC_redistribution_models_2$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "NDP_QC_redistribution_inter_models_2.html"))
+stargazer(conservative_ROC_redistribution_models_2$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_ROC_redistribution_inter_models_2.html"))
+stargazer(conservative_QC_redistribution_models_2$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_QC_redistribution_inter_models_2.html"))
 
 #------------------------------------------------------------------------------------------------
 #### Redistribution descriptives ####
@@ -318,6 +351,11 @@ ces %>%
 ggsave(here("Plots", "Pro_redistribution_working_class_vote_Liberal.png"))
 
 # Working Class redistribution by year
+ces88 %>%
+  select(working_class, redistribution, pro_redistribution) %>% 
+  group_by(working_class) %>%
+  summarise_at(vars(redistribution, pro_redistribution), mean, na.rm=T)
+
 ces93 %>%
   select(working_class, redistribution, pro_redistribution) %>% 
   group_by(working_class) %>%
@@ -358,13 +396,6 @@ ces19phone %>%
   group_by(working_class) %>%
   summarise_at(vars(redistribution, pro_redistribution), mean, na.rm=T)
 
-# Working Class voting by pro-redistribution 2019
-ces19phone %>%
-  select(working_class, pro_redistribution, liberal, conservative, ndp, bloc, green) %>% 
-  group_by(working_class, pro_redistribution) %>%
-  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
-  as.data.frame() %>% 
-  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro_redistribution_Working_Class_Vote_2019.html"))
 
 # Working Class voting pro-redistribution by election
 ces %>%
@@ -374,13 +405,6 @@ ces %>%
   as.data.frame() %>%
   stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro_redistribution_Working_Class_Vote_by_election.html"))
 
-# Low Incomes voting by pro-redistribution 2019
-ces19phone %>%
-  select(low_income, pro_redistribution, liberal, conservative, ndp, bloc, green) %>% 
-  group_by(low_income, pro_redistribution) %>%
-  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
-  as.data.frame() %>% 
-  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro_redistribution_low_income_Vote_2019.html"))
 
 # Low Income voting pro-redistribution by election
 ces %>%
@@ -390,64 +414,10 @@ ces %>%
   as.data.frame() %>%
   stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro_redistribution_low_income_Vote_by_election.html"))
 
-##### Moral traditionalism comparison ####
-# Working Class voting by moral traditionalism 2019
-ces19phone %>%
-  select(working_class, authoritarian, liberal, conservative, ndp, bloc, green) %>% 
-  group_by(working_class, authoritarian) %>%
-  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
-  as.data.frame() %>% 
-  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "moral_traditionalism_Working_Class_Vote_2019.html"))
-
-# Low Incomes voting by moral traditionalism 
-ces19phone %>%
-  select(low_income, authoritarian, liberal, conservative, ndp, bloc, green) %>% 
-  group_by(low_income, authoritarian) %>%
-  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
-  as.data.frame() %>% 
-  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "moral_traditionalism_low_income_Vote_2019.html"))
-
-ces15phone %>%
-  select(working_class, authoritarian, liberal, conservative, ndp, bloc, green) %>% 
-  group_by(working_class, authoritarian) %>%
-  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
-  as.data.frame() %>% 
-  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "moral_traditionalism_Working_Class_Vote_2015.html"))
-
-# Low Income voting by moral traditionalism 
-ces15phone %>%
-  select(low_income, authoritarian, liberal, conservative, ndp, bloc, green) %>% 
-  group_by(low_income, authoritarian) %>%
-  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
-  as.data.frame() %>% 
-  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "moral_traditionalism_low_income_Vote_2015.html"))
-
-ces19phone %>%
-  #  filter(!is.na(occupation4)) %>%
-  select(authoritarian, Jagmeet_Singh, Andrew_Scheer, immigration, redistribution, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology) %>% 
-  group_by(authoritarian) %>%
-  summarise_at(vars(Jagmeet_Singh, Andrew_Scheer, immigration, redistribution, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology), mean, na.rm=T)
-
-ces15phone %>%
-  #  filter(!is.na(occupation4)) %>%
-  select(authoritarian, Tom_Mulcair, Stephen_Harper, immigration, redistribution, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology) %>% 
-  group_by(authoritarian) %>%
-  summarise_at(vars(Tom_Mulcair, Stephen_Harper, immigration, redistribution, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology), mean, na.rm=T)
-
-ces19phone %>%
-  #  filter(!is.na(occupation4)) %>%
-  select(pro_redistribution, Jagmeet_Singh, Andrew_Scheer, immigration, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology) %>% 
-  group_by(pro_redistribution) %>%
-  summarise_at(vars(Jagmeet_Singh, Andrew_Scheer, immigration, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology), mean, na.rm=T)
-
-ces15phone %>%
-  #  filter(!is.na(occupation4)) %>%
-  select(pro_redistribution, Tom_Mulcair, Stephen_Harper, immigration, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology) %>% 
-  group_by(pro_redistribution) %>%
-  summarise_at(vars(Tom_Mulcair, Stephen_Harper, immigration, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology), mean, na.rm=T)
-
 #------------------------------------------------------------------------------------------------
 #### Working Class descriptives ####
+library(knitr)
+library(kableExtra)
 
 #Share of Working class voting NDP
 ces %>% 
@@ -524,6 +494,7 @@ ces %>%
   scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
   labs(title="Share of Working Class voting for political parties over time", x="Year", y="Percent")
 ggsave(here("Plots", "Party_shares_working_class_vote.png"))
+
 #Percent of NDP Voters Working Class
 ces %>% 
   group_by(election, vote, working_class) %>% 
@@ -551,5 +522,469 @@ ces %>%
   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Conservative Voter % that are Working Class")
 ggsave(here("Plots", "Con_Voters_Working_Class_Percent.png"))
 
+#------------------------------------------------------------------------------------------------
+#### Market vs Moral descriptive graphs ####
+
+#Redistribution
+ces %>% 
+  group_by(election, pro_redistribution, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(pro_redistribution==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Pro Redistribution voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_pro_redistribution_vote.png"))
+
+ces %>% 
+  group_by(election, pro_redistribution, working_class3, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(pro_redistribution==1 & working_class3==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Pro Redistribution Working Class voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_pro_redistribution_WC_vote.png"))
+
+ces %>% 
+  group_by(election, anti_redistribution, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(anti_redistribution==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Anti Redistribution voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_anti_redistribution_vote.png"))
+
+ces %>% 
+  group_by(election, anti_redistribution, working_class3, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(anti_redistribution==1 & working_class3==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Anti Redistribution Working Class voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_anti_redistribution_WC_vote.png"))
+
+#Market liberalism
+ces %>% 
+  group_by(election, pro_market, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(pro_market==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Pro Market voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_pro_market_vote.png"))
+
+ces %>% 
+  group_by(election, pro_market, working_class3, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(pro_market==1 & working_class3==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Pro Market Working Class voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_pro_market_WC_vote.png"))
+
+#Traditionalism
+ces %>% 
+  group_by(election, authoritarian, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(authoritarian==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Authoritarian voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_authoritarian_vote.png"))
+
+ces %>% 
+  group_by(election, authoritarian, working_class3, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(authoritarian==1 & working_class3==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Authoritarian Working Class voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_authoritarian_WC_vote.png"))
+
+#Immigration
+ces %>% 
+  group_by(election, anti_immigrant, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(anti_immigrant==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Anti-Immigrant voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_anti_immigrant_vote.png"))
+
+ces %>% 
+  group_by(election, anti_immigrant, working_class3, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(anti_immigrant==1 & working_class3==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Anti-Immigrant Working Class voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_anti_immigrant_WC_vote.png"))
+
+#Environment
+ces %>% 
+  group_by(election, anti_enviro, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(anti_enviro==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Jobs over Environment voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_anti_enviro_vote.png"))
+
+ces %>% 
+  group_by(election, anti_enviro, working_class3, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(anti_enviro==1 & working_class3==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Jobs over Environment Working Class voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_anti_enviro_WC_vote.png"))
+
+#Gay Rights
+ces %>% 
+  group_by(election, anti_gay, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(anti_gay==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Anti-Gay voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_anti_gay_vote.png"))
+
+ces %>% 
+  group_by(election, anti_gay, working_class3, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(anti_gay==1 & working_class3==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Anti-Gay Working Class voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_anti_gay_WC_vote.png"))
+
+#Abortion
+ces %>% 
+  group_by(election, anti_abortion, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(anti_abortion==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Anti-Abortion voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_anti_abortion_vote.png"))
+
+ces %>% 
+  group_by(election, anti_abortion, working_class3, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(anti_abortion==1 & working_class3==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Anti-Abortion Working Class voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_anti_abortion_WC_vote.png"))
+
+#Crime
+ces %>% 
+  group_by(election, tough_crime, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(tough_crime==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Tough on Crime voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_tough_crime_vote.png"))
+
+ces %>% 
+  group_by(election, tough_crime, working_class3, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(tough_crime==1 & working_class3==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Tough on Crime Working Class voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_tough_crime_WC_vote.png"))
+
+#Death Penalty
+ces %>% 
+  group_by(election, capital_punishment, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(capital_punishment==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Capital Punishment voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_capital_punishment_vote.png"))
+
+ces %>% 
+  group_by(election, capital_punishment, working_class3, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(capital_punishment==1 & working_class3==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Capital Punishment Working Class voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_capital_punishment_WC_vote.png"))
 
 
+#-------------------------------------------------------------------------------------------------
+#### Natural vs Unnatural voting ####
+
+#Create variables
+ces$left<-Recode(ces$vote, "3=1; 5=1; 0:2=0; 5:7=0; else=NA")
+table(ces$left)
+ces$right<-Recode(ces$vote, "2=1; 0:1=0; 3=0; 6=1; 7=0; else=NA")
+table(ces$right)
+ces$upper_class<-Recode(ces$occupation, "1:2=1; 3:5=0; else=NA")
+table(ces$upper_class)
+ces$upper_class2<-Recode(ces$occupation3, "1:2=1; 3:6=0; else=NA")
+table(ces$upper_class2)
+
+table(ces$employment, ces$election)
+
+#Using working_class (6 categories)
+#recode Natural voting
+ces %>% 
+  mutate(natural=case_when(
+    vote==3 & working_class3==1 ~1,
+    vote==5 & working_class3==1 ~1,
+    vote==2 & upper_class==1 ~1,
+  ))->ces
+val_labels(ces$natural)<-c(natural=1)
+#checks
+val_labels(ces$natural)
+table(ces$natural)
+
+#recode Unnatural voting
+ces %>% 
+  mutate(unnatural=case_when(
+    vote==0 & working_class3==1 ~1,
+    vote==1 & working_class3==1 ~1,
+    vote==2 & working_class3==1 ~1,
+    vote==4 & working_class3==1 ~1,
+    conservative==0 & upper_class==1 ~1,
+  ))->ces
+val_labels(ces$unnatural)<-c(unnatural=1)
+#checks
+val_labels(ces$unnatural)
+table(ces$unnatural)
+
+#Unnatural Model 1
+ces %>% 
+  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~unnatural+employment+degree+income, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->unnatmodel1_ROC
+
+ces %>% 
+  filter(quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~unnatural+employment+degree+income, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->unnatmodel1_QC
+
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~unnatural+employment+degree+income, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->unnatmodel1
+
+#Unnatural Model 2
+ces %>% 
+  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~unnatural+redistribution+traditionalism, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->unnatmodel2_ROC
+
+ces %>% 
+  filter(quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~unnatural+redistribution+traditionalism, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->unnatmodel2_QC
+
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~unnatural+redistribution+traditionalism, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->unnatmodel2
+
+#Unnatural Model 3
+ces %>% 
+  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~unnatural+employment+degree+income+redistribution+traditionalism, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->unnatmodel3_ROC
+
+ces %>% 
+  filter(quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~unnatural+employment+degree+income+redistribution+traditionalism, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->unnatmodel3_QC
+
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~unnatural+employment+degree+income+redistribution+traditionalism, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->unnatmodel3
+
+#Print models
+stargazer(unnatmodel1_ROC$model, column.labels=c("1979", "1980", "1984", "1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model1_ROC.html"))
+stargazer(unnatmodel1_QC$model, column.labels=c("1979", "1980", "1984", "1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model1_QC.html"))
+stargazer(unnatmodel1$model, column.labels=c("1979", "1980", "1984", "1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model1.html"))
+stargazer(unnatmodel2_ROC$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model2_ROC.html"))
+stargazer(unnatmodel2_QC$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model2_QC.html"))
+stargazer(unnatmodel2$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model2.html"))
+stargazer(unnatmodel3_ROC$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model3_ROC.html"))
+stargazer(unnatmodel3_QC$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model3_QC.html"))
+stargazer(unnatmodel3$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model3.html"))
+
+#Natural Model 1
+ces %>% 
+  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~natural+employment+degree+income, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->natmodel1_ROC
+
+ces %>% 
+  filter(quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~natural+employment+degree+income, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->natmodel1_QC
+
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~natural+employment+degree+income, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->natmodel1
+
+#Natural Model 2
+ces %>% 
+  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~natural+redistribution+traditionalism, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->natmodel2_ROC
+
+ces %>% 
+  filter(quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~natural+redistribution+traditionalism, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->natmodel2_QC
+
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~natural+redistribution+traditionalism, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->natmodel2
+
+#Natural Model 3
+ces %>% 
+  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~natural+employment+degree+income+redistribution+traditionalism, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->natmodel3_ROC
+
+ces %>% 
+  filter(quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~natural+employment+degree+income+redistribution+traditionalism, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->natmodel3_QC
+
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~natural+employment+degree+income+redistribution+traditionalism, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->natmodel3
+
+#Print models
+stargazer(natmodel1_ROC$model, column.labels=c("1979", "1980", "1984", "1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model1_ROC.html"))
+stargazer(natmodel1_QC$model, column.labels=c("1979", "1980", "1984", "1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model1_QC.html"))
+stargazer(natmodel1$model, column.labels=c("1979", "1980", "1984", "1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model1.html"))
+stargazer(natmodel2_ROC$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model2_ROC.html"))
+stargazer(natmodel2_QC$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model2_QC.html"))
+stargazer(natmodel2$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model2.html"))
+stargazer(natmodel3_ROC$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model3_ROC.html"))
+stargazer(natmodel3_QC$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model3_QC.html"))
+stargazer(natmodel3$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model3.html"))
+
+#Same model 3's but with Immigration added
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~unnatural+employment+degree+income+redistribution+traditionalism+immigration_rates, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->unnatmodel4
+
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(left~natural+employment+degree+income+redistribution+traditionalism+immigration_rates, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Left', nrow(.)))->natmodel4
+
+stargazer(unnatmodel4$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model4.html"))
+stargazer(natmodel4$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model4.html"))

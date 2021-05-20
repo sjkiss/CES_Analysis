@@ -4,28 +4,8 @@
 #Instead of typing Recode everytime, we can just load the car library here
 library(car)
 
-#Create other relevant variables 
-#ces$working_class<-Recode(ces$occupation, "5=1; 1:4=0; else=NA")
-
-#ces$working_class<-Recode(ces$occupation, "4:5=1; else=0")
-table(ces$occupation)
-table(ces$occupation3)
-#This was your old code 
-#ces$occupation2<-Recode(ces$occupation, "4:5=1; 3=2; 2=3; 1=4; NA=NA")
-#But I think I'd rather do it this way; just to keep the numbers as close as possible;
-#also this turns it into a factor with working class as the reference category.
-
-#ces$occupation2<-Recode(ces$occupation, "4:5='Working_Class'; 3='Routine_Nonmanual' ;2='Managers' ; 1='Professionals'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual'),as.factor=T)
-#The above didn't work for me so I am using this recode -Matt
-ces$occupation2<-Recode(as.factor(ces$occupation), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual'))
-levels(ces$occupation2)
-table(ces$occupation2)
-
-#This collapses the two labour categories into one working class; maintaining self-employed as a unique distinction
-ces$occupation4<-Recode(as.factor(ces$occupation3), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'; 6='Self-Employed'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual', 'Self-Employed'))
-levels(ces$occupation4)
-table(ces$occupation4)
-table(ces$occupation, ces$occupation2, ces$occupation4)
+#Working class without self-employed (going back to 1965)
+ces$working_class2<-Recode(ces$occupation2, "'Working_Class'=1; else=0; NA=NA")
 
 #I think Andersen has the Conservatives set as the reference category. 
 ces$vote
@@ -57,6 +37,8 @@ table(ces$region3)
 table(ces$election, ces$sector)
 table(ces$election, ces$occupation2)
 table(ces$election, ces$occupation4)
+table(ces$election, ces$working_class4)
+table(ces$election, ces$working_class2)
 
 #By election
 head(ces)

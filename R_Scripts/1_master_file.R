@@ -6,6 +6,9 @@ library(labelled)
 library(here)
 library(car)
 
+names(ces88)
+names(ces93)
+names(ces97)
 ### Checks
 nrow(ces74)==2562 #TRUE
 table(ces68$var323, ces68$var379)

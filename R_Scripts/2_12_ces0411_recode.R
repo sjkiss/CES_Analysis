@@ -452,7 +452,7 @@ ces0411 %>%
     c_across(c('trad041', 'trad042', 'trad043', 'trad044', 'trad045', 'trad046')), na.rm=T  
   )) %>% 
   ungroup()->ces0411
-
+ces0411$traditionalism04
 ces0411 %>% 
   select(starts_with("trad04")) %>% 
   summary()
