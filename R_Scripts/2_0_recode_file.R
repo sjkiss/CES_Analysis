@@ -49,7 +49,7 @@ here()
 # source(here("R_Scripts/2_2_ces68_recode.R"))
 # source(here("R_Scripts/2_3_ces72_nov_recode.R"))
 # source(here("R_Scripts/2_4_ces74_recode.R"))
-# source(here("R_Scripts/2_5_ces7980_recode.R"))
+#source(here("R_Scripts/2_5_ces7980_recode.R"))
 # source(here("R_Scripts/2_6_ces80_recode.R"))
 # source(here("R_Scripts/2_7_ces84_recode.R"))
 # source(here("R_Scripts/2_8_ces88_recode.R"))
@@ -67,11 +67,9 @@ here()
 #### Update the file recoded_cesdata with any recodes ####
 #Define Resave function
 #install.packages("cgwtools")
-library(cgwtools)
-
 #use resave to update the file recoded_cesdata.Rdata with just *one* specific file. All other files in recoded_cesdata.rdata are *untouched*. If you want you can update more than one file and all others are still untouched
-#resave(ces88, ces93, ces97, ces00, ces0411, ces15phone, ces19phone, file="Data/recoded_cesdata.Rdata")
-detach('package:cgwtools')
+#cgwtools::resave(ces7980,file="Data/recoded_cesdata.Rdata")
+
 #now clear everything out
 
 ## Detach package "cesdata"

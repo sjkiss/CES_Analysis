@@ -5,6 +5,8 @@ library(tidyverse)
 library(labelled)
 library(here)
 library(car)
+ces0411
+ces0411$market_liberalism04
 
 ### Checks
 nrow(ces74)==2562 #TRUE
@@ -538,7 +540,7 @@ table(str_detect(names(ces0411), "survey"))
 table(str_detect(names(ces00), "survey"))
 
 names(ces)
-ces$election
+table(ces$election, ces$male, useNA = "ifany")
 table(ces$union)
 
 
@@ -630,3 +632,4 @@ theme_set(theme_bw())
 #source("R_scripts/8_block_recursive_models.R", echo=T)
 
 source("R_scripts/8_analysis_script.R", echo=T)
+table(ces$election, ces$male)

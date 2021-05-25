@@ -67,21 +67,7 @@ library(broom)
 
 #------------------------------------------------------------------------------------------------------------
 ### Count cases
-ces %>% 
-  group_by(election) %>% 
-  filter(election==1965|
-           election==1968|
-           election==1972|
-           election==1974|
-           election==1979|
-           election==1980|
-           election==1984|
-           election==1988|
-           election==1993|
-           election==1997|
-           election==2004) %>% 
-  select(male, age, religion, degree, occupation2, occupation4, region, quebec) %>% 
-  summary()
+m
 
 ##Count missing values
 ces %>% 
