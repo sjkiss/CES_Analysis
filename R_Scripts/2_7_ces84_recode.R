@@ -192,3 +192,11 @@ val_labels(ces84$size)<-c(Rural=1, Under_10K=2, Under_100K=3, Under_500K=4, City
 #checks
 val_labels(ces84$size)
 table(ces84$size)
+
+#recode Religiosity (VAR372)
+look_for(ces84, "church")
+ces84$religiosity<-Recode(ces84$VAR372, "5=1; 4=2; 3=3; 2=4; 1=5; else=NA")
+val_labels(ces84$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces84$religiosity)
+table(ces84$religiosity)

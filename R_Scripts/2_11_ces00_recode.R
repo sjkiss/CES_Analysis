@@ -172,6 +172,15 @@ look_for(ces00, "noc")
 look_for(ces00, "employment")
 look_for(ces00, "career")
 ces00$bycat_15
+
+####recode Religiosity (cpsm10b)####
+look_for(ces00, "relig")
+ces00$religiosity<-Recode(ces00$cpsm10b, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
+val_labels(ces00$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces00$religiosity)
+table(ces00$religiosity)
+
 ####Redistribution #### 
 #recode Redistribution (cpsc13)
 look_for(ces00, "rich")
@@ -328,22 +337,24 @@ ces00$morals<-Recode(ces00$mbsa8, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
 table(ces00$morals)
 
 #recode Moral Traditionalism (abortion, lifestyles, stay home, values, marriage childen, morals)
-ces00$trad1<-ces00$abortion
-ces00$trad2<-ces00$lifestyles
-ces00$trad3<-ces00$stay_home
+ces00$trad3<-ces00$abortion
+ces00$trad7<-ces00$lifestyles
+ces00$trad1<-ces00$stay_home
 ces00$trad4<-ces00$values
 ces00$trad5<-ces00$marriage_children
 ces00$trad6<-ces00$morals
+ces00$trad2<-ces00$gay_rights
 table(ces00$trad1)
 table(ces00$trad2)
 table(ces00$trad3)
 table(ces00$trad4)
 table(ces00$trad5)
 table(ces00$trad6)
+table(ces00$trad7)
 #These variables are all still labelled 
 # because they were not turned into numeric above in the recode commands. 
 ces00 %>% 
-  select(num_range('trad', 1:6)) %>% 
+  select(num_range('trad', 1:7)) %>% 
 map(., class)
 
 #It's pretty easy to turn them all into numerics
@@ -352,23 +363,22 @@ ces00 %>%
   #across, works, well, across a bunch of columns that are sepcified in the brackets
   #num_range combines the prefix in the quotes with the numbers after the comma,
   #Then we say to specify that it everything should have values removed
-  mutate(across(num_range('trad', 1:6), remove_val_labels))->ces00
-
-
+  mutate(across(num_range('trad', 1:7), 
+                remove_val_labels))->ces00
 
 ces00 %>% 
-  mutate(traditionalism=mean(c_across(trad1:trad6), na.rm=T ))->out
+  mutate(traditionalism=mean(c_across(trad1:trad7), na.rm=T ))->out
 
 out %>% 
   ungroup() %>% 
-  select(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'traditionalism')) %>% 
+  select(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'trad7', 'traditionalism')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na>0, na<3)
 #Scale Averaging 
 ces00 %>% 
   rowwise() %>% 
   mutate(traditionalism=mean(
-    c_across(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6')), na.rm=T 
+    c_across(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'trad7')), na.rm=T 
   )) %>% 
   ungroup()->ces00
 
@@ -381,10 +391,100 @@ table(ces00$traditionalism, useNA="ifany")
 
 #Calculate Cronbach's alpha
 ces00 %>% 
-  select(trad1, trad2, trad3, trad4, trad5, trad6) %>% 
-  alpha(.)
+  select(trad1, trad2, trad3, trad4, trad5, trad6, trad7) %>% 
+  psych::alpha(.)
 #Check correlation
 ces00 %>% 
-  select(trad1, trad2, trad3, trad4, trad5, trad6) %>% 
+  select(trad1, trad2, trad3, trad4, trad5, trad6, trad7) %>% 
   cor(., use="complete.obs")
 
+#recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)
+ces00 %>% 
+  rowwise() %>% 
+  mutate(traditionalism2=mean(
+    c_across(trad1:trad2)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('trad1', 'trad2', 'traditionalism2')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces00 %>% 
+  rowwise() %>% 
+  mutate(traditionalism2=mean(
+    c_across(c('trad1', 'trad2')), na.rm=T  
+  )) %>% 
+  ungroup()->ces00
+
+ces00 %>% 
+  select(starts_with("trad")) %>% 
+  summary()
+#Check distribution of traditionalism
+qplot(ces00$traditionalism2, geom="histogram")
+table(ces00$traditionalism2, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces00 %>% 
+  select(trad1, trad2) %>% 
+  psych::alpha(.)
+
+#Check correlation
+ces00 %>% 
+  select(trad1, trad2) %>% 
+  cor(., use="complete.obs")
+
+#recode 2nd Dimension (stay home, immigration, gay rights, crime)
+ces00$author1<-ces00$stay_home
+ces00$author2<-ces00$immigration_rates
+ces00$author3<-ces00$gay_rights
+ces00$author4<-ces00$crime
+table(ces00$author1)
+table(ces00$author2)
+table(ces00$author3)
+table(ces00$author4)
+
+#Remove value labels
+ces00 %>% 
+  mutate(across(num_range('author', 1:4), remove_val_labels))->ces00
+
+ces00 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism=mean(
+    c_across(author1:author4)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('author1', 'author2', 'author3', 'author4', 'authoritarianism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces00 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism=mean(
+    c_across(c('author1', 'author2', 'author3', 'author4')), na.rm=T  
+  )) %>% 
+  ungroup()->ces00
+
+ces00 %>% 
+  select(starts_with("author")) %>% 
+  summary()
+#Check distribution of traditionalism
+qplot(ces00$authoritarianism, geom="histogram")
+table(ces00$authoritarianism, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces00 %>% 
+  select(author1, author2, author3, author4) %>% 
+  psych::alpha(.)
+
+#Check correlation
+ces00 %>% 
+  select(author1, author2, author3, author4) %>% 
+  cor(., use="complete.obs")
+
+#recode Quebec Accommodation (cpsc12) (Left=more accom)
+look_for(ces00, "quebec")
+ces00$quebec_accom<-Recode(ces00$cpsc12, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA")
+#checks
+table(ces00$quebec_accom)

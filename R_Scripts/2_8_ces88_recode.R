@@ -146,6 +146,14 @@ val_labels(ces88$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, 
 val_labels(ces88$income)
 table(ces88$income)
 
+#recode Religiosity (n12)
+look_for(ces88, "worship")
+ces88$religiosity<-Recode(ces88$n12, "0=1; 1:3=2; 4=3; 5:6=4; 7:8=5; else=NA")
+val_labels(ces88$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces88$religiosity)
+table(ces88$religiosity)
+
 #recode Market Liberalism (qc13 and qc2) (Left-Right)
 look_for(ces88, "profit")
 look_for(ces88, "regulation")
@@ -352,25 +360,27 @@ table(ces88$censorship)
 
 #recode Moral Traditionalism (abortion & censorship) (Left-Right)
 ces88$trad1<-ces88$abortion
-ces88$trad2<-ces88$censorship
+ces88$trad3<-ces88$censorship
+ces88$trad2<-ces88$gay_rights
 table(ces88$trad1)
 table(ces88$trad2)
+table(ces88$trad3)
 
 ces88 %>% 
   rowwise() %>% 
   mutate(traditionalism=mean(
-    c_across(trad1:trad2)
+    c_across(trad1:trad3)
     , na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
-  select(c('trad1', 'trad2', 'traditionalism')) %>% 
+  select(c('trad1', 'trad2', 'trad3', 'traditionalism')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na>0, na<3)
 #Scale Averaging 
 ces88 %>% 
   rowwise() %>% 
   mutate(traditionalism=mean(
-    c_across(c('trad1', 'trad2')), na.rm=T  
+    c_across(c('trad1', 'trad2', 'trad3')), na.rm=T  
   )) %>% 
   ungroup()->ces88
 
@@ -383,6 +393,42 @@ table(ces88$traditionalism, useNA="ifany")
 
 #Calculate Cronbach's alpha
 ces88 %>% 
+  select(trad1, trad2, trad3) %>% 
+  psych::alpha(.)
+#Check correlation
+ces88 %>% 
+  select(trad1, trad2, trad3) %>% 
+  cor(., use="complete.obs")
+
+
+#recode Moral Traditionalism 2 (abortion & gay rights) (Left-Right)
+ces88 %>% 
+  rowwise() %>% 
+  mutate(traditionalism2=mean(
+    c_across(trad1:trad2)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('trad1', 'trad2', 'traditionalism2')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces88 %>% 
+  rowwise() %>% 
+  mutate(traditionalism2=mean(
+    c_across(c('trad1', 'trad2')), na.rm=T  
+  )) %>% 
+  ungroup()->ces88
+
+ces88 %>% 
+  select(starts_with("trad")) %>% 
+  summary()
+#Check distribution of traditionalism
+qplot(ces88$traditionalism2, geom="histogram")
+table(ces88$traditionalism2, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces88 %>% 
   select(trad1, trad2) %>% 
   psych::alpha(.)
 
@@ -391,3 +437,53 @@ ces88 %>%
   select(trad1, trad2) %>% 
   cor(., use="complete.obs")
 
+#recode 2nd Dimension (censorship, immigration, gay rights, crime)
+ces88$author1<-ces88$censorship
+ces88$author2<-ces88$immigration_rates
+ces88$author3<-ces88$gay_rights
+ces88$author4<-ces88$crime
+table(ces88$author1)
+table(ces88$author2)
+table(ces88$author3)
+table(ces88$author4)
+
+ces88 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism=mean(
+    c_across(author1:author4)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('author1', 'author2', 'author3', 'author4', 'authoritarianism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces88 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism=mean(
+    c_across(c('author1', 'author2', 'author3', 'author4')), na.rm=T  
+  )) %>% 
+  ungroup()->ces88
+
+ces88 %>% 
+  select(starts_with("author")) %>% 
+  summary()
+#Check distribution of traditionalism
+qplot(ces88$authoritarianism, geom="histogram")
+table(ces88$authoritarianism, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces88 %>% 
+  select(author1, author2, author3, author4) %>% 
+  psych::alpha(.)
+
+#Check correlation
+ces88 %>% 
+  select(author1, author2, author3, author4) %>% 
+  cor(., use="complete.obs")
+
+#recode Quebec Accommodation (qa9) (Left=more accom)
+look_for(ces88, "quebec")
+ces88$quebec_accom<-Recode(ces88$qa9, "1=1; 2=0; 3=0.5; 8=0.5; else=NA")
+#checks
+table(ces88$quebec_accom)

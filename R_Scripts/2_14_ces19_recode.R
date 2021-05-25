@@ -172,6 +172,14 @@ val_labels(ces19phone$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middl
 val_labels(ces19phone$income)
 table(ces19phone$income, ces19phone$q70r , useNA = "ifany" )
 
+#recode Religiosity (q63)
+look_for(ces19phone, "relig")
+ces19phone$religiosity<-Recode(ces19phone$q63, "4=1; 3=2; -9=3; 2=4; 1=5; else=NA")
+val_labels(ces19phone$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces19phone$religiosity)
+table(ces19phone$religiosity)
+
 #recode Community Size (p57)
 look_for(ces19phone, "live")
 ces19phone$size<-Recode(ces19phone$p57, "1=1; 2=2; 3=3; 4=4; 5=5; else=NA")
@@ -702,5 +710,112 @@ ces19phone$stay_home<-Recode(ces19phone$p20_e, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0;
 table(ces19phone$stay_home, ces19phone$p20_e , useNA = "ifany" )
 
 #recode Moral Trad (abortion, lifestyles, stay home, values, marriage childen, morals)
-ces19phone$traditionalism<-ces19phone$stay_home
-table(ces19phone$traditionalism)
+ces19phone$trad1<-ces19phone$stay_home
+ces19phone$trad2<-ces19phone$gay_rights
+table(ces19phone$trad1)
+table(ces19phone$trad2)
+
+
+ces19phone %>% 
+  rowwise() %>% 
+  mutate(traditionalism=mean(
+    c_across(trad1:trad2)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('trad1', 'trad2', 'traditionalism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na<5)
+
+#Scale Averaging 
+ces19phone %>% 
+  rowwise() %>% 
+  mutate(traditionalism=mean(
+    c_across(c('trad1', 'trad2')), na.rm=T  
+  )) %>% 
+  ungroup()->ces19phone
+
+ces19phone %>% 
+  select(starts_with("trad")) %>% 
+  summary()
+#Check distribution of traditionalism
+qplot(ces19phone$traditionalism, geom="histogram")
+table(ces19phone$traditionalism, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces19phone %>% 
+  select(trad1, trad2) %>% 
+  psych::alpha(.)
+#Check correlation
+ces19phone %>% 
+  select(trad1, trad2) %>% 
+  cor(., use="complete.obs")
+
+#recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)
+ces19phone %>% 
+  rowwise() %>% 
+  mutate(traditionalism2=mean(
+    c_across(trad1:trad2)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('trad1', 'trad2', 'traditionalism2')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na<5)
+
+#Scale Averaging 
+ces19phone %>% 
+  rowwise() %>% 
+  mutate(traditionalism2=mean(
+    c_across(c('trad1', 'trad2')), na.rm=T  
+  )) %>% 
+  ungroup()->ces19phone
+
+ces19phone %>% 
+  select(starts_with("trad")) %>% 
+  summary()
+
+#recode 2nd Dimension (stay home, immigration, gay rights, crime)
+ces19phone$author1<-ces19phone$stay_home
+ces19phone$author2<-ces19phone$immigration_rates
+ces19phone$author3<-ces19phone$gay_rights
+ces19phone$author4<-ces19phone$crime
+table(ces19phone$author1)
+table(ces19phone$author2)
+table(ces19phone$author3)
+table(ces19phone$author4)
+
+ces19phone %>% 
+  rowwise() %>% 
+  mutate(authoritarianism=mean(
+    c_across(author1:author4)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('author1', 'author2', 'author3', 'author4', 'authoritarianism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces19phone %>% 
+  rowwise() %>% 
+  mutate(authoritarianism=mean(
+    c_across(c('author1', 'author2', 'author3', 'author4')), na.rm=T  
+  )) %>% 
+  ungroup()->ces19phone
+
+ces19phone %>% 
+  select(starts_with("author")) %>% 
+  summary()
+#Check distribution of traditionalism
+qplot(ces19phone$authoritarianism, geom="histogram")
+table(ces19phone$authoritarianism, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces19phone %>% 
+  select(author1, author2, author3, author4) %>% 
+  psych::alpha(.)
+
+#Check correlation
+ces19phone %>% 
+  select(author1, author2, author3, author4) %>% 
+  cor(., use="complete.obs")
