@@ -185,6 +185,22 @@ val_labels(ces93$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, 
 #checks
 val_labels(ces93$income)
 table(ces93$income)
+
+#####recode Religiosity (CPSO10 & REFN10)####
+look_for(ces93, "god")
+ces93 %>% 
+  mutate(religiosity=case_when(
+    RTYPE4==1 & (CPSO10==1 | REFN10==1)~ 5,
+    RTYPE4==1 & (CPSO10==3 | REFN10==3)~ 4,
+    RTYPE4==1 & (CPSO10==8 | REFN10==8)~ 3,
+    RTYPE4==1 & (CPSO10==5 | REFN10==5)~ 2,
+    RTYPE4==1 & (CPSO10==7 | REFN10==7)~ 1,
+  ))->ces93
+val_labels(ces93$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces93$religiosity)
+table(ces93$religiosity)
+
 #### redistribution#### 
 #recode Redistribution (MBSA8)
 look_for(ces93, "rich")
@@ -342,12 +358,13 @@ ces93$individualism<-Recode(ces93$MBSA7, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=
 table(ces93$individualism)
 
 #recode Moral Traditionalism (abortion, censorship, stay home, values, marriage childen, individualism)
-ces93$trad1<-ces93$abortion
-ces93$trad2<-ces93$censorship
-ces93$trad3<-ces93$stay_home
+ces93$trad3<-ces93$abortion
+ces93$trad6<-ces93$censorship
+ces93$trad1<-ces93$stay_home
 ces93$trad4<-ces93$values
 ces93$trad5<-ces93$marriage_children
-ces93$trad6<-ces93$individualism
+#ces93$trad6<-ces93$individualism
+ces93$trad2<-ces93$gay_rights
 table(ces93$trad1, useNA = "ifany")
 table(ces93$trad2, useNA = "ifany")
 table(ces93$trad3, useNA = "ifany")
@@ -400,3 +417,93 @@ ces93 %>%
   select(trad1, trad2, trad3, trad4, trad5, trad6) %>% 
   cor(., use="complete.obs")
 
+#recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)
+ces93 %>% 
+  rowwise() %>% 
+  mutate(traditionalism2=mean(
+    c_across(trad1:trad2)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('trad1', 'trad2', 'traditionalism2')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces93 %>% 
+  rowwise() %>% 
+  mutate(traditionalism2=mean(
+    c_across(c('trad1', 'trad2')), na.rm=T  
+  )) %>% 
+  ungroup()->ces93
+
+ces93 %>% 
+  select(starts_with("trad")) %>% 
+  summary()
+#Check distribution of traditionalism
+qplot(ces93$traditionalism2, geom="histogram")
+table(ces93$traditionalism2, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces93 %>% 
+  select(trad1, trad2) %>% 
+  psych::alpha(.)
+
+#Check correlation
+ces93 %>% 
+  select(trad1, trad2) %>% 
+  cor(., use="complete.obs")
+
+#recode 2nd Dimension (stay home, immigration, gay rights, crime)
+ces93$author1<-ces93$stay_home
+ces93$author2<-ces93$immigration_rates
+ces93$author3<-ces93$gay_rights
+ces93$author4<-ces93$crime
+table(ces93$author1)
+table(ces93$author2)
+table(ces93$author3)
+table(ces93$author4)
+
+#Remove value labels
+ces93 %>% 
+  mutate(across(num_range('author', 1:4), remove_val_labels))->ces93
+
+ces93 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism=mean(
+    c_across(author1:author4)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('author1', 'author2', 'author3', 'author4', 'authoritarianism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces93 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism=mean(
+    c_across(c('author1', 'author2', 'author3', 'author4')), na.rm=T  
+  )) %>% 
+  ungroup()->ces93
+
+ces93 %>% 
+  select(starts_with("author")) %>% 
+  summary()
+#Check distribution of traditionalism
+qplot(ces93$authoritarianism, geom="histogram")
+table(ces93$authoritarianism, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces93 %>% 
+  select(author1, author2, author3, author4) %>% 
+  psych::alpha(.)
+
+#Check correlation
+ces93 %>% 
+  select(author1, author2, author3, author4) %>% 
+  cor(., use="complete.obs")
+
+#recode Quebec Accommodation (PRC4 & REFE10) (Left=more accom)
+look_for(ces93, "quebec")
+ces93$quebec_accom<-Recode(ces93$PRC4, "1=1; 5=0; 3=0.5; 8=0.5; else=NA")
+#checks
+table(ces93$quebec_accom)

@@ -173,6 +173,14 @@ val_labels(ces7980$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4
 val_labels(ces7980$income)
 table(ces7980$income)
 
+#recode Religiosity (V1507)
+look_for(ces7980, "church")
+ces7980$religiosity<-Recode(ces7980$V1507, "5:9=1; 4=2; 3=3; 2=4; 1=5; else=NA")
+val_labels(ces7980$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces7980$religiosity)
+table(ces7980$religiosity)
+
 #--------------------------------------------------------------------------------------------------------------------
 ####1980
 #recode Gender (V2156)
@@ -259,3 +267,4 @@ table(ces7980$vote, ces7980$vote80)
 
 # No Income variable
 
+# No Religiosity variable

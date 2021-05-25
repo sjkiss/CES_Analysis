@@ -8,6 +8,9 @@ library(car)
 ces0411
 ces0411$market_liberalism04
 
+names(ces88)
+names(ces93)
+names(ces97)
 ### Checks
 nrow(ces74)==2562 #TRUE
 table(ces68$var323, ces68$var379)
@@ -27,7 +30,6 @@ ces19web %>%
 
 #### Check the MIP Problems have been added ####
 ces19phone$mip
-
 
 #### SPLITTING THE 1979-1980 FILE ####
 table(ces7980$male80)
@@ -49,7 +51,6 @@ ces7980 %>%
 ces74%>% 
   select(V2) %>% 
   summary()
-
 
 #### CES74 Sector ####
 
@@ -113,7 +114,7 @@ names(ces7980)
 ### We have all of the demographic variables from the ces79 questions stored in the ces80 data set. 
 ##Show this
 table(ces80$male)
-### Show that they are the same for the demogrphics
+### Show that they are the same for the demographics
 table(ces80$male, ces80$male80)
 table(ces80$region, ces80$region80)
 ##but they are different for political variables for obvious reasons. Demographics didn't change much but vote changed quite a bit.
@@ -208,6 +209,7 @@ nrow(ces04)
 nrow(ces06)
 nrow(ces08)
 nrow(ces11)
+
 #### STEP 3 RENAMING VARIABLES
 
 ### This is how we will rename the variables in each data frame.. removing the years. 
@@ -269,6 +271,8 @@ ces04 %>%
 ces04 %>% 
   rename(traditionalism=traditionalism04)->ces04
 ces04 %>% 
+  rename(traditionalism2=traditionalism204)->ces04
+ces04 %>% 
   rename(immigration_rates=immigration_rates04)->ces04
 ces04 %>% 
   rename(enviro=enviro04)->ces04
@@ -280,6 +284,12 @@ ces04 %>%
   rename(gay_rights=gay_rights04)->ces04
 ces04 %>% 
   rename(abortion=abortion04)->ces04
+ces04 %>% 
+  rename(authoritarianism=authoritarianism04)->ces04
+ces04 %>% 
+  rename(quebec_accom=quebec_accom04)->ces04
+ces04 %>% 
+  rename(religiosity=religiosity04)->ces04
 table(ces04$survey, ces04$non_charter_language)
 
 #### Rename CES06 ####
@@ -324,6 +334,8 @@ ces06 %>%
 ces06 %>% 
   rename(traditionalism=traditionalism06)->ces06
 ces06 %>% 
+  rename(traditionalism2=traditionalism206)->ces06
+ces06 %>% 
   rename(immigration_rates=immigration_rates06)->ces06
 ces06 %>% 
   rename(enviro=enviro06)->ces06
@@ -335,6 +347,12 @@ ces06 %>%
   rename(gay_rights=gay_rights06)->ces06
 ces06 %>% 
   rename(abortion=abortion06)->ces06
+ces06 %>% 
+  rename(authoritarianism=authoritarianism06)->ces06
+ces06 %>% 
+  rename(quebec_accom=quebec_accom06)->ces06
+ces06 %>% 
+  rename(religiosity=religiosity06)->ces06
 table(ces06$survey, ces06$non_charter_language)
 
 #### Rename CES08 ####
@@ -379,6 +397,8 @@ ces08 %>%
 ces08 %>% 
   rename(traditionalism=traditionalism08)->ces08
 ces08 %>% 
+  rename(traditionalism2=traditionalism208)->ces08
+ces08 %>% 
   rename(immigration_rates=immigration_rates08)->ces08
 ces08 %>% 
   rename(enviro=enviro08)->ces08
@@ -390,6 +410,12 @@ ces08 %>%
   rename(gay_rights=gay_rights08)->ces08
 ces08 %>% 
   rename(abortion=abortion08)->ces08
+ces08 %>% 
+  rename(authoritarianism=authoritarianism08)->ces08
+ces08 %>% 
+  rename(quebec_accom=quebec_accom08)->ces08
+ces08 %>% 
+  rename(religiosity=religiosity08)->ces08
 table(ces08$survey, ces08$non_charter_language)
 
 #### Rename CES11 ####
@@ -434,6 +460,8 @@ ces11 %>%
 ces11 %>% 
   rename(traditionalism=traditionalism11)->ces11
 ces11 %>% 
+  rename(traditionalism2=traditionalism211)->ces11
+ces11 %>% 
   rename(immigration_rates=immigration_rates11)->ces11
 ces11 %>% 
   rename(enviro=enviro11)->ces11
@@ -445,6 +473,12 @@ ces11 %>%
   rename(gay_rights=gay_rights11)->ces11
 ces11 %>% 
   rename(abortion=abortion11)->ces11
+ces11 %>% 
+  rename(authoritarianism=authoritarianism11)->ces11
+ces11 %>% 
+  rename(quebec_accom=quebec_accom11)->ces11
+ces11 %>% 
+  rename(religiosity=religiosity11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -479,7 +513,6 @@ names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988',
 # rm(ces93)
 # rm(ces97)
 # rm(ces19phone)
-
 # 
 # str(ces.list)
 # str(ces.list$`2019`)
@@ -530,9 +563,10 @@ ces %>%
           "income", 
           "non_charter_language", 
           "occupation3",
+          "religiosity",
           "election", "size", "redistribution", "pro_redistribution",
-          "market_liberalism", "traditionalism", "immigration_rates", "enviro", "death_penalty", 
-          "crime", "gay_rights", "abortion", ) )-> ces
+          "market_liberalism", "traditionalism", "traditionalism2", "immigration_rates", "enviro", "death_penalty", 
+          "crime", "gay_rights", "abortion", "authoritarianism", "quebec_accom") )-> ces
 ##
 
 library(stringr)
@@ -542,7 +576,6 @@ table(str_detect(names(ces00), "survey"))
 names(ces)
 table(ces$election, ces$male, useNA = "ifany")
 table(ces$union)
-
 
 #### Currently region is regions of English Canada only
 #### quebec is dichotomous Quebec v. non-quebec
@@ -571,7 +604,6 @@ library(car)
 ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
 ces$liberal<-Recode(ces$vote, "1=1; 2:5=0; NA=NA")
 ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
-
 
 names(ces)
 
@@ -605,7 +637,6 @@ val_labels(ces$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Hi
 val_labels(ces$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 val_labels(ces$redistribution)<-c(Less=0, More=1)
 
-
 ####
 names(ces)
 
@@ -624,10 +655,8 @@ theme_set(theme_bw())
 #source("R_scripts/4_make_models.R", echo=T)
 #source("R_scripts/5_ces15_models.R", echo=T)
 #source("R_scripts/5_ces15_block_models.R", echo=T)
-
 #source("R_scripts/5_ces19_models.R", echo=T)
 #source("R_scripts/5_ces19_block_models.R", echo=T)
-
 #source("R_scripts/7_class_logistic_models.R", echo=T)
 #source("R_scripts/8_block_recursive_models.R", echo=T)
 

@@ -170,8 +170,16 @@ val_labels(ces97$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, 
 #checks
 val_labels(ces97$income)
 table(ces97$income)
-#### recode Redistribution (mbsa4)#### 
 
+####recode Religiosity (pesm10b)####
+look_for(ces97, "relig")
+ces97$religiosity<-Recode(ces97$pesm10b, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
+val_labels(ces97$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces97$religiosity)
+table(ces97$religiosity)
+
+#### recode Redistribution (mbsa4)#### 
 look_for(ces97, "rich")
 val_labels(ces97$mbsa4)
 ces97$redistribution<-Recode(ces97$mbsa4, "; 1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
@@ -315,12 +323,13 @@ ces97$morals<-Recode(ces97$mbsa8, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
 table(ces97$morals)
 #### Moral traditionalism#### 
 #recode Moral Traditionalism (abortion, lifestyles, stay home, values, marriage childen, morals)
-ces97$trad1<-ces97$abortion
-ces97$trad2<-ces97$lifestyles
-ces97$trad3<-ces97$stay_home
+ces97$trad3<-ces97$abortion
+ces97$trad7<-ces97$lifestyles
+ces97$trad1<-ces97$stay_home
 ces97$trad4<-ces97$values
 ces97$trad5<-ces97$marriage_children
 ces97$trad6<-ces97$morals
+ces97$trad2<-ces97$gay_rights
 
 #This code removes value labels from trad1 to trad6
 #Start with data frame
@@ -328,32 +337,33 @@ ces97 %>%
   #mutate because changing variables
   #across because we are doing something across a series of columns
   # What columns are we working on? The ones with the names generated in 
-  #num_range('trad', 1:6)
-  mutate(across(.cols=num_range('trad', 1:6),
+  #num_range('trad', 1:7)
+  mutate(across(.cols=num_range('trad', 1:7),
                 #The thing we are doing is removing value labels
                 remove_val_labels))->ces97
-?remove_val_labels
+#remove_val_labels
 table(ces97$trad1)
 table(ces97$trad2)
 table(ces97$trad3)
 table(ces97$trad4)
 table(ces97$trad5)
 table(ces97$trad6)
+table(ces97$trad7)
 
 ces97 %>% 
   rowwise() %>% 
-  mutate(traditionalism=mean(c_across(c(trad1, trad2, trad3, trad4,trad5 ,trad6)) , na.rm=T )) -> out
+  mutate(traditionalism=mean(c_across(c(trad1, trad2, trad3, trad4, trad5, trad6, trad7)) , na.rm=T )) -> out
 
 out %>% 
   ungroup() %>% 
-  select(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'traditionalism')) %>% 
+  select(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'trad7', 'traditionalism')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na>0, na<3)
 #Scale Averaging 
 ces97 %>% 
   rowwise() %>% 
   mutate(traditionalism=mean(
-    c_across(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6')), na.rm=T 
+    c_across(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'trad7')), na.rm=T 
   )) %>% 
   ungroup()->ces97
 
@@ -368,11 +378,48 @@ table(ces97$traditionalism, useNA="ifany")
 
 #Calculate Cronbach's alpha
 ces97 %>% 
-  select(trad1, trad2, trad3, trad4, trad5, trad6) %>% 
-  alpha(.)
+  select(trad1, trad2, trad3, trad4, trad5, trad6, trad7) %>% 
+  psych::alpha(.)
 #Check correlation
 ces97 %>% 
-  select(trad1, trad2, trad3, trad4, trad5, trad6) %>% 
+  select(trad1, trad2, trad3, trad4, trad5, trad6, trad7) %>% 
+  cor(., use="complete.obs")
+
+
+#recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)
+ces97 %>% 
+  rowwise() %>% 
+  mutate(traditionalism2=mean(
+    c_across(trad1:trad2)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('trad1', 'trad2', 'traditionalism2')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces97 %>% 
+  rowwise() %>% 
+  mutate(traditionalism2=mean(
+    c_across(c('trad1', 'trad2')), na.rm=T  
+  )) %>% 
+  ungroup()->ces97
+
+ces97 %>% 
+  select(starts_with("trad")) %>% 
+  summary()
+#Check distribution of traditionalism
+qplot(ces97$traditionalism2, geom="histogram")
+table(ces97$traditionalism2, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces97 %>% 
+  select(trad1, trad2) %>% 
+  psych::alpha(.)
+
+#Check correlation
+ces97 %>% 
+  select(trad1, trad2) %>% 
   cor(., use="complete.obs")
 
 #just check the market and traditionalism scales for NAs
@@ -381,3 +428,58 @@ ces97 %>%
   str()
 
 ggplot(ces97, aes(x=market_liberalism, y=traditionalism))+geom_point()+geom_smooth(method="lm")
+
+#recode 2nd Dimension (stay home, immigration, gay rights, crime)
+ces97$author1<-ces97$stay_home
+ces97$author2<-ces97$immigration_rates
+ces97$author3<-ces97$gay_rights
+ces97$author4<-ces97$crime
+table(ces97$author1)
+table(ces97$author2)
+table(ces97$author3)
+table(ces97$author4)
+
+#Remove value labels
+ces97 %>% 
+  mutate(across(num_range('author', 1:4), remove_val_labels))->ces97
+
+ces97 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism=mean(
+    c_across(author1:author4)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('author1', 'author2', 'author3', 'author4', 'authoritarianism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces97 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism=mean(
+    c_across(c('author1', 'author2', 'author3', 'author4')), na.rm=T  
+  )) %>% 
+  ungroup()->ces97
+
+ces97 %>% 
+  select(starts_with("author")) %>% 
+  summary()
+#Check distribution of traditionalism
+qplot(ces97$authoritarianism, geom="histogram")
+table(ces97$authoritarianism, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces97 %>% 
+  select(author1, author2, author3, author4) %>% 
+  psych::alpha(.)
+
+#Check correlation
+ces97 %>% 
+  select(author1, author2, author3, author4) %>% 
+  cor(., use="complete.obs")
+
+#recode Quebec Accommodation (cpse3a) (Left=more accom)
+look_for(ces97, "quebec")
+ces97$quebec_accom<-Recode(ces97$cpse3a, "2=1; 1=0; 3=0.5; 8=0.5; else=NA")
+#checks
+table(ces97$quebec_accom)

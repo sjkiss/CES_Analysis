@@ -252,6 +252,7 @@ val_labels(ces0411$occupation04)<-c(Professional=1, Managers=2, Routine_Nonmanua
 val_labels(ces0411$occupation04)
 table(ces0411$occupation04)
 ces0411$ces04_CPS_S4
+
 #recode Occupation3 as 6 class schema with self-employed (ces04_CPS_S4)
 look_for(ces0411, "employ")
 ces0411$occupation04_3<-ifelse(ces0411$ces04_CPS_S4==1, 6, ces0411$occupation04)
@@ -292,6 +293,14 @@ val_labels(ces0411$income04)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle
 #checks
 val_labels(ces0411$income04)
 table(ces0411$income04)
+
+#### recode Religiosity (ces04_CPS_S11)#### 
+look_for(ces0411, "relig")
+ces0411$religiosity04<-Recode(ces0411$ces04_CPS_S11, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
+val_labels(ces0411$religiosity04)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces0411$religiosity04)
+table(ces0411$religiosity04)
 
 #### #recode Redistribution (ces04_CPS_F6)#### 
 look_for(ces0411, "rich")
@@ -347,7 +356,7 @@ table(ces0411$market_liberalism04, useNA="ifany")
 library(psych)
 ces0411 %>% 
   select(market041, market042) %>% 
-  alpha(.)
+  psych::alpha(.)
 #Check correlation
 ces0411 %>% 
   select(market041, market042) %>% 
@@ -423,36 +432,38 @@ ces0411$morals04<-Recode(ces0411$ces04_MBS_A8, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5;
 table(ces0411$morals04)
 
 #### #recode Moral Traditionalism (abortion, lifestyles, stay home, values, marriage childen, morals)#### 
-ces0411$trad041<-ces0411$abortion04
-ces0411$trad042<-ces0411$lifestyles04
-ces0411$trad043<-ces0411$stay_home04
+ces0411$trad043<-ces0411$abortion04
+ces0411$trad047<-ces0411$lifestyles04
+ces0411$trad041<-ces0411$stay_home04
 ces0411$trad044<-ces0411$values04
 ces0411$trad045<-ces0411$marriage_children04
 ces0411$trad046<-ces0411$morals04
+ces0411$trad042<-ces0411$gay_rights04
 table(ces0411$trad041)
 table(ces0411$trad042)
 table(ces0411$trad043)
 table(ces0411$trad044)
 table(ces0411$trad045)
 table(ces0411$trad046)
+table(ces0411$trad047)
 
 ces0411 %>% 
   rowwise() %>% 
-  mutate(traditionalism04=mean(c_across(trad041:trad046)
+  mutate(traditionalism04=mean(c_across(trad041:trad047)
     , na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
-  select(c('trad041', 'trad042', 'trad043', 'trad044', 'trad045', 'trad046', 'traditionalism04')) %>% 
+  select(c('trad041', 'trad042', 'trad043', 'trad044', 'trad045', 'trad046', 'trad047', 'traditionalism04')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na>0, na<6)
 #Scale Averaging 
 ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism04=mean(
-    c_across(c('trad041', 'trad042', 'trad043', 'trad044', 'trad045', 'trad046')), na.rm=T  
+    c_across(c('trad041', 'trad042', 'trad043', 'trad044', 'trad045', 'trad046', 'trad047')), na.rm=T  
   )) %>% 
   ungroup()->ces0411
-
+ces0411$traditionalism04
 ces0411 %>% 
   select(starts_with("trad04")) %>% 
   summary()
@@ -462,12 +473,95 @@ table(ces0411$traditionalism04, useNA="ifany")
 
 #Calculate Cronbach's alpha
 ces0411 %>% 
-  select(trad041, trad042, trad043, trad044, trad045, trad046) %>% 
-  alpha(.)
+  select(trad041, trad042, trad043, trad044, trad045, trad046, trad047) %>% 
+  psych::alpha(.)
 #Check correlation
 ces0411 %>% 
-  select(trad041, trad042, trad043, trad044, trad045, trad046) %>% 
+  select(trad041, trad042, trad043, trad044, trad045, trad046, trad047) %>% 
   cor(., use="complete.obs")
+
+####recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)####
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(traditionalism204=mean(c_across(trad041:trad042)
+                               , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('trad041', 'trad042', 'traditionalism204')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<6)
+#Scale Averaging 
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(traditionalism204=mean(
+    c_across(c('trad041', 'trad042')), na.rm=T  
+  )) %>% 
+  ungroup()->ces0411
+ces0411$traditionalism204
+ces0411 %>% 
+  select(starts_with("trad04")) %>% 
+  summary()
+#Check distribution of traditionalism204
+qplot(ces0411$traditionalism204, geom="histogram")
+table(ces0411$traditionalism204, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces0411 %>% 
+  select(trad041, trad042) %>% 
+  psych::alpha(.)
+#Check correlation
+ces0411 %>% 
+  select(trad041, trad042) %>% 
+  cor(., use="complete.obs")
+
+#### recode 2nd Dimension (stay home, immigration, gay rights, crime)#### 
+ces0411$author041<-ces0411$stay_home04
+ces0411$author042<-ces0411$immigration_rates04
+ces0411$author043<-ces0411$gay_rights04
+ces0411$author044<-ces0411$crime04
+table(ces0411$author041)
+table(ces0411$author042)
+table(ces0411$author043)
+table(ces0411$author044)
+
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism04=mean(c_across(author041:author044)
+                               , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('author041', 'author042', 'author043', 'author044', 'authoritarianism04')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<6)
+#Scale Averaging 
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism04=mean(
+    c_across(c('author041', 'author042', 'author043', 'author044')), na.rm=T  
+  )) %>% 
+  ungroup()->ces0411
+ces0411$authoritarianism04
+ces0411 %>% 
+  select(starts_with("author04")) %>% 
+  summary()
+#Check distribution of authoritarianism04
+qplot(ces0411$authoritarianism04, geom="histogram")
+table(ces0411$authoritarianism04, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces0411 %>% 
+  select(author041, author042, author043, author044) %>% 
+  psych::alpha(.)
+#Check correlation
+ces0411 %>% 
+  select(author041, author042, author043, author044) %>% 
+  cor(., use="complete.obs")
+
+#### #recode Quebec Accommodation (ces04_CPS_F9) (Left=more accom) ####
+look_for(ces0411, "quebec")
+ces0411$quebec_accom04<-Recode(ces0411$ces04_CPS_F9, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA")
+#checks
+table(ces0411$quebec_accom04)
 
 
 ###Recode 2006 2nd ####
@@ -812,6 +906,14 @@ val_labels(ces0411$income06)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle
 val_labels(ces0411$income06)
 table(ces0411$income06)
 
+#### recode Religiosity (ces06_CPS_S11)#### 
+look_for(ces0411, "relig")
+ces0411$religiosity06<-Recode(ces0411$ces06_CPS_S11, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
+val_labels(ces0411$religiosity06)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces0411$religiosity06)
+table(ces0411$religiosity06)
+
 #### #recode Redistribution (ces06_CPS_F6)#### 
 look_for(ces0411, "rich")
 val_labels(ces0411$ces06_CPS_F6)
@@ -865,7 +967,7 @@ table(ces0411$market_liberalism06, useNA="ifany")
 #Calculate Cronbach's alpha
 ces0411 %>% 
   select(market061, market062) %>% 
-  alpha(.)
+  psych::alpha(.)
 
 #Check correlation
 ces0411 %>% 
@@ -915,26 +1017,28 @@ ces0411$stay_home06<-Recode(ces0411$ces06_CPS_P3 , "1=1; 3=0.75; 5=0.25; 7=0; 8=
 table(ces0411$stay_home06, useNA = "ifany")
 
 #recode Moral Traditionalism (abortion, stay home)
-ces0411$trad061<-ces0411$abortion06
+ces0411$trad063<-ces0411$abortion06
 ces0411$trad062<-ces0411$stay_home06
+ces0411$trad061<-ces0411$gay_rights06
 table(ces0411$trad061)
 table(ces0411$trad062)
+table(ces0411$trad063)
 
 ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism06=mean(
-    c_across(trad061:trad062)
+    c_across(trad061:trad063)
     , na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
-  select(c('trad061', 'trad062', 'traditionalism06')) %>% 
+  select(c('trad061', 'trad062', 'trad063', 'traditionalism06')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na>0, na<4)
 #Scale Averaging 
 ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism06=mean(
-    c_across(c('trad061', 'trad062')), na.rm=T  
+    c_across(c('trad061', 'trad062', 'trad063')), na.rm=T  
   )) %>% 
   ungroup()->ces0411
 
@@ -947,12 +1051,95 @@ table(ces0411$traditionalism06, useNA="ifany")
 
 #Calculate Cronbach's alpha
 ces0411 %>% 
+  select(trad061, trad062, trad063) %>% 
+  psych::alpha(.)
+#Check correlation
+ces0411 %>% 
+  select(trad061, trad062, trad063) %>% 
+  cor(., use="complete.obs")
+
+####recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)####
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(traditionalism206=mean(c_across(trad061:trad062)
+                                , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('trad061', 'trad062', 'traditionalism206')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<6)
+#Scale Averaging 
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(traditionalism206=mean(
+    c_across(c('trad061', 'trad062')), na.rm=T  
+  )) %>% 
+  ungroup()->ces0411
+ces0411$traditionalism206
+ces0411 %>% 
+  select(starts_with("trad06")) %>% 
+  summary()
+#Check distribution of traditionalism206
+qplot(ces0411$traditionalism206, geom="histogram")
+table(ces0411$traditionalism206, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces0411 %>% 
   select(trad061, trad062) %>% 
-  alpha(.)
+  psych::alpha(.)
 #Check correlation
 ces0411 %>% 
   select(trad061, trad062) %>% 
   cor(., use="complete.obs")
+
+#### recode 2nd Dimension (stay home, immigration, gay rights, crime)#### 
+ces0411$author061<-ces0411$stay_home06
+ces0411$author062<-ces0411$immigration_rates06
+ces0411$author063<-ces0411$gay_rights06
+ces0411$author064<-ces0411$crime06
+table(ces0411$author061)
+table(ces0411$author062)
+table(ces0411$author063)
+table(ces0411$author064)
+
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism06=mean(c_across(author061:author064)
+                                 , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('author061', 'author062', 'author063', 'author064', 'authoritarianism06')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<6)
+#Scale Averaging 
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism06=mean(
+    c_across(c('author061', 'author062', 'author063', 'author064')), na.rm=T  
+  )) %>% 
+  ungroup()->ces0411
+ces0411$authoritarianism06
+ces0411 %>% 
+  select(starts_with("author06")) %>% 
+  summary()
+#Check distribution of authoritarianism06
+qplot(ces0411$authoritarianism06, geom="histogram")
+table(ces0411$authoritarianism06, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces0411 %>% 
+  select(author061, author062, author063, author064) %>% 
+  psych::alpha(.)
+#Check correlation
+ces0411 %>% 
+  select(author061, author062, author063, author064) %>% 
+  cor(., use="complete.obs")
+
+#### recode Quebec Accommodation (ces06_CPS_F7) (Left=more accom) ####
+look_for(ces0411, "quebec")
+ces0411$quebec_accom06<-Recode(ces0411$ces06_CPS_F7, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA")
+#checks
+table(ces0411$quebec_accom06)
 
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
@@ -1274,7 +1461,7 @@ val_labels(ces0411$occupation08_3)<-c(Professional=1, Managers=2, Routine_Nonman
 val_labels(ces0411$occupation08_3)
 table(ces0411$occupation08_3)
 
-#### #recode Income (ces08_CPS_S18A, ces08_CPS_S18B,#### # ces08_PES_S9A, ces08_PES_S9B)
+#### #recode Income (ces08_CPS_S18A, ces08_CPS_S18B, ces08_PES_S9A, ces08_PES_S9B) ####
 look_for(ces0411, "income")
 #ces0411$income06<-Recode(ces0411$ces06_CPS_S18, "1=1; 2:3=2; 4:5=3; 6:9=4; 10=5; else=NA")
 #ces0411$income04<-Recode(ces0411$ces04_CPS_S18, "1=1; 2:3=2; 4:5=3; 6:7=4; 8:10=5; else=NA")
@@ -1318,6 +1505,14 @@ val_labels(ces0411$income08)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle
 #checks
 val_labels(ces0411$income08)
 table(ces0411$income08)
+
+#### recode Religiosity (ces08_CPS_S11)#### 
+look_for(ces0411, "relig")
+ces0411$religiosity08<-Recode(ces0411$ces08_CPS_S11, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
+val_labels(ces0411$religiosity08)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces0411$religiosity08)
+table(ces0411$religiosity08)
 
 #### #recode Redistribution (ces08_PES_F6)#### 
 look_for(ces0411, "rich")
@@ -1372,7 +1567,7 @@ table(ces0411$market_liberalism08, useNA="ifany")
 #Calculate Cronbach's alpha
 ces0411 %>% 
   select(market081, market082) %>% 
-  alpha(.)
+  psych::alpha(.)
 #Check correlation
 ces0411 %>% 
   select(market081, market082) %>% 
@@ -1445,35 +1640,36 @@ ces0411$morals08<-Recode(ces0411$ces08_MBS_A8, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5;
 table(ces0411$morals08, useNA = "ifany" )
 
 #### #recode Moral Traditionalism (abortion, lifestyles, stay home, values, marriage childen, morals)#### 
-ces0411$trad081<-ces0411$abortion08
-ces0411$trad082<-ces0411$lifestyles08
-ces0411$trad083<-ces0411$stay_home08
+ces0411$trad083<-ces0411$abortion08
+ces0411$trad087<-ces0411$lifestyles08
+ces0411$trad081<-ces0411$stay_home08
 ces0411$trad084<-ces0411$values08
 ces0411$trad085<-ces0411$marriage_children08
 ces0411$trad086<-ces0411$morals08
-ces0411$lifestyles08
+ces0411$trad082<-ces0411$gay_rights08
 table(ces0411$trad081, useNA = "ifany" )
 table(ces0411$trad082, useNA = "ifany" )
 table(ces0411$trad083, useNA = "ifany" )
 table(ces0411$trad084, useNA = "ifany" )
 table(ces0411$trad085, useNA = "ifany" )
 table(ces0411$trad086, useNA = "ifany" )
+table(ces0411$trad087, useNA = "ifany" )
 
 ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism08=mean(
-    c_across(trad081:trad086)
+    c_across(trad081:trad087)
     , na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
-  select(c('trad081', 'trad082', 'trad083', 'trad084', 'trad085', 'trad086', 'traditionalism08')) %>% 
+  select(c('trad081', 'trad082', 'trad083', 'trad084', 'trad085', 'trad086', 'trad087', 'traditionalism08')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na>0, na<6)
 #Scale Averaging 
 ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism08=mean(
-    c_across(c('trad081', 'trad082', 'trad083', 'trad084', 'trad085', 'trad086')), na.rm=T  
+    c_across(c('trad081', 'trad082', 'trad083', 'trad084', 'trad085', 'trad086', 'trad087')), na.rm=T  
   )) %>% 
   ungroup()->ces0411
 
@@ -1486,12 +1682,96 @@ table(ces0411$traditionalism08, useNA="ifany")
 
 #Calculate Cronbach's alpha
 ces0411 %>% 
-  select(trad081, trad082, trad083, trad084, trad085, trad086) %>% 
-  alpha(.)
+  select(trad081, trad082, trad083, trad084, trad085, trad086, trad087) %>% 
+  psych::alpha(.)
 #Check correlation
 ces0411 %>% 
-  select(trad081, trad082, trad083, trad084, trad085, trad086) %>% 
+  select(trad081, trad082, trad083, trad084, trad085, trad086, trad087) %>% 
   cor(., use="complete.obs")
+
+####recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)####
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(traditionalism208=mean(c_across(trad081:trad082)
+                                , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('trad081', 'trad082', 'traditionalism208')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<6)
+#Scale Averaging 
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(traditionalism208=mean(
+    c_across(c('trad081', 'trad082')), na.rm=T  
+  )) %>% 
+  ungroup()->ces0411
+ces0411$traditionalism208
+ces0411 %>% 
+  select(starts_with("trad08")) %>% 
+  summary()
+#Check distribution of traditionalism208
+qplot(ces0411$traditionalism208, geom="histogram")
+table(ces0411$traditionalism208, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces0411 %>% 
+  select(trad081, trad082) %>% 
+  psych::alpha(.)
+#Check correlation
+ces0411 %>% 
+  select(trad081, trad082) %>% 
+  cor(., use="complete.obs")
+
+#### recode 2nd Dimension (stay home, immigration, gay rights, crime)#### 
+ces0411$author081<-ces0411$stay_home08
+ces0411$author082<-ces0411$immigration_rates08
+ces0411$author083<-ces0411$gay_rights08
+ces0411$author084<-ces0411$crime08
+table(ces0411$author081)
+table(ces0411$author082)
+table(ces0411$author083)
+table(ces0411$author084)
+
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism08=mean(c_across(author081:author084)
+                                 , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('author081', 'author082', 'author083', 'author084', 'authoritarianism08')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<6)
+#Scale Averaging 
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism08=mean(
+    c_across(c('author081', 'author082', 'author083', 'author084')), na.rm=T  
+  )) %>% 
+  ungroup()->ces0411
+ces0411$authoritarianism08
+ces0411 %>% 
+  select(starts_with("author08")) %>% 
+  summary()
+#Check distribution of authoritarianism08
+qplot(ces0411$authoritarianism08, geom="histogram")
+table(ces0411$authoritarianism08, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces0411 %>% 
+  select(author081, author082, author083, author084) %>% 
+  psych::alpha(.)
+#Check correlation
+ces0411 %>% 
+  select(author081, author082, author083, author084) %>% 
+  cor(., use="complete.obs")
+
+##### recode Quebec Accommodation (ces08_PES_f7) (Left=more accom) ####
+look_for(ces0411, "quebec")
+ces0411$quebec_accom08<-Recode(ces0411$ces08_PES_F7, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA")
+#checks
+table(ces0411$quebec_accom08)
+
 
 ####Recode 2011 4th ####
 
@@ -1687,6 +1967,14 @@ val_labels(ces0411$income11)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle
 val_labels(ces0411$income11)
 table(ces0411$income11, useNA = "ifany" )
 
+#### recode Religiosity (CPS11_82)#### 
+look_for(ces0411, "relig")
+ces0411$religiosity11<-Recode(ces0411$CPS11_82, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
+val_labels(ces0411$religiosity11)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces0411$religiosity11)
+table(ces0411$religiosity11)
+
 #### #recode Redistribution (PES11_41)#### 
 look_for(ces0411, "rich")
 val_labels(ces0411$PES11_41)
@@ -1740,7 +2028,7 @@ table(ces0411$market_liberalism11, useNA="ifany")
 #Calculate Cronbach's alpha
 ces0411 %>% 
   select(market111, market011) %>% 
-  alpha(.)
+  psych::alpha(.)
 #Check correlation
 ces0411 %>% 
   select(market111, market112) %>% 
@@ -1814,34 +2102,36 @@ ces0411$morals11<-Recode(ces0411$MBS11_C7, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; els
 table(ces0411$morals11, ces0411$MBS11_C7, useNA="ifany")
 
 #recode Moral Traditionalism (abortion, lifestyles, stay home, values, marriage childen, morals)
-ces0411$trad111<-ces0411$abortion11
-ces0411$trad112<-ces0411$lifestyles11
-ces0411$trad113<-ces0411$stay_home11
+ces0411$trad113<-ces0411$abortion11
+ces0411$trad117<-ces0411$lifestyles11
+ces0411$trad111<-ces0411$stay_home11
 ces0411$trad114<-ces0411$values11
 ces0411$trad115<-ces0411$marriage_children11
 ces0411$trad116<-ces0411$morals11
+ces0411$trad112<-ces0411$gay_rights11
 table(ces0411$trad111, useNA = "ifany" )
 table(ces0411$trad112, useNA = "ifany" )
 table(ces0411$trad113, useNA = "ifany" )
 table(ces0411$trad114, useNA = "ifany" )
 table(ces0411$trad115, useNA = "ifany" )
 table(ces0411$trad116, useNA = "ifany" )
+table(ces0411$trad117, useNA = "ifany" )
 
 ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism11=mean(
-    c_across(trad111:trad116)
+    c_across(trad111:trad117)
     , na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
-  select(c('trad111', 'trad112', 'trad113', 'trad114', 'trad115', 'trad116', 'traditionalism11')) %>% 
+  select(c('trad111', 'trad112', 'trad113', 'trad114', 'trad115', 'trad116', 'trad117', 'traditionalism11')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na>0, na<6)
 #Scale Averaging 
 ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism11=mean(
-    c_across(c('trad111', 'trad112', 'trad113', 'trad114', 'trad115', 'trad116')), na.rm=T  
+    c_across(c('trad111', 'trad112', 'trad113', 'trad114', 'trad115', 'trad116', 'trad117')), na.rm=T  
   )) %>% 
   ungroup()->ces0411
 
@@ -1854,9 +2144,93 @@ qplot(ces0411$traditionalism11, geom="histogram")
 
 #Calculate Cronbach's alpha
 ces0411 %>% 
-  select(trad111, trad112, trad113, trad114, trad115, trad116) %>% 
-  alpha(.)
+  select(trad111, trad112, trad113, trad114, trad115, trad116, trad117) %>% 
+  psych::alpha(.)
 #Check correlation
 ces0411 %>% 
-  select(trad111, trad112, trad113, trad114, trad115, trad116) %>% 
+  select(trad111, trad112, trad113, trad114, trad115, trad116, trad117) %>% 
   cor(., use="complete.obs")
+
+####recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)####
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(traditionalism211=mean(c_across(trad111:trad112)
+                                , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('trad111', 'trad112', 'traditionalism211')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<6)
+#Scale Averaging 
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(traditionalism211=mean(
+    c_across(c('trad111', 'trad112')), na.rm=T  
+  )) %>% 
+  ungroup()->ces0411
+ces0411$traditionalism211
+ces0411 %>% 
+  select(starts_with("trad11")) %>% 
+  summary()
+#Check distribution of traditionalism211
+qplot(ces0411$traditionalism211, geom="histogram")
+table(ces0411$traditionalism211, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces0411 %>% 
+  select(trad111, trad112) %>% 
+  psych::alpha(.)
+#Check correlation
+ces0411 %>% 
+  select(trad111, trad112) %>% 
+  cor(., use="complete.obs")
+
+
+#### recode 2nd Dimension (stay home, immigration, gay rights, crime)#### 
+ces0411$author111<-ces0411$stay_home11
+ces0411$author112<-ces0411$immigration_rates11
+ces0411$author113<-ces0411$gay_rights11
+ces0411$author114<-ces0411$crime11
+table(ces0411$author111)
+table(ces0411$author112)
+table(ces0411$author113)
+table(ces0411$author114)
+
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism11=mean(c_across(author111:author114)
+                                 , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('author111', 'author112', 'author113', 'author114', 'authoritarianism11')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<6)
+#Scale Averaging 
+ces0411 %>% 
+  rowwise() %>% 
+  mutate(authoritarianism11=mean(
+    c_across(c('author111', 'author112', 'author113', 'author114')), na.rm=T  
+  )) %>% 
+  ungroup()->ces0411
+ces0411$authoritarianism11
+ces0411 %>% 
+  select(starts_with("author11")) %>% 
+  summary()
+#Check distribution of authoritarianism11
+qplot(ces0411$authoritarianism11, geom="histogram")
+table(ces0411$authoritarianism11, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces0411 %>% 
+  select(author111, author112, author113, author114) %>% 
+  psych::alpha(.)
+#Check correlation
+ces0411 %>% 
+  select(author111, author112, author113, author114) %>% 
+  cor(., use="complete.obs")
+
+####recode Quebec Accommodation (PES11_44) (Left=more accom) ####
+look_for(ces0411, "quebec")
+ces0411$quebec_accom11<-Recode(ces0411$PES11_44, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA")
+#checks
+table(ces0411$quebec_accom11)
