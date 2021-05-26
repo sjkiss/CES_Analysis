@@ -246,7 +246,7 @@ ces19phone$minorities_help<-Recode(as.numeric(ces19phone$p35_a), "1=1; 2=0.75; 3
 
 ces19phone %>% 
   rowwise() %>% 
-  mutate(minorities=mean(c_across(c(minorities_culture, minorities_help)), na.rm=T))->ces19phone
+  mutate(minorities=mean(c(minorities_culture, minorities_help), na.rm=T))->ces19phone
 #checks
 #val_labels(ces19phone$minorities_help)
 #table(ces19phone$minorities_help)
@@ -254,7 +254,7 @@ ces19phone %>%
 #Combine the 4 immigration variables and divide by 4
 ces19phone %>% 
   rowwise() %>% 
-  mutate(immigration=mean(c_across(c(immigration_economy, immigration_culture, immigration_crime, immigration_rate)), na.rm=T))->ces19phone
+  mutate(immigration=mean(c(immigration_economy, immigration_culture, immigration_crime, immigration_rate), na.rm=T))->ces19phone
 
 #Check distribution of immigration
 qplot(ces19phone$immigration, geom="histogram")
@@ -269,7 +269,7 @@ ces19phone %>%
 ## Or Create a 5 variable immigration/racial minority sentiment index by dividing by 5
 ces19phone %>% 
   rowwise() %>% 
-  mutate(immigration2=mean(c_across(c(immigration_economy, immigration_culture, immigration_crime, immigration_rate, minorities_help))))->ces19phone
+  mutate(immigration2=mean(c(immigration_economy, immigration_culture, immigration_crime, immigration_rate, minorities_help)))->ces19phone
 
 
 #Calculate Cronbach's alpha
@@ -438,19 +438,17 @@ table(ces19phone$market2, ces19phone$p20_f , useNA = "ifany" )
 
 ces19phone %>% 
   rowwise() %>% 
-  mutate(market_liberalism=mean(
-    c_across(market1:market2)
-    , na.rm=T )) -> out
+  mutate(market_liberalism=mean(market1, market2), na.rm=T ) -> out
 out %>% 
   ungroup() %>% 
-  select(c('market1', 'market2', 'market_liberalism')) %>% 
+  select(c(market1, market2, market_liberalism)) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
+  filter(na>0, na<4)
 #Scale Averaging 
 ces19phone %>% 
   rowwise() %>% 
   mutate(market_liberalism=mean(
-    c_across(c('market1', 'market2')), na.rm=T  
+   c(market1, market2), na.rm=T  
   )) %>% 
   ungroup()->ces19phone
 
@@ -487,20 +485,16 @@ ces19phone %>%
   names()
 ces19phone %>% 
   rowwise() %>% 
-  mutate(moral_traditionalism=mean(
-    c_across(moral_1:moral_3)
-    , na.rm=T )) -> out
+  mutate(moral_traditionalism=mean(c(moral_1, moral_2,moral_3), na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
-  select(c('moral_1', 'moral_2', 'moral_3', 'moral_traditionalism')) %>% 
+  select(c(moral_1, moral_2, moral_3, moral_traditionalism)) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na>0, na<4)
 #Scale Averaging 
 ces19phone %>% 
   rowwise() %>% 
-  mutate(moral_traditionalism=mean(
-    c_across(c('moral_1', 'moral_2', 'moral_3')), na.rm=T  
-  )) %>% 
+  mutate(moral_traditionalism=mean(c(moral_1, moral_2, moral_3), na.rm=T  )) %>% 
   ungroup()->ces19phone
 ces19phone %>% 
   select(starts_with("moral_")) %>% 
@@ -530,15 +524,14 @@ ces19phone %>%
     , na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
-  select(c('disaffection1', 'disaffection2', 'political_disaffection')) %>% 
+  select(contains('disaffection')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na>0, na<3)
 #Scale Averaging 
 ces19phone %>% 
   rowwise() %>% 
-  mutate(political_disaffection=mean(
-    c_across(c('disaffection1', 'disaffection2')), na.rm=T  
-  )) %>% 
+  mutate(political_disaffection=mean(c(disaffection1, disaffection2)), na.rm=T  
+  )%>% 
   ungroup()->ces19phone
 ces19phone %>% 
   select(contains("disaffection")) %>% 
@@ -723,15 +716,14 @@ ces19phone %>%
     , na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
-  select(c('trad1', 'trad2', 'traditionalism')) %>% 
+  select(c(trad1, trad2, traditionalism)) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na<5)
 
 #Scale Averaging 
 ces19phone %>% 
   rowwise() %>% 
-  mutate(traditionalism=mean(
-    c_across(c('trad1', 'trad2')), na.rm=T  
+  mutate(traditionalism=mean(c(trad1, trad2), na.rm=T  
   )) %>% 
   ungroup()->ces19phone
 
@@ -754,21 +746,17 @@ ces19phone %>%
 #recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)
 ces19phone %>% 
   rowwise() %>% 
-  mutate(traditionalism2=mean(
-    c_across(trad1:trad2)
-    , na.rm=T )) -> out
+  mutate(traditionalism2=mean(c(trad1, trad2), na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
-  select(c('trad1', 'trad2', 'traditionalism2')) %>% 
+  select(c(trad1, trad2, traditionalism2)) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na<5)
 
 #Scale Averaging 
 ces19phone %>% 
   rowwise() %>% 
-  mutate(traditionalism2=mean(
-    c_across(c('trad1', 'trad2')), na.rm=T  
-  )) %>% 
+  mutate(traditionalism2=mean(c(trad1, trad2), na.rm=T   )) %>% 
   ungroup()->ces19phone
 
 ces19phone %>% 
@@ -792,15 +780,13 @@ ces19phone %>%
     , na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
-  select(c('author1', 'author2', 'author3', 'author4', 'authoritarianism')) %>% 
+  select(c(author1, author2, author3, author4, authoritarianism)) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
+  filter(na>0, na<6)
 #Scale Averaging 
 ces19phone %>% 
   rowwise() %>% 
-  mutate(authoritarianism=mean(
-    c_across(c('author1', 'author2', 'author3', 'author4')), na.rm=T  
-  )) %>% 
+  mutate(authoritarianism=mean(c(author1, author2, author3, author4)), na.rm=T  ) %>% 
   ungroup()->ces19phone
 
 ces19phone %>% 

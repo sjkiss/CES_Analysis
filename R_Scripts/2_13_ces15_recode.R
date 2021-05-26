@@ -239,12 +239,12 @@ ces15phone$immigration_jobs<-Recode(ces15phone$PES15_51, "7=1; 5=0.75; 3=0.25; 1
 table(ces15phone$immigration_jobs)
 ces15phone$PES15_19
 
-ces15phone$immigration_feel1<-car::Recode(as.numeric(ces15phone$PES15_19), "998:999=NA", as.numeric=T)
+ces15phone$immigration_feel<-car::Recode(as.numeric(ces15phone$PES15_19), "998:999=NA", as.numeric=T)
 
-ces15phone$immigration_feel<-ces15phone$immigration_feel1 /100
+ces15phone$immigration_feel<-ces15phone$immigration_feel /100
 summary(ces15phone$immigration_feel)
 class(ces15phone$immigration_feel)
-class(ces15phone$immigration_feel1)
+class(ces15phone$immigration_feel)
 #checks
 #val_labels(ces15phone$immigrations_feel)
 table(ces15phone$immigration_feel)
@@ -260,7 +260,7 @@ ces15phone$immigration_feel
 
 ces15phone %>% 
   rowwise() %>% 
-  mutate(immigration=mean(c_across(c(immigration_jobs, immigration_rate, immigration_feel)), na.rm=T))->ces15phone
+  mutate(immigration=mean(c(immigration_jobs, immigration_rate, immigration_feel), na.rm=T))->ces15phone
 
 #Check distribution of immigration
 qplot(ces15phone$immigration, geom="histogram")
@@ -300,9 +300,16 @@ ces15phone %>%
 
 
 ## Or Create a 5 variable immigration/racial minority sentiment index by dividing by 5
+ces15phone %>% 
+  select(starts_with('immigration_'))
+#Remove value labels
+ces15phone %>% 
+  mutate(across(.cols=starts_with('immigration_|minorities_'), remove_val_labels) )->ces15phone
+
+
 
 ces15phone %>% 
-  mutate(immigration2=mean(c_across(c(immigration_jobs, immigration_feel, immigration_rate, minorities_feel, minorities_help)), na.rm=T))->ces15phone
+  mutate(immigration2=mean(c(immigration_jobs, immigration_feel, immigration_rate, minorities_feel, minorities_help), na.rm=T))->ces15phone
 qplot(ces15phone$immigration2, geom="histogram")
 
 #Calculate Cronbach's alpha
@@ -443,19 +450,16 @@ table(ces15phone$market2, useNA="ifany")
 ces15phone %>% 
   rowwise() %>% 
   mutate(market_liberalism=mean(
-    c_across(market1:market2)
-    , na.rm=T )) -> out
+    c(market1, market2), na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
-  select(c('market1', 'market2', 'market_liberalism')) %>% 
+  select(c(market1, market2, market_liberalism)) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na>0, na<3)
 #Scale Averaging 
 ces15phone %>% 
   rowwise() %>% 
-  mutate(market_liberalism=mean(
-    c_across(c('market1', 'market2')), na.rm=T  
-  )) %>% 
+  mutate(market_liberalism=mean(c(market1, market2), na.rm=T  )) %>% 
   ungroup()->ces15phone
 ces15phone %>% 
   select(starts_with("market")) %>% 
@@ -488,10 +492,10 @@ ces15phone$moral_3
 ces15phone %>% 
   select(starts_with('moral_'))
 #Scale Averaging 
+
 ces15phone %>% 
   rowwise() %>% 
-  mutate(moral_traditionalism=mean(
-    c_across(c('moral_1', 'moral_2', 'moral_3')), na.rm=T  
+  mutate(moral_traditionalism=mean(c(moral_1, moral_2, moral_3), na.rm=T  
   )) %>% 
   ungroup()->ces15phone
 ces15phone %>% 
@@ -746,13 +750,13 @@ out %>%
   ungroup() %>% 
   select(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'trad7', 'traditionalism')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
-  filter(na<5)
+  filter(na<8)
   
 #Scale Averaging 
 ces15phone %>% 
   rowwise() %>% 
   mutate(traditionalism=mean(
-    c_across(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'trad7')), na.rm=T  
+    c_across(num_range('trad', 1:7)), na.rm=T  
   )) %>% 
   ungroup()->ces15phone
 
@@ -827,12 +831,12 @@ out %>%
   ungroup() %>% 
   select(c('author1', 'author2', 'author3', 'author4', 'authoritarianism')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
+  filter(na>0, na<6)
 #Scale Averaging 
 ces15phone %>% 
   rowwise() %>% 
   mutate(authoritarianism=mean(
-    c_across(c('author1', 'author2', 'author3', 'author4')), na.rm=T  
+    c_across(num_range('author', 4)), na.rm=T  
   )) %>% 
   ungroup()->ces15phone
 

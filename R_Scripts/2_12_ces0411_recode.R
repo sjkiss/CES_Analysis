@@ -2,7 +2,7 @@
 library(tidyverse)
 library(car)
 library(labelled)
-
+library(cesdata)
 #load data
 data("ces0411")
 
@@ -17,7 +17,7 @@ val_labels(ces0411$male)<-c(Female=0, Male=1)
 val_labels(ces0411$male)
 table(ces0411$male)
 
-##### Union ####
+#### Union ####
 #recode Union Respondent (ces04_CPS_S6A)
 ces0411$union04<-Recode(ces0411$ces04_CPS_S6A, 
                         "1=1; 5=0; else=NA")
@@ -68,7 +68,7 @@ val_labels(ces0411$degree04)<-c(nodegree=0, degree=1)
 val_labels(ces0411$degree04)
 table(ces0411$degree04)
 
-#####Region (ces04_PROVINCE)####
+#### Region (ces04_PROVINCE)####
 look_for(ces0411, "province")
 ces0411$region04<-Recode(ces0411$ces04_PROVINCE, "10:13=1; 35=2; 46:59=3; 4=NA; else=NA")
 val_labels(ces0411$region04)<-c(Atlantic=1, Ontario=2, West=3)
@@ -112,7 +112,7 @@ val_labels(ces0411$religion04)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 val_labels(ces0411$religion04)
 table(ces0411$religion04)
 
-#####recode Language (ces04_CPS_INTLANG) #### 
+####recode Language (ces04_CPS_INTLANG) #### 
 look_for(ces0411, "language")
 ces0411$language04<-Recode(ces0411$ces04_CPS_INTLANG, "2=0; 1=1; else=NA")
 val_labels(ces0411$language04)<-c(French=0, English=1)
@@ -447,7 +447,13 @@ table(ces0411$trad045)
 table(ces0411$trad046)
 table(ces0411$trad047)
 
+
+#Remove Value Labels
 ces0411 %>% 
+  mutate(across(.cols=num_range('trad04', 1:7), remove_val_labels)) ->ces0411
+  
+  
+  ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism04=mean(c_across(trad041:trad047)
     , na.rm=T )) -> out
@@ -455,12 +461,14 @@ out %>%
   ungroup() %>% 
   select(c('trad041', 'trad042', 'trad043', 'trad044', 'trad045', 'trad046', 'trad047', 'traditionalism04')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<6)
+  filter(na>0, na<7)
+
 #Scale Averaging 
+
 ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism04=mean(
-    c_across(c('trad041', 'trad042', 'trad043', 'trad044', 'trad045', 'trad046', 'trad047')), na.rm=T  
+    c_across(c(trad041, trad042, trad043, trad044, trad045, trad046, trad047)), na.rm=T  
   )) %>% 
   ungroup()->ces0411
 ces0411$traditionalism04
@@ -481,6 +489,10 @@ ces0411 %>%
   cor(., use="complete.obs")
 
 ####recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)####
+#Check value labels
+ces0411 %>% 
+  select(trad041:trad042)
+
 ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism204=mean(c_across(trad041:trad042)
@@ -523,6 +535,10 @@ table(ces0411$author041)
 table(ces0411$author042)
 table(ces0411$author043)
 table(ces0411$author044)
+
+#Check for value labels
+ces0411 %>% 
+  select(starts_with('author04'))
 
 ces0411 %>% 
   rowwise() %>% 
@@ -939,11 +955,19 @@ ces0411$market062<-Recode(ces0411$ces06_PES_G9, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5
 table(ces0411$market061)
 table(ces0411$market062)
 
+#Check for value labels
+ces0411 %>% 
+  select(starts_with('market06'))
+
+ces0411 %>% 
+  mutate(across(num_range('market06', 1:2), remove_val_labels))->ces0411
+
 ces0411 %>% 
   rowwise() %>% 
   mutate(market_liberalism06=mean(
     c_across(market061:market062)
     , na.rm=T )) -> out
+
 out %>% 
   ungroup() %>% 
   select(c('market061', 'market062', 'market_liberalism06')) %>% 
@@ -1024,6 +1048,12 @@ table(ces0411$trad061)
 table(ces0411$trad062)
 table(ces0411$trad063)
 
+#Remove value labels
+ces0411 %>% 
+  select(starts_with('trad06'))
+
+ces0411 %>% 
+  mutate(across(num_range('trad06', 1:3), remove_val_labels))->ces0411
 ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism06=mean(
@@ -1103,6 +1133,8 @@ table(ces0411$author063)
 table(ces0411$author064)
 
 ces0411 %>% 
+  mutate(across(.cols=num_range('author06', 1:4), remove_val_labels))->ces0411
+ces0411 %>% 
   rowwise() %>% 
   mutate(authoritarianism06=mean(c_across(author061:author064)
                                  , na.rm=T )) -> out
@@ -1118,7 +1150,7 @@ ces0411 %>%
     c_across(c('author061', 'author062', 'author063', 'author064')), na.rm=T  
   )) %>% 
   ungroup()->ces0411
-ces0411$authoritarianism06
+
 ces0411 %>% 
   select(starts_with("author06")) %>% 
   summary()
@@ -1540,6 +1572,9 @@ table(ces0411$market081, useNA = "ifany" )
 table(ces0411$market082, useNA = "ifany" )
 
 ces0411 %>% 
+  select(starts_with('market08'))
+
+ces0411 %>% 
   rowwise() %>% 
   mutate(market_liberalism08=mean(
     c_across(market081:market082)
@@ -1654,6 +1689,10 @@ table(ces0411$trad084, useNA = "ifany" )
 table(ces0411$trad085, useNA = "ifany" )
 table(ces0411$trad086, useNA = "ifany" )
 table(ces0411$trad087, useNA = "ifany" )
+#Remove value labels
+
+ces0411 %>% 
+  mutate(across(.cols=num_range('trad08', 1:7), remove_val_labels))->ces0411
 
 ces0411 %>% 
   rowwise() %>% 
@@ -1664,12 +1703,12 @@ out %>%
   ungroup() %>% 
   select(c('trad081', 'trad082', 'trad083', 'trad084', 'trad085', 'trad086', 'trad087', 'traditionalism08')) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<6)
+  filter(na>0, na<7)
 #Scale Averaging 
 ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism08=mean(
-    c_across(c('trad081', 'trad082', 'trad083', 'trad084', 'trad085', 'trad086', 'trad087')), na.rm=T  
+    c_across(num_range('trad08', 1:7)), na.rm=T  
   )) %>% 
   ungroup()->ces0411
 
@@ -1733,6 +1772,11 @@ table(ces0411$author082)
 table(ces0411$author083)
 table(ces0411$author084)
 
+
+#Remove Value Labels
+ces0411 %>% 
+  mutate(across(num_range('author08', 1:4), remove_val_labels))->ces0411
+
 ces0411 %>% 
   rowwise() %>% 
   mutate(authoritarianism08=mean(c_across(author081:author084)
@@ -1755,7 +1799,6 @@ ces0411 %>%
   summary()
 #Check distribution of authoritarianism08
 qplot(ces0411$authoritarianism08, geom="histogram")
-table(ces0411$authoritarianism08, useNA="ifany")
 
 #Calculate Cronbach's alpha
 ces0411 %>% 
@@ -1766,7 +1809,7 @@ ces0411 %>%
   select(author081, author082, author083, author084) %>% 
   cor(., use="complete.obs")
 
-##### recode Quebec Accommodation (ces08_PES_f7) (Left=more accom) ####
+#### recode Quebec Accommodation (ces08_PES_f7) (Left=more accom) ####
 look_for(ces0411, "quebec")
 ces0411$quebec_accom08<-Recode(ces0411$ces08_PES_F7, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA")
 #checks
@@ -2000,6 +2043,10 @@ ces0411$market112<-Recode(ces0411$PES11_49, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; el
 table(ces0411$market111, useNA = "ifany" )
 table(ces0411$market112, useNA = "ifany" )
 
+#Remvoe value labels
+ces0411 %>% 
+  mutate(across(.cols=num_range('market11', 1:2), remove_val_labels))->ces0411
+
 ces0411 %>% 
   rowwise() %>% 
   mutate(market_liberalism11=mean(
@@ -2027,7 +2074,7 @@ table(ces0411$market_liberalism11, useNA="ifany")
 
 #Calculate Cronbach's alpha
 ces0411 %>% 
-  select(market111, market011) %>% 
+  select(market111, market112) %>% 
   psych::alpha(.)
 #Check correlation
 ces0411 %>% 
@@ -2095,7 +2142,7 @@ ces0411$values11<-Recode(ces0411$MBS11_C8, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; els
 #checks
 table(ces0411$values11, useNA = "ifany" )
 
-##### recode Morals (MBS11_C7)#### 
+#### recode Morals (MBS11_C7)#### 
 look_for(ces0411, "moral")
 ces0411$morals11<-Recode(ces0411$MBS11_C7, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
 #checks
@@ -2117,6 +2164,11 @@ table(ces0411$trad115, useNA = "ifany" )
 table(ces0411$trad116, useNA = "ifany" )
 table(ces0411$trad117, useNA = "ifany" )
 
+#remove value labels
+
+ces0411 %>% 
+  mutate(across(.cols=num_range('trad11', 1:7), remove_val_labels))->ces0411
+
 ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism11=mean(
@@ -2129,9 +2181,11 @@ out %>%
   filter(na>0, na<6)
 #Scale Averaging 
 ces0411 %>% 
+  select(num_range('trad11', 1:7))
+ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism11=mean(
-    c_across(c('trad111', 'trad112', 'trad113', 'trad114', 'trad115', 'trad116', 'trad117')), na.rm=T  
+    c_across(num_range('trad11', 1:7)), na.rm=T  
   )) %>% 
   ungroup()->ces0411
 
@@ -2165,7 +2219,7 @@ out %>%
 ces0411 %>% 
   rowwise() %>% 
   mutate(traditionalism211=mean(
-    c_across(c('trad111', 'trad112')), na.rm=T  
+    c_across(num_range('trad11', 1:2)), na.rm=T  
   )) %>% 
   ungroup()->ces0411
 ces0411$traditionalism211
@@ -2196,6 +2250,11 @@ table(ces0411$author112)
 table(ces0411$author113)
 table(ces0411$author114)
 
+#Remove value labels
+
+ces0411 %>% 
+  mutate(across(.cols=num_range('author11', 1:4), remove_val_labels))->ces0411
+
 ces0411 %>% 
   rowwise() %>% 
   mutate(authoritarianism11=mean(c_across(author111:author114)
@@ -2209,7 +2268,7 @@ out %>%
 ces0411 %>% 
   rowwise() %>% 
   mutate(authoritarianism11=mean(
-    c_across(c('author111', 'author112', 'author113', 'author114')), na.rm=T  
+    c_across(num_range('author11', 1:4)), na.rm=T  
   )) %>% 
   ungroup()->ces0411
 ces0411$authoritarianism11
