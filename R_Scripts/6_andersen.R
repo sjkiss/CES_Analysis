@@ -96,9 +96,6 @@ stargazer(andersen1roc, type="html", out=here("Tables", "andersen1roc.html"), ti
 #social class and time coded as a set of dummy regressors representing each year
 #separately.
 
-#First we spread the election variable to be dummies
-ces %>% 
-  pivot_wider(., names_from=election, values_from=election)->ces.out
 
 #Need to make 15 separate regression models: one each with occupation and an interaction between occupation and an election dummy. Then generate predicted probabilities for each
 
@@ -200,20 +197,20 @@ andersen2qc<-multinom(vote2 ~ as.factor(occupation2)+age+male+as.factor(religion
 #ROC
 andersen2roc<-multinom(vote2 ~ as.factor(occupation2)+age+male+as.factor(religion2)+degree+as.factor(election)+as.factor(region3), data = subset(ces.out, quebec!=1))
 
-library(stargazer)
-#The command add.lines adds output into the stargazer table
-#The number of observations is stored in the number of fitted values in the model
-nrow(andersen2qc$fitted.values)
-#nobs vector
-nobs_andersen2qc<-c("N", rep(nrow(andersen2qc$fitted.values), 2))
-nobs_andersen2roc<-c("N", rep(nrow(andersen2roc$fitted.values), 2))
-
-#Check
-nobs_andersen2qc
-#add in 
-
-stargazer(andersen2qc, type="html", out=here("Tables", "andersen2qc.html"), title="Multinomial Logistic Regression of Left Vote, 1965-2004, QC", add.lines=list(nobs_andersen2qc))
-stargazer(andersen2roc, type="html", out=here("Tables", "andersen2roc.html"), title="Multinomial Logistic Regression of NDP Vote, 1965-2004, ROC", add.lines=list(nobs_andersen2roc))
+# library(stargazer)
+# #The command add.lines adds output into the stargazer table
+# #The number of observations is stored in the number of fitted values in the model
+# nrow(andersen2qc$fitted.values)
+# #nobs vector
+# nobs_andersen2qc<-c("N", rep(nrow(andersen2qc$fitted.values), 2))
+# nobs_andersen2roc<-c("N", rep(nrow(andersen2roc$fitted.values), 2))
+# 
+# #Check
+# nobs_andersen2qc
+# #add in 
+# 
+# stargazer(andersen2qc, type="html", out=here("Tables", "andersen2qc.html"), title="Multinomial Logistic Regression of Left Vote, 1965-2004, QC", add.lines=list(nobs_andersen2qc))
+# stargazer(andersen2roc, type="html", out=here("Tables", "andersen2roc.html"), title="Multinomial Logistic Regression of NDP Vote, 1965-2004, ROC", add.lines=list(nobs_andersen2roc))
 
 #----------------------------------------------------------------------------------------------------
 ####Model 3 - Replication of Table 7.3 in Andersen (by Region) expanded to 2019 ####
@@ -225,22 +222,29 @@ table(ces$vote2)
 andersen3qc<-multinom(vote2 ~ as.factor(occupation2)+age+male+as.factor(religion2)+degree+as.factor(election), data = subset(ces.out, quebec==1))
 #ROC
 andersen3roc<-multinom(vote2 ~ as.factor(occupation2)+age+male+as.factor(religion2)+degree+as.factor(election)+as.factor(region3), data = subset(ces.out, quebec!=1))
-
+andersen3qc
 library(stargazer)
 #The command add.lines adds output into the stargazer table
 #The number of observations is stored in the number of fitted values in the model
-nrow(andersen3qc$fitted.values)
-#nobs vector
-nobs_andersen3qc<-c("N", rep(nrow(andersen3qc$fitted.values), 2))
-nobs_andersen3roc<-c("N", rep(nrow(andersen3roc$fitted.values), 2))
-
-#Check
-nobs_andersen3qc
+# nrow(andersen3qc$fitted.values)
+# #nobs vector
+# nobs_andersen3qc<-c("N", rep(nrow(andersen3qc$fitted.values), 2))
+# nobs_andersen3roc<-c("N", rep(nrow(andersen3roc$fitted.values), 2))
+# 
+# #Check
+# nobs_andersen3qc
 #add in 
+# 
+stargazer(andersen3qc, type="html", out=here("Tables", "andersen3qc.html"),
+          covariate.labels=c('(Social Class) Managers', '(Social Class) Professionals','(Social Class) Routine Non Manual', 'Age', 'Male', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other', '(Education) Degree', '1965', '1968', '1972', '1974','1979', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015','2019' ),
+          title="Multinomial Logistic Regression of Left Vote, 1965-2019, QC", add.lines=list(nobs_andersen3qc), single.row=T, digits=2)
+stargazer(andersen3roc, type="html", covariate.labels=c('(Social Class) Managers', '(Social Class) Professionals', '(Social Class) Routine Non Manual', 'Age', 'Male', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other', '(Education) Degree', '1965', '1968', '1972', '1974','1979', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015','2019' , 'Region (Ontario), Region (West)'),
+          out=here("Tables", "andersen3roc.html"), title="Multinomial Logistic Regression of NDP Vote, 1965-2019, ROC", add.lines=list(nobs_andersen3roc), single.row=T, digits=2)
 
-stargazer(andersen3qc, type="html", out=here("Tables", "andersen3qc.html"), title="Multinomial Logistic Regression of Left Vote, 1965-2019, QC", add.lines=list(nobs_andersen3qc))
-stargazer(andersen3roc, type="html", out=here("Tables", "andersen3roc.html"), title="Multinomial Logistic Regression of NDP Vote, 1965-2019, ROC", add.lines=list(nobs_andersen3roc))
-
+andersen3<-list(andersen3qc, andersen3roc)
+map(andersen3, function(x) rep(nrow(x$fitted.values), 2)) %>% 
+  unlist()->n_obs
+stargazer(andersen3qc, andersen3roc, digits=2,single.row=T, out=here("Tables", "andersen_replication_extension_1965_2019.html"), type="html", column.labels=c("QC", "ROC"), column.separate = c(2,2), title="Multinomial Logistic Regression of Left Vote On Class, 1980-2019", notes=c("These models do not account for the self-employed because of limitations in the Canada Election Study Files"), add.lines=list(c("N", n_obs)))
 #----------------------------------------------------------------------------------------------------
   ####Model 4 - Extension of Table 7.3 in Andersen including Self-Employed (by Region) 1979-2019 ####
 
@@ -256,17 +260,27 @@ summary(andersen4roc)
 library(stargazer)
 #The command add.lines adds output into the stargazer table
 #The number of observations is stored in the number of fitted values in the model
-nrow(andersen4qc$fitted.values)
-#nobs vector
-nobs_andersen4qc<-c("N", rep(nrow(andersen4qc$fitted.values), 2))
-nobs_andersen4roc<-c("N", rep(nrow(andersen4roc$fitted.values), 2))
+# nrow(andersen4qc$fitted.values)
+# #nobs vector
+# nobs_andersen4qc<-c("N", rep(nrow(andersen4qc$fitted.values), 2))
+# nobs_andersen4roc<-c("N", rep(nrow(andersen4roc$fitted.values), 2))
+# 
+# #Check
+# nobs_andersen4qc
+# #add in 
+# andersen4qc
+# andersen4roc
+# stargazer(andersen4qc, 
+#           type="html", 
+#           covariate.labels=c('(Social Class) Managers', '(Social Class) Professionals','(Social Class) Self-Employed', '(Social Class) Routine Non Manual', 'Age', 'Male', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other', '(Education) Degree', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015','2019' ),out=here("Tables", "andersen4qc.html"), title="Multinomial Logistic Regression of Left Vote, 1979-2019, QC", add.lines=list(nobs_andersen4qc), single.row=T, digits=2)
+# stargazer(andersen4roc, type="html", covariate.labels=c('(Social Class) Managers', '(Social Class) Professionals','(Social Class) Self-Employed', '(Social Class) Routine Non Manual', 'Age', 'Male', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other', '(Education) Degree', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015','2019', 'Region (Ontario)', 'Region (West)'),out=here("Tables", "andersen4roc.html"), title="Multinomial Logistic Regression of NDP Vote, 1979-2019, ROC", add.lines=list(nobs_andersen4roc), single.row=T, digits=2)
 
-#Check
-nobs_andersen4qc
-#add in 
-andersen4qc
-andersen4roc
-stargazer(andersen4qc, 
-          type="html", 
-          covariate.labels=c('(Social Class) Managers', '(Social Class) Professionals','(Social Class) Self-Employed', '(Social Class) Routine Non Manual', 'Age', 'Male', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other', '(Education) Degree', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015','2019' ),out=here("Tables", "andersen4qc.html"), title="Multinomial Logistic Regression of Left Vote, 1979-2019, QC", add.lines=list(nobs_andersen4qc), single.row=T, digits=2)
-stargazer(andersen4roc, type="html", covariate.labels=c('(Social Class) Managers', '(Social Class) Professionals','(Social Class) Self-Employed', '(Social Class) Routine Non Manual', 'Age', 'Male', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other', '(Education) Degree', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015','2019', 'Region (Ontario)', 'Region (West)'),out=here("Tables", "andersen4roc.html"), title="Multinomial Logistic Regression of NDP Vote, 1979-2019, ROC", add.lines=list(nobs_andersen4roc), single.row=T, digits=2)
+andersen4<-list(andersen4qc, andersen4roc)
+
+map(andersen4, function(x) rep(nrow(x$fitted.values), 2)) %>% 
+  unlist()->n_obs
+
+stargazer(andersen4qc, andersen4roc, digits=2, out=here("Tables", "andersen_replication_extension_1980_2019.html"), type="html", column.labels=c("QC", "ROC"), column.separate = c(2,2), title="Multinomial Logistic Regression of Left Vote On Class, 1980-2019", add.lines=list(c("N", n_obs)), single.row = T)
+
+
+

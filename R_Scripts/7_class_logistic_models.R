@@ -1510,3 +1510,24 @@ stargazer(con_class_models_inter_1$model, column.labels=c("1988", "1993", "1997"
 stargazer(con_class_models_inter_2$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_class_models_inter_2.html"))
 stargazer(liberal_class_models_inter_1$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "liberal_class_models_inter_1.html"))
 stargazer(liberal_class_models_inter_2$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "liberal_class_models_inter_2.html"))
+
+
+#### 
+names(ces)
+table(ces$occupation4)
+ces %>% 
+  select(election, occupation4,  vote2, crime, market_liberalism, traditionalism, quebec_accom, crime) %>% 
+  pivot_longer(cols=crime:quebec_accom) %>% 
+  group_by(name) %>% 
+  mutate(pro=case_when(
+    value>0.5~ 1,
+    TRUE ~ 0
+  )) %>% 
+  group_by(election, vote2, name, pro) %>% 
+  filter(election>1984) %>% 
+  filter(!is.na(vote2)) %>% 
+  filter(vote2!="Green") %>% 
+summarize(n=n()) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  ggplot(., aes(x=election, y=percent, fill=vote2))+geom_col(position="dodge")+facet_wrap(~name)
+  
