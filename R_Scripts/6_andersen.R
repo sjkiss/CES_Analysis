@@ -10,6 +10,8 @@ ces$working_class2<-Recode(ces$occupation2, "'Working_Class'=1; else=0; NA=NA")
 #I think Andersen has the Conservatives set as the reference category. 
 ces$vote
 table(as_factor(ces$vote))
+ces$vote
+ces$vote2
 ces$vote2<-Recode(as.factor(ces$vote), "0=NA; ;1='Liberal' ; 2='Conservative' ; 3:4='Left' ; 5='Green'", levels=c('Conservative', 'Liberal', 'Left', 'Green'))
 table(ces$vote2)
 levels(ces$vote2)
@@ -49,7 +51,7 @@ library(broom)
 
 #------------------------------------------------------------------------------------------------------------
 ### Count cases
-m
+
 
 ##Count missing values
 ces %>% 
@@ -141,7 +143,7 @@ roc_models %>%
   #filter in only probability of voting for left
   filter(response.level!="Green") %>% 
   #PLot as line plot 
-  ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In ROC\nLeft Vote")
+  ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In ROC\nLeft Vote")+ylim(c(0,1))
 
 #### Extend Figure 7.1 to 2019 ####
 #Make ROC Models to 2019
@@ -152,6 +154,7 @@ ces %>%
          predicted=map(model, ggpredict))->roc_models_2019
 
 #Start with where the predicted values are stored
+
 roc_models_2019 %>% 
   #unnest_wider is a new command; I just found out about it today;
   #unnest the predicted values objects
@@ -162,7 +165,8 @@ roc_models_2019 %>%
   filter(response.level!="Green") %>% 
   #PLot as line plot 
   ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In ROC")+theme(axis.text.x=element_text(angle=90))
-ggsave(here("Plots", "class_voting_roc_2019.png"), width=8, height=3)
+
+ggsave(here("Plots", "class_voting_roc_2019.png"), width=10, height=3)
 #Now QC 2019
 ces %>% 
   filter(election!=2000 &quebec==1) %>% 
@@ -181,7 +185,7 @@ qc_models_2019 %>%
   filter(response.level!="Green") %>% 
   #PLot as line plot 
   ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In QCC")+theme(axis.text.x=element_text(angle=90))
-ggsave(here("Plots", "class_voting_qc_2019.png"), width=8, height=3)
+ggsave(here("Plots", "class_voting_qc_2019.png"), width=10, height=3)
 
 #----------------------------------------------------------------------------------------------------
 ####Model 2 - Replication of Table 7.3 in Andersen (by Region) ####
@@ -248,7 +252,7 @@ table(ces$vote2)
 andersen4qc<-multinom(vote2 ~ as.factor(occupation4)+age+male+as.factor(religion2)+degree+as.factor(election), data = subset(ces.out, quebec==1))
 #ROC
 andersen4roc<-multinom(vote2 ~ as.factor(occupation4)+age+male+as.factor(religion2)+degree+as.factor(election)+as.factor(region3), data = subset(ces.out, quebec!=1))
-
+summary(andersen4roc)
 library(stargazer)
 #The command add.lines adds output into the stargazer table
 #The number of observations is stored in the number of fitted values in the model
@@ -260,6 +264,9 @@ nobs_andersen4roc<-c("N", rep(nrow(andersen4roc$fitted.values), 2))
 #Check
 nobs_andersen4qc
 #add in 
-
-stargazer(andersen4qc, type="html", out=here("Tables", "andersen4qc.html"), title="Multinomial Logistic Regression of Left Vote, 1979-2019, QC", add.lines=list(nobs_andersen4qc))
-stargazer(andersen4roc, type="html", out=here("Tables", "andersen4roc.html"), title="Multinomial Logistic Regression of NDP Vote, 1979-2019, ROC", add.lines=list(nobs_andersen4roc))
+andersen4qc
+andersen4roc
+stargazer(andersen4qc, 
+          type="html", 
+          covariate.labels=c('(Social Class) Managers', '(Social Class) Professionals','(Social Class) Self-Employed', '(Social Class) Routine Non Manual', 'Age', 'Male', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other', '(Education) Degree', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015','2019' ),out=here("Tables", "andersen4qc.html"), title="Multinomial Logistic Regression of Left Vote, 1979-2019, QC", add.lines=list(nobs_andersen4qc), single.row=T, digits=2)
+stargazer(andersen4roc, type="html", covariate.labels=c('(Social Class) Managers', '(Social Class) Professionals','(Social Class) Self-Employed', '(Social Class) Routine Non Manual', 'Age', 'Male', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other', '(Education) Degree', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015','2019', 'Region (Ontario)', 'Region (West)'),out=here("Tables", "andersen4roc.html"), title="Multinomial Logistic Regression of NDP Vote, 1979-2019, ROC", add.lines=list(nobs_andersen4roc), single.row=T, digits=2)
