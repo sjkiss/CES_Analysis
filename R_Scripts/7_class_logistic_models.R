@@ -1516,7 +1516,7 @@ stargazer(liberal_class_models_inter_2$model, column.labels=c("1988", "1993", "1
 names(ces)
 table(ces$occupation4)
 ces %>% 
-  select(election, occupation4,  vote2, crime, market_liberalism, traditionalism, quebec_accom, crime) %>% 
+  select(election, occupation4,  vote2, crime, market_liberalism,traditionalism2, traditionalism, authoritarianism, quebec_accom, crime) %>% 
   pivot_longer(cols=crime:quebec_accom) %>% 
   group_by(name) %>% 
   mutate(pro=case_when(
