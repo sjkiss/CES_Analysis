@@ -1511,23 +1511,43 @@ stargazer(con_class_models_inter_2$model, column.labels=c("1988", "1993", "1997"
 stargazer(liberal_class_models_inter_1$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "liberal_class_models_inter_1.html"))
 stargazer(liberal_class_models_inter_2$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "liberal_class_models_inter_2.html"))
 
-
+names(ces)
 #### 
 names(ces)
 table(ces$occupation4)
+ces$vote
+
+#### Descriptives Combined For All Classes ####
 ces %>% 
-  select(election, occupation4,  vote2, crime, market_liberalism,traditionalism2, traditionalism, authoritarianism, quebec_accom, crime) %>% 
+  select(election, occupation4,  vote, crime, market_liberalism,traditionalism2, authoritarianism, quebec_accom, crime) %>% 
   pivot_longer(cols=crime:quebec_accom) %>% 
   group_by(name) %>% 
   mutate(pro=case_when(
     value>0.5~ 1,
     TRUE ~ 0
   )) %>% 
-  group_by(election, vote2, name, pro) %>% 
+  group_by(election, name, pro, vote) %>% 
   filter(election>1984) %>% 
-  filter(!is.na(vote2)) %>% 
-  filter(vote2!="Green") %>% 
+  filter(!is.na(vote)) %>% 
+  filter(vote > 0 &vote<5) %>% 
 summarize(n=n()) %>% 
   mutate(percent=n/sum(n)) %>% 
-  ggplot(., aes(x=election, y=percent, fill=vote2))+geom_col(position="dodge")+facet_wrap(~name)
-  
+  ggplot(., aes(x=election, y=percent, fill=as_factor(vote)))+geom_col(position="dodge")+facet_wrap(~name)+scale_fill_manual(values=c('red', 'darkblue', 'orange', 'lightblue' ))
+#### 
+
+ces %>% 
+  select(election, occupation4,  vote, crime, market_liberalism,traditionalism2, authoritarianism, quebec_accom, crime) %>% 
+  pivot_longer(cols=crime:quebec_accom) %>% 
+  group_by(name) %>% 
+  mutate(pro=case_when(
+    value>0.5~ 1,
+    TRUE ~ 0
+  )) %>% 
+  group_by(election, name, pro, vote) %>% 
+  filter(election>1984) %>% 
+  filter(!is.na(vote)) %>% 
+  filter(vote > 0 &vote<5) %>% 
+  filter(occupation4=="Working_Class") %>% 
+  summarize(n=n()) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(vote)))+geom_col(position="dodge")+facet_wrap(~name)+scale_fill_manual(values=c('red', 'darkblue', 'orange', 'lightblue' ))
