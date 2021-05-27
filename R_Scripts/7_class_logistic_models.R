@@ -1517,7 +1517,7 @@ names(ces)
 table(ces$occupation4)
 ces$vote
 ces %>% 
-  select(election, occupation4,  vote, crime, market_liberalism,traditionalism2, traditionalism, authoritarianism, quebec_accom, crime) %>% 
+  select(election, occupation4,  vote, crime, market_liberalism,traditionalism2, authoritarianism, quebec_accom, crime) %>% 
   pivot_longer(cols=crime:quebec_accom) %>% 
   group_by(name) %>% 
   mutate(pro=case_when(
