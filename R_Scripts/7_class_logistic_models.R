@@ -1536,8 +1536,8 @@ summarize(n=n()) %>%
 #### 
 
 ces %>% 
-  select(election, occupation4,  vote, crime, market_liberalism,traditionalism2, authoritarianism, quebec_accom, crime) %>% 
-  pivot_longer(cols=crime:quebec_accom) %>% 
+  select(election, occupation4, vote, crime, market_liberalism, traditionalism2, redistribution, immigration_rates, quebec_accom, enviro, crime) %>% 
+  pivot_longer(cols=crime:enviro) %>% 
   group_by(name) %>% 
   mutate(pro=case_when(
     value>0.5~ 1,
@@ -1551,3 +1551,39 @@ ces %>%
   summarize(n=n()) %>% 
   mutate(percent=n/sum(n)) %>% 
   ggplot(., aes(x=election, y=percent, fill=as_factor(vote)))+geom_col(position="dodge")+facet_wrap(~name)+scale_fill_manual(values=c('red', 'darkblue', 'orange', 'lightblue' ))
+
+# WIthout Bloc
+ces %>% 
+  select(election, occupation4, vote, crime, market_liberalism, traditionalism2, redistribution, immigration_rates, quebec_accom, enviro, crime) %>% 
+  pivot_longer(cols=crime:enviro) %>% 
+  group_by(name) %>% 
+  mutate(pro=case_when(
+    value>0.5~ 1,
+    TRUE ~ 0
+  )) %>% 
+  group_by(election, name, pro, vote) %>% 
+  filter(election>1984) %>% 
+  filter(!is.na(vote)) %>% 
+  filter(vote > 0 &vote<4) %>% 
+  filter(occupation4=="Working_Class") %>% 
+  summarize(n=n()) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(vote)))+geom_col(position="dodge")+facet_wrap(~name)+scale_fill_manual(values=c('red', 'darkblue', 'orange' ))
+
+# WIth Bloc and Greens
+ces %>% 
+  select(election, occupation4, vote, crime, market_liberalism, traditionalism2, redistribution, immigration_rates, quebec_accom, enviro, crime) %>% 
+  pivot_longer(cols=crime:enviro) %>% 
+  group_by(name) %>% 
+  mutate(pro=case_when(
+    value>0.5~ 1,
+    TRUE ~ 0
+  )) %>% 
+  group_by(election, name, pro, vote) %>% 
+  filter(election>1984) %>% 
+  filter(!is.na(vote)) %>% 
+  filter(vote > 0 &vote<6) %>% 
+  filter(occupation4=="Working_Class") %>% 
+  summarize(n=n()) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(vote)))+geom_col(position="dodge")+facet_wrap(~name)+scale_fill_manual(values=c('red', 'darkblue', 'orange', 'lightblue', 'green3' ))
