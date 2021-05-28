@@ -16,3 +16,12 @@ ces93 %>%
   summary()
 nrow(ces93)
 nrow(andersen)
+
+andersen %>% 
+  select(year, region, age, men, relig, degree, class, vote) %>% 
+  summary()
+
+table(ces93$occupation)
+table(andersen$class)
+table(ces93$vote)
+table(andersen$vote)

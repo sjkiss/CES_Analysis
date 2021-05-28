@@ -1462,7 +1462,7 @@ stargazer(liberal_class_models_accom_3$model, column.labels=c("1988", "1993", "1
 ces %>% 
   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(ndp~as.factor(region2)+male+age+income+degree+union+sector+working_class3+market_liberalism+traditionalism2+working_class3:traditionalism+redistribution, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(ndp~as.factor(region2)+male+age+income+degree+union+sector+working_class3+market_liberalism+traditionalism2+working_class3:traditionalism2+redistribution, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('NDP', nrow(.)))->ndp_class_models_inter_1
 
@@ -1477,7 +1477,7 @@ ces %>%
 ces %>% 
   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(conservative~as.factor(region2)+male+age+income+degree+union+sector+working_class3+market_liberalism+traditionalism2+working_class3:traditionalism+redistribution, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(conservative~as.factor(region2)+male+age+income+degree+union+sector+working_class3+market_liberalism+traditionalism2+working_class3:traditionalism2+redistribution, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Conservative', nrow(.)))->con_class_models_inter_1
 
@@ -1492,7 +1492,7 @@ ces %>%
 ces %>% 
   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(liberal~as.factor(region2)+male+age+income+degree+union+sector+working_class3+market_liberalism+traditionalism2+working_class3:traditionalism+redistribution, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(liberal~as.factor(region2)+male+age+income+degree+union+sector+working_class3+market_liberalism+traditionalism2+working_class3:traditionalism2+redistribution, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Liberal', nrow(.)))->liberal_class_models_inter_1
 
