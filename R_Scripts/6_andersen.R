@@ -12,7 +12,21 @@ ces$vote
 table(as_factor(ces$vote))
 ces$vote
 ces$vote2
-ces$vote2<-Recode(as.factor(ces$vote), "0=NA; ;1='Liberal' ; 2='Conservative' ; 3:4='Left' ; 5='Green'", levels=c('Conservative', 'Liberal', 'Left', 'Green'))
+
+#This combines the NDP and Bloc into a left-vote 
+as_factor(ces$vote)
+as_factor(ces$vote)
+ces %>% 
+  mutate(vote2=case_when(
+  vote==  1~"Liberal",
+  vote== 2~"Conservative",
+  vote== 3~"NDP", 
+  vote==  4~"BQ", 
+  vote== 5~"Green",
+  vote==  0~NA_character_
+  ))->ces
+ces$vote2<-factor(ces$vote2, levels=c("Conservative", "Liberal", "NDP", "BQ", "Green"))
+#ces$vote2<-Recode(as_factor(ces$vote), "'; ;1='Liberal' ; 2='Conservative' ; 3='Left' ; 5='Green'", levels=c('Conservative', 'Liberal', 'Left', 'Green'))
 table(ces$vote2)
 levels(ces$vote2)
 
@@ -68,12 +82,13 @@ ces$election
 #we need to filter out years 2000
 ces %>% 
   filter(election!=2000 & election<2006 &vote2!="Green")->ces.out
-table(ces$vote2)
+
   #QC
   andersen1qc<-multinom(vote2 ~ occupation2+as.factor(election), data = subset(ces.out, quebec==1))
   #ROC
     andersen1roc<-multinom(vote2 ~ occupation2+as.factor(election), data = subset(ces.out, quebec!=1))
 
+    summary(andersen1qc)
 library(stargazer)
 #The command add.lines adds output into the stargazer table
     #The number of observations is stored in the number of fitted values in the model
@@ -91,18 +106,14 @@ stargazer(andersen1roc, type="html", out=here("Tables", "andersen1roc.html"), ti
 
 #### Produce Figure 7.1 ####
 #This is how Andersen does it; seems unwieldy 
+names(ces)
+
 #In this regard, Figure 7.1 displays fitted probabilities of
 #voting by social class derived from models specifying an interaction between
 #social class and time coded as a set of dummy regressors representing each year
 #separately.
 
-
-#Need to make 15 separate regression models: one each with occupation and an interaction between occupation and an election dummy. Then generate predicted probabilities for each
-
-# I think I can do it quicker; you tell me. 
-
 #First Quebec
-#For some reason ggpredict fails to produce standard errors, which I think we would like to produce margins of errors
 library(ggeffects)
 ces %>% 
   filter(election!=2000& election<2006 &quebec==1) %>% 
@@ -118,9 +129,9 @@ qc_models %>%
   #Now unnest occupation2
   unnest(occupation2) %>%
   #filter in only probability of voting for left
-  filter(response.level!="Green") %>% 
+  filter(response.level!="Green|BQ") %>% 
   #PLot as line plot 
-  ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In QC\nLeft Vote")
+  ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In QC")
 
 #Now ROC
 ces %>% 
@@ -138,10 +149,24 @@ roc_models %>%
   #Now unnest occupation2
   unnest(occupation2) %>%
   #filter in only probability of voting for left
-  filter(response.level!="Green") %>% 
+  filter(response.level!="Green|BQ") %>% 
   #PLot as line plot 
-  ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In ROC\nLeft Vote")+ylim(c(0,1))
+  ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In ROC")+ylim(c(0,1))
 
+
+#Combine ROC and QC Models
+
+#Provide region
+qc_models$region<-rep("Quebec", nrow(qc_models))
+roc_models$region<-rep("Rest of Canada", nrow(roc_models))
+qc_models %>% 
+  bind_rows(., roc_models) %>% 
+  unnest_wider(predicted) %>% 
+  unnest(occupation2) %>% 
+  filter(response.level!="Green") %>%
+  rename(Class=x, Election=election) %>% 
+  ggplot(., aes(x=Election, y=predicted, group=Class, linetype=Class))+geom_line()+facet_grid(region~response.level)->canada_class_voting_1965_2004
+ggsave(filename=here("Plots", "canada_class_voting_1965_2004.png"), width=12, height=4)
 #### Extend Figure 7.1 to 2019 ####
 #Make ROC Models to 2019
 ces %>% 
@@ -159,11 +184,11 @@ roc_models_2019 %>%
   #Now unnest occupation2
   unnest(occupation2) %>%
   #filter in only probability of voting for left
-  filter(response.level!="Green") %>% 
+  filter(response.level!="Green|BQ") %>% 
   #PLot as line plot 
   ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In ROC")+theme(axis.text.x=element_text(angle=90))
 
-ggsave(here("Plots", "class_voting_roc_2019.png"), width=10, height=3)
+#ggsave(here("Plots", "class_voting_roc_2019.png"), width=10, height=3)
 #Now QC 2019
 ces %>% 
   filter(election!=2000 &quebec==1) %>% 
@@ -179,10 +204,22 @@ qc_models_2019 %>%
   #Now unnest occupation2
   unnest(occupation2) %>%
   #filter in only probability of voting for left
-  filter(response.level!="Green") %>% 
+  filter(response.level!="Green|BQ") %>% 
   #PLot as line plot 
   ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In QCC")+theme(axis.text.x=element_text(angle=90))
-ggsave(here("Plots", "class_voting_qc_2019.png"), width=10, height=3)
+#ggsave(here("Plots", "class_voting_qc_2019.png"), width=10, height=3)
+
+qc_models_2019$region<-rep("Quebec", nrow(qc_models_2019))
+roc_models_2019$region<-rep("Rest of Canada", nrow(roc_models_2019))
+
+qc_models_2019 %>% 
+  bind_rows(roc_models_2019) %>% 
+unnest_wider(predicted) %>% 
+  unnest(occupation2) %>% 
+  filter(response.level!="Green") %>%
+  rename(Class=x, Election=election) %>% 
+  ggplot(., aes(x=Election, y=predicted, group=Class, linetype=Class))+geom_line()+facet_grid(region~response.level)+scale_linetype_manual(values=c(1,2,3,6))+theme(axis.text.x = element_text(angle = 90))
+ggsave(filename=here("Plots", "canada_class_voting_1965_2019.png"), width=12, height=4)
 
 #----------------------------------------------------------------------------------------------------
 ####Model 2 - Replication of Table 7.3 in Andersen (by Region) ####
@@ -235,16 +272,16 @@ library(stargazer)
 # nobs_andersen3qc
 #add in 
 # 
-stargazer(andersen3qc, type="html", out=here("Tables", "andersen3qc.html"),
-          covariate.labels=c('(Social Class) Managers', '(Social Class) Professionals','(Social Class) Routine Non Manual', 'Age', 'Male', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other', '(Education) Degree', '1965', '1968', '1972', '1974','1979', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015','2019' ),
-          title="Multinomial Logistic Regression of Left Vote, 1965-2019, QC", add.lines=list(nobs_andersen3qc), single.row=T, digits=2)
-stargazer(andersen3roc, type="html", covariate.labels=c('(Social Class) Managers', '(Social Class) Professionals', '(Social Class) Routine Non Manual', 'Age', 'Male', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other', '(Education) Degree', '1965', '1968', '1972', '1974','1979', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015','2019' , 'Region (Ontario), Region (West)'),
-          out=here("Tables", "andersen3roc.html"), title="Multinomial Logistic Regression of NDP Vote, 1965-2019, ROC", add.lines=list(nobs_andersen3roc), single.row=T, digits=2)
+
 
 andersen3<-list(andersen3qc, andersen3roc)
-map(andersen3, function(x) rep(nrow(x$fitted.values), 2)) %>% 
+map(andersen3, function(x) rep(nrow(x$fitted.values), 3)) %>% 
   unlist()->n_obs
-stargazer(andersen3qc, andersen3roc, digits=2,single.row=T, out=here("Tables", "andersen_replication_extension_1965_2019.html"), type="html", column.labels=c("QC", "ROC"), column.separate = c(2,2), title="Multinomial Logistic Regression of Left Vote On Class, 1980-2019", notes=c("These models do not account for the self-employed because of limitations in the Canada Election Study Files"), add.lines=list(c("N", n_obs)))
+stargazer(andersen3qc, andersen3roc, digits=2,single.row=T, covariate.labels=c('(Social Class) Managers', '(Social Class) Professionals', '(Social Class) Routine Non Manual', 'Age', 'Male', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other', '(Education) Degree', '1965', '1968', '1972', '1974','1979', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015','2019' , 'Region (Ontario), Region (West)'),out=here("Tables", "andersen_replication_extension_1965_2019.html"), type="html", column.labels=c("QC", "ROC"), column.separate = c(3,2), title="Multinomial Logistic Regression of Party Vote On Class, 1980-2019", notes=c("These models do not account for the self-employed because of limitations in the Canada Election Study Files"), add.lines=list(c("N", n_obs)))
+
+#Graph
+
+
 #----------------------------------------------------------------------------------------------------
   ####Model 4 - Extension of Table 7.3 in Andersen including Self-Employed (by Region) 1979-2019 ####
 
@@ -277,10 +314,29 @@ library(stargazer)
 
 andersen4<-list(andersen4qc, andersen4roc)
 
-map(andersen4, function(x) rep(nrow(x$fitted.values), 2)) %>% 
+map(andersen4, function(x) rep(nrow(x$fitted.values), 3)) %>% 
   unlist()->n_obs
 
-stargazer(andersen4qc, andersen4roc, digits=2, out=here("Tables", "andersen_replication_extension_1980_2019.html"), type="html", column.labels=c("QC", "ROC"), column.separate = c(2,2), title="Multinomial Logistic Regression of Left Vote On Class, 1980-2019", add.lines=list(c("N", n_obs)), single.row = T)
+stargazer(andersen4qc, andersen4roc, digits=2, out=here("Tables", "andersen_replication_extension_1980_2019.html"), type="html", column.labels=c("QC", "ROC"), covariate.labels=c('(Social Class) Managers', '(Social Class) Professionals','(Social Class) Self-Employed', '(Social Class) Routine Non Manual', 'Age', 'Male', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other', '(Education) Degree', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015','2019', 'Region (Ontario)', 'Region (West)'),column.separate = c(3,2), title="Multinomial Logistic Regression of Left Vote On Class, 1980-2019", add.lines=list(c("N", n_obs)), single.row = T)
+table(ces.out$vote2, ces.out$election)
 
+
+####  Trendline For Class Voting
+# no_class_roc<-multinom(vote2~  age+male+degree+region, data=subset(ces.out, quebec==0))
+# no_class_qc<-multinom(vote2~  age+male+degree, data=subset(ces.out, quebec==1))
+# no_effects_roc<-multinom(vote2~ occupation2 + age+male+degree+region, data=subset(ces.out, quebec==0))
+# no_effects_qc<-multinom(vote2~ occupation2 + age+male+degree, data=subset(ces.out, quebec==1))
+# linear_roc<-multinom(vote2~ occupation2 + age+male+degree+region+as.numeric(election), data=subset(ces.out, quebec==0))
+# linear_qc<-multinom(vote2~ occupation2 + age+male+degree+as.numeric(election), data=subset(ces.out, quebec==1))
+# quadratic_roc<-multinom(vote2~ occupation2 + age+male+degree+region+poly(as.numeric(election),2), data=subset(ces.out, quebec==0))
+# quadratic_qc<-multinom(vote2~ occupation2 + age+male+degree+poly(as.numeric(election), 2), data=subset(ces.out, quebec==1))
+# cubic_roc<-multinom(vote2~ occupation2 + age+male+degree+region+poly(as.numeric(election),3), data=subset(ces.out, quebec==0))
+# cubic_qc<-multinom(vote2~ occupation2 + age+male+degree+poly(as.numeric(election), 3), data=subset(ces.out, quebec==1))
+# time.model.list<-list(no_class_qc, no_effects_qc, linear_qc, quadratic_qc, cubic_qc, no_class_roc,no_effects_roc, linear_roc, quadratic_roc, cubic_roc)
+# map(time.model.list, function(x) x$AIC) %>% 
+# matrix(nrow=5,ncol=2)
+# map(time.model.list, function(x) x$BIC)
+# names(cubic_roc)
+#### Test For post-2004 change
 
 

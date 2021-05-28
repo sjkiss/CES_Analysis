@@ -305,6 +305,7 @@ table(ces0411$religiosity04)
 #### #recode Redistribution (ces04_CPS_F6)#### 
 look_for(ces0411, "rich")
 val_labels(ces0411$ces04_CPS_F6)
+ces0411$ces04_CPS_F6
 ces0411$redistribution04<-Recode(ces0411$ces04_CPS_F6, "; 1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 8=0.5; else=NA", as.numeric=T)
 #val_labels(ces0411$redistribution04)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
 #checks

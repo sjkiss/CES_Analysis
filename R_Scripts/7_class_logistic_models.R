@@ -1551,3 +1551,34 @@ ces %>%
   summarize(n=n()) %>% 
   mutate(percent=n/sum(n)) %>% 
   ggplot(., aes(x=election, y=percent, fill=as_factor(vote)))+geom_col(position="dodge")+facet_wrap(~name)+scale_fill_manual(values=c('red', 'darkblue', 'orange', 'lightblue' ))
+
+
+#### Average Scores For Working Class Versus Average ####
+
+ces %>% 
+  select(election,  working_class4, vote, crime, redistribution, immigration_rates, market_liberalism,traditionalism2) %>% 
+  rename(`Crime`=`crime`,Redistribution=redistribution, `Immigration Rates`=immigration_rates, `Market Liberalism`=market_liberalism, `Moral Traditionalism`=traditionalism2) %>% 
+  mutate(Redistribution=skpersonal::revScale(Redistribution, reverse=T)) %>% 
+  pivot_longer(cols=4:8) %>% 
+  group_by(election, working_class4, name) %>% 
+  summarize(average=mean(value, na.rm=T)) %>% 
+  arrange(election, name, working_class4) %>%
+  group_by(election, name) %>%
+  mutate(difference=average-lag(average)) ->average_views_scores
+ggsave(here("Plots", "average_scores_differences_class_population.png"), width=12, height=2)
+
+average_views_scores %>% 
+  filter(working_class4==1& election> 1984) %>% 
+  ggplot(., aes(y=election, x=difference))+geom_point()+facet_grid(~fct_relevel(name, "Crime", "Immigration Rates", "Moral Traditionalism", "Market Liberalism", "Redistribution"))+theme(axis.text.x=element_text(angle=90))+labs(caption="Score above 0 means working class has more conservative views than the rest of thep opulation.")+scale_y_discrete(limits=rev)+xlim(c(-0.15,0.15))+geom_vline(xintercept=0, linetype=2)
+average_views_scores %>% 
+  ungroup() %>% 
+  mutate(working_class4=recode_factor(working_class4, "0"="Other", "1"="Working Class")) %>% 
+  rename(`Working Class`=working_class4) %>%
+  filter(election>1984) %>% 
+  ggplot(., aes(y=election, x=average, col=`Working Class`))+geom_point()+facet_wrap(~fct_relevel(name, "Crime", "Immigration Rates", "Moral Traditionalism", "Market Liberalism", "Redistribution"), nrow=2)+theme(axis.text.x=element_text(angle=90))+scale_y_discrete(limits=rev)+
+  geom_vline(xintercept=0.5, linetype=2)+scale_color_grey(start=0.8, end=0.2, name="Class")+labs(y="Election", x="Average")
+ggsave(here("Plots", "average_scores_raw_class_population.png"), width=6, height=4)
+
+
+
+
