@@ -1157,18 +1157,18 @@ stargazer(natmodel3_ROC$model, column.labels=c("1988", "1993", "1997", "2004", "
 stargazer(natmodel3_QC$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model3_QC.html"))
 stargazer(natmodel3$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model3.html"))
 
-#Same model 3's but with Immigration added
+#Same model 3's but with Market Liberalism & Immigration added
 ces %>% 
   filter(unnatural==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2+immigration_rates, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2+market_liberalism+immigration_rates, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->unnatmodel4
 
 ces %>% 
   filter(natural==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2+immigration_rates, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2+market_liberalism+immigration_rates, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->natmodel4
 
