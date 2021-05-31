@@ -1005,67 +1005,67 @@ table(ces$unnatural)
 
 #Unnatural Model 1
 ces %>% 
-  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  filter(unnatural==1 & quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~unnatural+employment+degree+income, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->unnatmodel1_ROC
 
 ces %>% 
-  filter(quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  filter(unnatural==1 & quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~unnatural+employment+degree+income, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->unnatmodel1_QC
 
 ces %>% 
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  filter(unnatural==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~unnatural+employment+degree+income, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->unnatmodel1
 
 #Unnatural Model 2
 ces %>% 
-  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  filter(unnatural==1 & quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~unnatural+redistribution+traditionalism2, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~redistribution+traditionalism2, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->unnatmodel2_ROC
 
 ces %>% 
-  filter(quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  filter(unnatural==1 & quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~unnatural+redistribution+traditionalism2, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~redistribution+traditionalism2, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->unnatmodel2_QC
 
 ces %>% 
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  filter(unnatural==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~unnatural+redistribution+traditionalism2, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~redistribution+traditionalism2, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->unnatmodel2
 
 #Unnatural Model 3
 ces %>% 
-  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  filter(unnatural==1 & quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~unnatural+employment+degree+income+redistribution+traditionalism2, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->unnatmodel3_ROC
 
 ces %>% 
-  filter(quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  filter(unnatural==1 & quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~unnatural+employment+degree+income+redistribution+traditionalism2, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->unnatmodel3_QC
 
 ces %>% 
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  filter(unnatural==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~unnatural+employment+degree+income+redistribution+traditionalism2, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->unnatmodel3
 
@@ -1082,67 +1082,67 @@ stargazer(unnatmodel3$model, column.labels=c("1988", "1993", "1997", "2004", "20
 
 #Natural Model 1
 ces %>% 
-  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  filter(natural==1 & quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~natural+employment+degree+income, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->natmodel1_ROC
 
 ces %>% 
-  filter(quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  filter(natural==1 & quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~natural+employment+degree+income, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->natmodel1_QC
 
 ces %>% 
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  filter(natural==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~natural+employment+degree+income, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->natmodel1
 
 #Natural Model 2
 ces %>% 
-  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  filter(natural==1 & quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~natural+redistribution+traditionalism2, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~redistribution+traditionalism2, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->natmodel2_ROC
 
 ces %>% 
-  filter(quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  filter(natural==1 & quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~natural+redistribution+traditionalism2, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~redistribution+traditionalism2, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->natmodel2_QC
 
 ces %>% 
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  filter(natural==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~natural+redistribution+traditionalism2, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~redistribution+traditionalism2, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->natmodel2
 
 #Natural Model 3
 ces %>% 
-  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  filter(natural==1 & quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~natural+employment+degree+income+redistribution+traditionalism2, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->natmodel3_ROC
 
 ces %>% 
-  filter(quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  filter(natural==1 & quebec!=0 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~natural+employment+degree+income+redistribution+traditionalism2, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->natmodel3_QC
 
 ces %>% 
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  filter(natural==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~natural+employment+degree+income+redistribution+traditionalism2, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->natmodel3
 
@@ -1159,16 +1159,16 @@ stargazer(natmodel3$model, column.labels=c("1988", "1993", "1997", "2004", "2006
 
 #Same model 3's but with Immigration added
 ces %>% 
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  filter(unnatural==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~unnatural+employment+degree+income+redistribution+traditionalism2+immigration_rates, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2+immigration_rates, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->unnatmodel4
 
 ces %>% 
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  filter(natural==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~natural+employment+degree+income+redistribution+traditionalism2+immigration_rates, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2+immigration_rates, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->natmodel4
 
