@@ -592,6 +592,12 @@ ces %>%
 #### This can be changed anytime very easily 
 ces$region2<-factor(ces$region2, levels=c("Quebec", "Atlantic", "Ontario", "West"))
 levels(ces$region2)
+
+#Turn region into factor with East as reference case
+ces$region3<-Recode(as.factor(ces$region), "1='East' ; 2='Ontario' ; 3='West'", levels=c('East', 'Ontario', 'West'))
+levels(ces$region3)
+table(ces$region3)
+
 ##Create female variable
 ## Sometimes we may want to report male dichotomous variable, sometimes female. 
 ces %>% 
@@ -599,28 +605,33 @@ ces %>%
     male==1~0,
     male==0~1
   ))->ces
+
 library(car)
 #To model party voting we need to create party vote dummy variables
 ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
 ces$liberal<-Recode(ces$vote, "1=1; 2:5=0; NA=NA")
 ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
+ces$bloc<-Recode(ces$vote, "4=1; 0:3=0; 5=0; else=NA")
+ces$green<-Recode(ces$vote, "5=1; 0:4=0; else=NA")
 
-names(ces)
+#Recode NDP vs Liberals/Right
+ces$ndp_vs_right<-Recode(ces$vote, "3=1; 2=0; else=NA")
+ces$liberal_vs_right<-Recode(ces$vote, "1=1; 2=0; else=NA")
+ces$bloc_vs_right<-Recode(ces$vote, "4=1; 2=0; else=NA")
+ces$ndp_vs_liberal<-Recode(ces$vote, "3=1; 1=0; else=NA")
+table(ces$ndp_vs_right)
+table(ces$liberal_vs_right)
+table(ces$bloc_vs_right)
+table(ces$ndp_vs_liberal)
 
-#### Some occupatoin recodes ####
-#This collapses the two labour categories into one working class
-#so occupation2 is always 1 working class but no self-employed/.
-ces$occupation2<-Recode(as.factor(ces$occupation), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual'))
-#Working class without self-employed (going back to 1965)
-ces$working_class2<-Recode(ces$occupation2, "'Working_Class'=1; else=0; NA=NA")
+# Turn religion into factor with None as reference case
+ces$religion2<-Recode(as.factor(ces$religion), "0='None' ; 1='Catholic' ; 2='Protestant' ; 3='Other'", levels=c('None', 'Catholic', 'Protestant', 'Other'))
+levels(ces$religion2)
+table(ces$religion2)
+# Religion dummies
+ces$catholic<-Recode(ces$religion, "1=1; 2:3=0; 0=0; NA=NA")
+ces$no_religion<-Recode(ces$religion, "0=1; 1:3=0; NA=NA")
 
-#This collapses the two labour categories into one working class; maintaining self-employed as a unique distinction
-#occupation 4 is always 1 working class but with self-employed carved out. 
-ces$occupation4<-Recode(as.factor(ces$occupation3), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'; 6='Self-Employed'", levels=c('Working_Class', 'Managers', 'Professionals','Self-Employed', 'Routine_Nonmanual'))
-
-#make working class dichotomies out of ouccupation 4
-ces$working_cass3<-Recode(ces$occupation4, "'Working_Class'=1; else=0; NA=NA")
-ces$working_class4<-Recode(ces$occupation4, "'Working_Class'=1; else=0")
 ### Value labels often go missing in the creation of the ces data frame
 ### assign value label
 val_labels(ces$sector)<-c(Private=0, Public=1)
@@ -635,22 +646,40 @@ val_labels(ces$language)<-c(French=0, English=1)
 val_labels(ces$non_charter_language)<-c(Charter=0, Non_Charter=1)
 val_labels(ces$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
-val_labels(ces$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
 val_labels(ces$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
-val_labels(ces$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 val_labels(ces$redistribution)<-c(Less=0, More=1)
 
 ####
 names(ces)
 
-#### Check Occupation####
+#### Some occupation recodes (occupation 3 and 4 include self-employed) ####
+val_labels(ces$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+ces$occupation2<-Recode(as.factor(ces$occupation), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual'))
+ces$occupation2<-fct_relevel(ces$occupation2, "Managers", "Professionals", "Routine_Nonmanual", 'Working_Class')
+val_labels(ces$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+ces$occupation4<-fct_relevel(ces$occupation4, "Managers", "Self-Employed", "Professionals", "Routine_Nonmanual", 'Working_Class')
+ces$occupation4<-Recode(as.factor(ces$occupation3), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'; 6='Self-Employed'", levels=c('Working_Class', 'Managers', 'Professionals','Self-Employed', 'Routine_Nonmanual'))
+table(ces$occupation, ces$election)
+table(ces$occupation2, ces$election)
+table(ces$occupation3, ces$election)
+table(ces$occupation4, ces$election)
 
 ces %>% 
   select(occupation, occupation3, election) %>% 
-group_by(election) %>% 
+  group_by(election) %>% 
   summarise_all(funs(sum(is.na(.))/length(.))) 
 prop.table(table(ces15phone$occupation, useNA = "ifany"))
 prop.table(table(ces19phone$occupation, useNA = "ifany"))
+
+# Working Class variables (3 and 4 include self-employed; 2 and 4 are dichotomous where everyone else is set to 0)
+ces$working_class<-Recode(ces$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
+ces$working_class2<-Recode(ces$occupation, "4:5=1; else=0")
+ces$working_class3<-Recode(ces$occupation3, "4:5=1; 3=0; 2=0; 1=0; 6=0; else=NA")
+ces$working_class4<-Recode(ces$occupation3, "4:5=1; else=0")
+table(ces$working_class, ces$election)
+table(ces$working_class2, ces$election)
+table(ces$working_class3, ces$election)
+table(ces$working_class4, ces$election)
 
 #### Set Theme ####
 theme_set(theme_bw())
