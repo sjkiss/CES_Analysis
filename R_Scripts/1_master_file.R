@@ -611,10 +611,13 @@ names(ces)
 #This collapses the two labour categories into one working class
 #so occupation2 is always 1 working class but no self-employed/.
 ces$occupation2<-Recode(as.factor(ces$occupation), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual'))
+#Working class without self-employed (going back to 1965)
+ces$working_class2<-Recode(ces$occupation2, "'Working_Class'=1; else=0; NA=NA")
 
 #This collapses the two labour categories into one working class; maintaining self-employed as a unique distinction
 #occupation 4 is always 1 working class but with self-employed carved out. 
 ces$occupation4<-Recode(as.factor(ces$occupation3), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'; 6='Self-Employed'", levels=c('Working_Class', 'Managers', 'Professionals','Self-Employed', 'Routine_Nonmanual'))
+
 #make working class dichotomies out of ouccupation 4
 ces$working_cass3<-Recode(ces$occupation4, "'Working_Class'=1; else=0; NA=NA")
 ces$working_class4<-Recode(ces$occupation4, "'Working_Class'=1; else=0")
@@ -664,4 +667,5 @@ theme_set(theme_bw())
 
 #source("R_scripts/8_analysis_script.R", echo=T)
 
-table(ces$election, ces$male)
+table(ces$election, ces$occupation2)
+table(ces$election, ces$occupation)

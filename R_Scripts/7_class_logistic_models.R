@@ -14,15 +14,7 @@ ces$no_religion<-Recode(ces$religion, "0=1; 1:3=0; NA=NA")
 ces$bloc<-Recode(ces$vote, "4=1; 0:3=0; 5=0; else=NA")
 ces$green<-Recode(ces$vote, "5=1; 0:4=0; else=NA")
 
-#CREATE WORKING CLASS DICHOTOMOUS VARIABLE; NOTE HERE ONLY EMPLOYED AND SELF-EMPLOYED PEOPLE ARE SET TO 0 OR 1; ELSE = NA
-ces$working_class<-Recode(ces$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
-ces$working_class2<-Recode(ces$occupation, "4:5=1; else=0")
-#This collapses the two labour categories into one working class
-ces$occupation2<-Recode(as.factor(ces$occupation), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual'))
-#This collapses the two labour categories into one working class; maintaining self-employed as a unique distinction
-ces$occupation4<-Recode(as.factor(ces$occupation3), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'; 6='Self-Employed'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual', 'Self-Employed'))
-ces$working_class3<-Recode(ces$occupation3, "4:5=1; 3=0; 2=0; 1=0; 6=0; else=NA")
-ces$working_class4<-Recode(ces$occupation3, "4:5=1; else=0")
+
 
 #this is the NDP vote variable
 ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
@@ -156,14 +148,13 @@ stargazer(ndp_vs_liberal_QC_models_1$model, column.labels=c("1979", "1980", "198
 #Plot coefficients
 ndp_vs_right_ROC_models_1 %>% 
   unnest(tidied) %>% 
-  filter(term=="degree") %>% 
-  ggplot(., aes(x=as.numeric(election),y=estimate ))+geom_point()+labs(title="Logit Coefficients of voting NDP vote by degree")+geom_smooth(method="loess", se=F)
+  filter(term=="degree"|term=="income"|term=="sector"|term=="occupation4Working_Class") %>% 
+  ggplot(., aes(x=as.numeric(election),y=estimate ))+geom_point()+labs(title="Logit Coefficients of voting NDP vote by degree")+geom_smooth(method="loess", se=F)+facet_wrap(~term)
 ggsave(here("Plots", "ROC_degree_ndp_vs_right_coefficients.png"))
 
 ndp_vs_right_QC_models_1 %>% 
   unnest(tidied) %>% 
-  filter(term=="degree") %>% 
-  ggplot(., aes(x=as.numeric(election),y=estimate ))+geom_point()+labs(title="Logit Coefficients of voting NDP vote by degree")+geom_smooth(method="loess", se=F)
+  filter(term=="degree"|term=="income"|term=="sector"|term=="occupation4Working_Class") %>%   ggplot(., aes(x=as.numeric(election),y=estimate ))+geom_point()+labs(title="Logit Coefficients of voting NDP vote by degree, QC")+geom_smooth(method="loess", se=F)+facet_wrap(~term)
 ggsave(here("Plots", "QC_degree_ndp_vs_right_coefficients.png"))
 
 ndp_vs_liberal_ROC_models_1 %>% 
@@ -965,10 +956,12 @@ ces %>%
 
 #Create variables
 ces$left<-Recode(ces$vote, "1=1; 3=1; 5=1; 0=0; 2=0; 4=0; else=NA")
+
 table(ces$left, ces$election)
 table(ces$ndp, ces$election)
 ces$right<-Recode(ces$vote, "2=1; 0=0; 1=0; 3:5=0; else=NA")
 table(ces$right, ces$election)
+val_labels(ces$right)<-c(Right=1, Other=0)
 ces$upper_class<-Recode(ces$occupation, "1:2=1; 3:5=0; else=NA")
 table(ces$upper_class)
 ces$upper_class2<-Recode(ces$occupation3, "1:2=1; 3:6=0; else=NA")
@@ -1078,7 +1071,8 @@ stargazer(unnatmodel2_QC$model, column.labels=c("1988", "1993", "1997", "2004", 
 stargazer(unnatmodel2$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model2.html"))
 stargazer(unnatmodel3_ROC$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model3_ROC.html"))
 stargazer(unnatmodel3_QC$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model3_QC.html"))
-stargazer(unnatmodel3$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model3.html"))
+
+stargazer(unnatmodel3$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model3.html"), covariate.labels=c("Employment", "Degree", "Income", "Redistribution", "Moral Traditionalism"))
 
 #Natural Model 1
 ces %>% 
@@ -1142,7 +1136,7 @@ ces %>%
 ces %>% 
   filter(natural==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2, data=x, family="binomial", )),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->natmodel3
 
@@ -1155,7 +1149,7 @@ stargazer(natmodel2_QC$model, column.labels=c("1988", "1993", "1997", "2004", "2
 stargazer(natmodel2$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model2.html"))
 stargazer(natmodel3_ROC$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model3_ROC.html"))
 stargazer(natmodel3_QC$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model3_QC.html"))
-stargazer(natmodel3$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model3.html"))
+stargazer(natmodel3$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model3.html"),covariate.labels=c("Employment", "Degree", "Income", "Redistribution", "Moral Traditionalism"))
 
 #Same model 3's but with Market Liberalism & Immigration added
 ces %>% 
@@ -1615,7 +1609,7 @@ ces %>%
     TRUE ~ 0
   )) %>% 
   group_by(election, name, pro, vote) %>% 
-  filter(election>1984) %>% 
+  filter(election>1984 &election!=2000) %>% 
   filter(!is.na(vote)) %>% 
   filter(vote > 0 &vote<5) %>% 
   filter(occupation4=="Working_Class") %>% 
@@ -1627,30 +1621,38 @@ ces %>%
 #### Average Scores For Working Class Versus Average ####
 
 ces %>% 
-  select(election,  working_class4, vote, crime, redistribution, immigration_rates, market_liberalism,traditionalism2) %>% 
-  rename(`Crime`=`crime`,Redistribution=redistribution, `Immigration Rates`=immigration_rates, `Market Liberalism`=market_liberalism, `Moral Traditionalism`=traditionalism2) %>% 
+  select(election,  working_class4, vote, crime, redistribution, immigration_rates, market_liberalism,traditionalism2, enviro) %>%
+  rename(`Crime`=`crime`,Redistribution=redistribution, `Immigration Rates`=immigration_rates, `Market Liberalism`=market_liberalism, `Moral Traditionalism`=traditionalism2, Environmentalism=enviro) %>% 
   mutate(Redistribution=skpersonal::revScale(Redistribution, reverse=T)) %>% 
-  pivot_longer(cols=4:8) %>% 
+  pivot_longer(cols=4:9) %>% 
+  #filter(election>1984 &election!=2000) %>% 
   group_by(election, working_class4, name) %>% 
   summarize(average=mean(value, na.rm=T)) %>% 
   arrange(election, name, working_class4) %>%
   group_by(election, name) %>%
   mutate(difference=average-lag(average)) ->average_views_scores
-ggsave(here("Plots", "average_scores_differences_class_population.png"), width=12, height=2)
+table(ces$election, ces$working_class4)
 
 average_views_scores %>% 
-  filter(working_class4==1& election> 1984) %>% 
+  filter(working_class4==1& election> 1984) %>%
   ggplot(., aes(y=election, x=difference))+geom_point()+facet_grid(~fct_relevel(name, "Crime", "Immigration Rates", "Moral Traditionalism", "Market Liberalism", "Redistribution"))+theme(axis.text.x=element_text(angle=90))+labs(caption="Score above 0 means working class has more conservative views than the rest of thep opulation.")+scale_y_discrete(limits=rev)+xlim(c(-0.15,0.15))+geom_vline(xintercept=0, linetype=2)
 average_views_scores %>% 
   ungroup() %>% 
   mutate(working_class4=recode_factor(working_class4, "0"="Other", "1"="Working Class")) %>% 
   rename(`Working Class`=working_class4) %>%
-  filter(election>1984) %>% 
+  filter(election>1984 &election!=2000) %>% 
   ggplot(., aes(y=election, x=average, col=`Working Class`))+geom_point()+facet_wrap(~fct_relevel(name, "Crime", "Immigration Rates", "Moral Traditionalism", "Market Liberalism", "Redistribution"), nrow=2)+theme(axis.text.x=element_text(angle=90))+scale_y_discrete(limits=rev)+
   geom_vline(xintercept=0.5, linetype=2)+scale_color_grey(start=0.8, end=0.2, name="Class")+labs(y="Election", x="Average")
 ggsave(here("Plots", "average_scores_raw_class_population.png"), width=6, height=4)
 
 
 
-
-
+# 
+# model<-glm(right~occupation2+as.numeric(election)+occupation2*as.numeric(election), data=ces)
+# summary(model)
+# model2<-glm(right~occupation2+as.numeric(election)+occupation2*as.numeric(election), data=ces)
+# stargazer(model, type="text")
+# model3<-glm(right~occupation2+as.numeric(election)+occupation2*as.numeric(election)+income*as.numeric(election), data=ces)
+# model4<-glm(right~occupation2+as.numeric(election)+occupation2*as.numeric(election)+degree*as.numeric(election), data=ces)
+# 
+# stargazer(model2, model3, model4, type="text")
