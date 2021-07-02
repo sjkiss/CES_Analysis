@@ -164,3 +164,39 @@ val_labels(ces68$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middl
 #checks
 val_labels(ces68$religiosity)
 table(ces68$religiosity)
+
+#recode Liberal leader (var208)
+look_for(ces68, "Trudeau")
+ces68$liberal_leader<-Recode(ces68$var208, "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
+#checks
+table(ces68$liberal_leader)
+
+#recode conservative leader (var209)
+look_for(ces68, "Stanfield")
+ces68$conservative_leader<-Recode(ces68$var209, "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
+#checks
+table(ces68$conservative_leader)
+
+#recode NDP leader (var210)
+look_for(ces68, "Douglas")
+ces68$ndp_leader<-Recode(ces68$var210, "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
+#checks
+table(ces68$ndp_leader)
+
+#recode liberal rating (var223)
+look_for(ces68, "liberal")
+ces68$liberal_rating<-Recode(ces68$var223, "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
+#checks
+table(ces68$liberal_rating)
+
+#recode conservative rating (var224)
+look_for(ces68, "conservative")
+ces68$conservative_rating<-Recode(ces68$var224, "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
+#checks
+table(ces68$conservative_rating)
+
+#recode NDP rating (var225)
+look_for(ces68, "ndp")
+ces68$ndp_rating<-Recode(ces68$var225, "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
+#checks
+table(ces68$ndp_rating)

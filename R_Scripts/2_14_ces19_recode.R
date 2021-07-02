@@ -319,35 +319,38 @@ table(ces19phone$past_vote, ces19phone$q60 , useNA = "ifany" )
 # ces19phone$Francois_Blanchet<-(ces19phone$Blanchet /100)
 # table(ces19phone$Francois_Blanchet)
 
-#recode leaders including don't knows
-#recode Jagmeet Singh (q22)
-ces19phone$Singh19<-Recode(ces19phone$q22, "-6=50; -8=NA; -9=50")
+#recode Liberal leader (q20)
+ces19phone$liberal_leader<-Recode(ces19phone$q20, "0=1; -9:-6=NA")
 #checks
-table(ces19phone$Singh19)
-ces19phone$ndp_leader<-(ces19phone$Singh19 /100)
-table(ces19phone$ndp_leader)
-
-#recode Justin Trudeau (q20)
-ces19phone$Trudeau19<-Recode(ces19phone$q20, "-6=50; -8=NA; -9=50")
-#checks
-table(ces19phone$Trudeau19)
-ces19phone$liberal_leader<-(ces19phone$Trudeau19 /100)
+#table(ces19phone$Trudeau19)
+#ces19phone$liberal_leader<-(ces19phone$Trudeau19 /100)
 table(ces19phone$liberal_leader)
 
-#recode Andrew Scheer (q21)
-ces19phone$Scheer19<-Recode(ces19phone$q21, "-6=50; -8=NA; -9=50")
+#recode Conservative leader (q21)
+ces19phone$conservative_leader<-Recode(ces19phone$q21, "0=1; -9:-6=NA")
 #checks
-table(ces19phone$Scheer19)
-ces19phone$conservative_leader<-(ces19phone$Scheer19 /100)
+#table(ces19phone$Scheer19)
+#ces19phone$conservative_leader<-(ces19phone$Scheer19 /100)
 table(ces19phone$conservative_leader)
 
-#recode Francois Blanchet (q23)
-ces19phone$Blanchet19<-Recode(ces19phone$q23, "-6=50; -8=NA; -9=50")
+#recode NDP leader (q22)
+ces19phone$ndp_leader<-Recode(ces19phone$q22, "0=1; -9:-6=NA")
 #checks
-table(ces19phone$Blanchet19)
-ces19phone$bloc_leader<-(ces19phone$Blanchet19 /100)
+#table(ces19phone$Singh19)
+#ces19phone$ndp_leader<-(ces19phone$Singh19 /100)
+table(ces19phone$ndp_leader)
+
+#recode Bloc leader (q23)
+ces19phone$bloc_leader<-Recode(ces19phone$q23, "0=1; -9:-6=NA")
+#checks
+#table(ces19phone$Blanchet19)
+#ces19phone$bloc_leader<-(ces19phone$Blanchet19 /100)
 table(ces19phone$bloc_leader)
 
+#recode Green leader (q24)
+ces19phone$green_leader<-Recode(ces19phone$q24, "0=1; -9:-6=NA")
+#checks
+table(ces19phone$green_leader)
 
 #recode Environment (q27_b)
 look_for(ces19phone, "enviro")
@@ -356,8 +359,6 @@ val_labels(ces19phone$environment)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1
 #checks
 val_labels(ces19phone$environment)
 table(ces19phone$environment, ces19phone$q27_b , useNA = "ifany" )
-
-
 
 #recode Redistribution (p44)
 look_for(ces19phone, "rich")
@@ -374,14 +375,6 @@ val_labels(ces19phone$pro_redistribution)<-c(Non_Pro=0, Pro=1)
 val_labels(ces19phone$pro_redistribution)
 table(ces19phone$pro_redistribution)
 
-#recode NDP rating (q16)
-look_for(ces19phone, "NDP")
-ces19phone$NDP_therm<-Recode(ces19phone$q16, "-6=NA; -8=NA; -9=NA")
-#checks
-table(ces19phone$NDP_therm)
-ces19phone$NDP_rating<-(ces19phone$NDP_therm /100)
-table(ces19phone$NDP_rating)
-
 #recode Liberal rating (q14)
 look_for(ces19phone, "Liberal")
 ces19phone$Liberal_therm<-Recode(ces19phone$q14, "996=NA; 998=NA; 999=NA")
@@ -390,6 +383,9 @@ table(ces19phone$Liberal_therm)
 ces19phone$Liberal_rating<-(ces19phone$Liberal_therm /100)
 table(ces19phone$Liberal_rating)
 
+ces19phone$liberal_rating<-Recode(ces19phone$q14, "0=1; -9:-6=NA")
+table(ces19phone$liberal_rating)
+
 #recode Conservative rating (q15)
 look_for(ces19phone, "Conservative")
 ces19phone$Conservative_therm<-Recode(ces19phone$q15, "996=NA; 998=NA; 999=NA")
@@ -397,6 +393,30 @@ ces19phone$Conservative_therm<-Recode(ces19phone$q15, "996=NA; 998=NA; 999=NA")
 table(ces19phone$Conservative_therm)
 ces19phone$Conservative_rating<-(ces19phone$Conservative_therm /100)
 table(ces19phone$Conservative_rating)
+
+ces19phone$conservative_rating<-Recode(ces19phone$q15, "0=1; -9:-6=NA")
+table(ces19phone$conservative_rating)
+
+#recode NDP rating (q16)
+look_for(ces19phone, "NDP")
+ces19phone$NDP_therm<-Recode(ces19phone$q16, "-6=NA; -8=NA; -9=NA")
+#checks
+table(ces19phone$NDP_therm)
+ces19phone$NDP_rating<-(ces19phone$NDP_therm /100)
+table(ces19phone$NDP_rating)
+
+ces19phone$ndp_rating<-Recode(ces19phone$q16, "0=1; -9:-6=NA")
+table(ces19phone$ndp_rating)
+
+#recode Bloc rating (q17)
+look_for(ces19phone, "bloc")
+ces19phone$bloc_rating<-Recode(ces19phone$q17, "0=1; -9:-6=NA")
+table(ces19phone$bloc_rating)
+
+#recode Green rating (q18)
+look_for(ces19phone, "green")
+ces19phone$green_rating<-Recode(ces19phone$q18, "0=1; -9:-6=NA")
+table(ces19phone$green_rating)
 
 #recode Manage economy (q33)
 look_for(ces19phone, "economy")

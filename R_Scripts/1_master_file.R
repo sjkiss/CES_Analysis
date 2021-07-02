@@ -290,6 +290,26 @@ ces04 %>%
   rename(quebec_accom=quebec_accom04)->ces04
 ces04 %>% 
   rename(religiosity=religiosity04)->ces04
+ces04 %>% 
+  rename(liberal_leader=liberal_leader04)->ces04
+ces04 %>% 
+  rename(conservative_leader=conservative_leader04)->ces04
+ces04 %>% 
+  rename(ndp_leader=ndp_leader04)->ces04
+ces04 %>% 
+  rename(bloc_leader=bloc_leader04)->ces04
+ces04 %>% 
+  rename(green_leader=green_leader04)->ces04
+ces04 %>% 
+  rename(liberal_rating=liberal_rating04)->ces04
+ces04 %>% 
+  rename(conservative_rating=conservative_rating04)->ces04
+ces04 %>% 
+  rename(ndp_rating=ndp_rating04)->ces04
+ces04 %>% 
+  rename(bloc_rating=bloc_rating04)->ces04
+ces04 %>% 
+  rename(green_rating=green_rating04)->ces04
 table(ces04$survey, ces04$non_charter_language)
 
 #### Rename CES06 ####
@@ -353,6 +373,26 @@ ces06 %>%
   rename(quebec_accom=quebec_accom06)->ces06
 ces06 %>% 
   rename(religiosity=religiosity06)->ces06
+ces06 %>% 
+  rename(liberal_leader=liberal_leader06)->ces06
+ces06 %>% 
+  rename(conservative_leader=conservative_leader06)->ces06
+ces06 %>% 
+  rename(ndp_leader=ndp_leader06)->ces06
+ces06 %>% 
+  rename(bloc_leader=bloc_leader06)->ces06
+ces06 %>% 
+  rename(green_leader=green_leader06)->ces06
+ces06 %>% 
+  rename(liberal_rating=liberal_rating06)->ces06
+ces06 %>% 
+  rename(conservative_rating=conservative_rating06)->ces06
+ces06 %>% 
+  rename(ndp_rating=ndp_rating06)->ces06
+ces06 %>% 
+  rename(bloc_rating=bloc_rating06)->ces06
+ces06 %>% 
+  rename(green_rating=green_rating06)->ces06
 table(ces06$survey, ces06$non_charter_language)
 
 #### Rename CES08 ####
@@ -416,6 +456,26 @@ ces08 %>%
   rename(quebec_accom=quebec_accom08)->ces08
 ces08 %>% 
   rename(religiosity=religiosity08)->ces08
+ces08 %>% 
+  rename(liberal_leader=liberal_leader08)->ces08
+ces08 %>% 
+  rename(conservative_leader=conservative_leader08)->ces08
+ces08 %>% 
+  rename(ndp_leader=ndp_leader08)->ces08
+ces08 %>% 
+  rename(bloc_leader=bloc_leader08)->ces08
+ces08 %>% 
+  rename(green_leader=green_leader08)->ces08
+ces08 %>% 
+  rename(liberal_rating=liberal_rating08)->ces08
+ces08 %>% 
+  rename(conservative_rating=conservative_rating08)->ces08
+ces08 %>% 
+  rename(ndp_rating=ndp_rating08)->ces08
+ces08 %>% 
+  rename(bloc_rating=bloc_rating08)->ces08
+ces08 %>%  
+  rename(green_rating=green_rating08)->ces08
 table(ces08$survey, ces08$non_charter_language)
 
 #### Rename CES11 ####
@@ -479,6 +539,26 @@ ces11 %>%
   rename(quebec_accom=quebec_accom11)->ces11
 ces11 %>% 
   rename(religiosity=religiosity11)->ces11
+ces11 %>% 
+  rename(liberal_leader=liberal_leader11)->ces11
+ces11 %>% 
+  rename(conservative_leader=conservative_leader11)->ces11
+ces11 %>% 
+  rename(ndp_leader=ndp_leader11)->ces11
+ces11 %>% 
+  rename(bloc_leader=bloc_leader11)->ces11
+ces11 %>% 
+  rename(green_leader=green_leader11)->ces11
+ces11 %>% 
+  rename(liberal_rating=liberal_rating11)->ces11
+ces11 %>% 
+  rename(conservative_rating=conservative_rating11)->ces11
+ces11 %>% 
+  rename(ndp_rating=ndp_rating11)->ces11
+ces11 %>% 
+  rename(bloc_rating=bloc_rating11)->ces11
+ces11 %>% 
+  rename(green_rating=green_rating11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -566,7 +646,9 @@ ces %>%
           "religiosity",
           "election", "size", "redistribution", "pro_redistribution",
           "market_liberalism", "traditionalism", "traditionalism2", "immigration_rates", "enviro", "death_penalty", 
-          "crime", "gay_rights", "abortion", "authoritarianism", "quebec_accom") )-> ces
+          "crime", "gay_rights", "abortion", "authoritarianism", "quebec_accom",
+          "liberal_rating", "conservative_rating", "ndp_rating", "green_rating", "bloc_rating",
+          "liberal_leader", "conservative_leader", "ndp_leader", "green_leader", "bloc_leader") )-> ces
 ##
 
 library(stringr)
@@ -658,7 +740,7 @@ ces$occupation2<-Recode(as.factor(ces$occupation), "4:5='Working_Class' ; 3='Rou
 ces$occupation2<-fct_relevel(ces$occupation2, "Managers", "Professionals", "Routine_Nonmanual", 'Working_Class')
 val_labels(ces$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 ces$occupation4<-fct_relevel(ces$occupation4, "Managers", "Self-Employed", "Professionals", "Routine_Nonmanual", 'Working_Class')
-ces$occupation4<-Recode(as.factor(ces$occupation3), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'; 6='Self-Employed'", levels=c('Working_Class', 'Managers', 'Professionals','Self-Employed', 'Routine_Nonmanual'))
+#ces$occupation4<-Recode(as.factor(ces$occupation3), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'; 6='Self-Employed'", levels=c('Working_Class', 'Managers', 'Professionals','Self-Employed', 'Routine_Nonmanual'))
 table(ces$occupation, ces$election)
 table(ces$occupation2, ces$election)
 table(ces$occupation3, ces$election)

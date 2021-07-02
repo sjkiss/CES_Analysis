@@ -350,34 +350,40 @@ ces15phone %>%
 # ces15phone$Gilles_Duceppe<-(ces15phone$Duceppe /100)
 # table(ces15phone$Gilles_Duceppe)
 
-#recode leaders including don't knows
-#recode Tom Mulclair (CPS15_25)
-ces15phone$Mulcair15<-Recode(ces15phone$CPS15_25, "998=50; 996:997=NA; 999=NA")
+#recode Liberal leader (CPS15_24)
+ces15phone$liberal_leader<-Recode(ces15phone$CPS15_24, "0=1; 996:999=NA")
 #checks
-table(ces15phone$Mulcair15, useNA = "ifany" )
-ces15phone$ndp_leader<-(ces15phone$Mulcair15 /100)
-table(ces15phone$ndp_leader, useNA = "ifany" )
-
-#recode Justin Trudeau (CPS15_24)
-ces15phone$Trudeau15<-Recode(ces15phone$CPS15_24, "998=50; 996:997=NA; 999=NA")
-#checks
-table(ces15phone$Trudeau15)
-ces15phone$liberal_leader<-(ces15phone$Trudeau15 /100)
+#table(ces15phone$Trudeau15)
+#ces15phone$liberal_leader<-(ces15phone$Trudeau15 /100)
 table(ces15phone$liberal_leader)
 
-#recode Stephen Harper (CPS15_23)
-ces15phone$Harper15<-Recode(ces15phone$CPS15_23, "998=50; 996:997=NA; 999=NA")
+#recode Conservative leader (CPS15_23)
+ces15phone$conservative_leader<-Recode(ces15phone$CPS15_23, "0=1; 996:999=NA")
 #checks
-table(ces15phone$Harper15)
-ces15phone$conservative_leader<-(ces15phone$Harper15 /100)
+#table(ces15phone$Harper15)
+#ces15phone$conservative_leader<-(ces15phone$Harper15 /100)
 table(ces15phone$conservative_leader)
 
-#recode Gilles Duceppe (CPS15_26)
-ces15phone$Duceppe15<-Recode(ces15phone$CPS15_26, "998=50; 996:997=NA; 999=NA")
+#recode NDP leader (CPS15_25)
+ces15phone$ndp_leader<-Recode(ces15phone$CPS15_25, "0=1; 996:999=NA")
 #checks
-table(ces15phone$Duceppe15)
-ces15phone$bloc_leader<-(ces15phone$Duceppe15 /100)
+#table(ces15phone$Mulcair15, useNA = "ifany" )
+#ces15phone$ndp_leader<-(ces15phone$Mulcair15 /100)
+table(ces15phone$ndp_leader, useNA = "ifany" )
+
+#recode Bloc leader (CPS15_26)
+ces15phone$bloc_leader<-Recode(ces15phone$CPS15_26, "0=1; 996:999=NA")
+#checks
+#table(ces15phone$Duceppe15)
+#ces15phone$bloc_leader<-(ces15phone$Duceppe15 /100)
 table(ces15phone$bloc_leader)
+
+#recode Green leader (CPS15_27)
+ces15phone$green_leader<-Recode(ces15phone$CPS15_27, "0=1; 996:999=NA")
+#checks
+#table(ces15phone$May15)
+#ces15phone$green_leader<-(ces15phone$May15 /100)
+table(ces15phone$green_leader)
 
 #recode Environment (CPS15_35)
 look_for(ces15phone, "enviro")
@@ -404,14 +410,6 @@ val_labels(ces15phone$pro_redistribution)<-c(Non_Pro=0, Pro=1)
 val_labels(ces15phone$pro_redistribution)
 table(ces15phone$pro_redistribution)
 
-#recode NDP rating (CPS15_20)
-look_for(ces15phone, "NDP")
-ces15phone$NDP_therm<-Recode(ces15phone$CPS15_20, "996=NA; 998=NA; 999=NA")
-#checks
-table(ces15phone$NDP_therm)
-ces15phone$NDP_rating<-(ces15phone$NDP_therm /100)
-table(ces15phone$NDP_rating)
-
 #recode Liberal rating (CPS15_19)
 look_for(ces15phone, "Liberal")
 ces15phone$Liberal_therm<-Recode(ces15phone$CPS15_19, "996=NA; 998=NA; 999=NA")
@@ -420,6 +418,9 @@ table(ces15phone$Liberal_therm)
 ces15phone$Liberal_rating<-(ces15phone$Liberal_therm /100)
 table(ces15phone$Liberal_rating)
 
+ces15phone$liberal_rating<-Recode(ces15phone$CPS15_19, "0=1; 996:999=NA")
+table(ces15phone$liberal_rating)
+
 #recode Conservative rating (CPS15_18)
 look_for(ces15phone, "Conservative")
 ces15phone$Conservative_therm<-Recode(ces15phone$CPS15_18, "996=NA; 998=NA; 999=NA")
@@ -427,6 +428,30 @@ ces15phone$Conservative_therm<-Recode(ces15phone$CPS15_18, "996=NA; 998=NA; 999=
 table(ces15phone$Conservative_therm)
 ces15phone$Conservative_rating<-(ces15phone$Conservative_therm /100)
 table(ces15phone$Conservative_rating)
+
+ces15phone$conservative_rating<-Recode(ces15phone$CPS15_18, "0=1; 996:999=NA")
+table(ces15phone$conservative_rating)
+
+#recode NDP rating (CPS15_20)
+look_for(ces15phone, "NDP")
+ces15phone$NDP_therm<-Recode(ces15phone$CPS15_20, "996=NA; 998=NA; 999=NA")
+#checks
+table(ces15phone$NDP_therm)
+ces15phone$NDP_rating<-(ces15phone$NDP_therm /100)
+table(ces15phone$NDP_rating)
+
+ces15phone$ndp_rating<-Recode(ces15phone$CPS15_20, "0=1; 996:999=NA")
+table(ces15phone$ndp_rating)
+
+#recode Bloc rating (CPS15_21)
+look_for(ces15phone, "bloc")
+ces15phone$bloc_rating<-Recode(ces15phone$CPS15_21, "0=1; 996:999=NA")
+table(ces15phone$bloc_rating)
+
+#recode Green rating (CPS15_22)
+look_for(ces15phone, "green")
+ces15phone$green_rating<-Recode(ces15phone$CPS15_22, "0=1; 996:999=NA")
+table(ces15phone$green_rating)
 
 #recode Manage economy (CPS15_40b)
 look_for(ces15phone, "economy")

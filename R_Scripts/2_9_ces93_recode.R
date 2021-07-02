@@ -507,3 +507,51 @@ look_for(ces93, "quebec")
 ces93$quebec_accom<-Recode(ces93$PRC4, "1=1; 5=0; 3=0.5; 8=0.5; else=NA")
 #checks
 table(ces93$quebec_accom)
+
+#recode Liberal leader (PESD2B)
+look_for(ces93, "Chretien")
+ces93$liberal_leader<-Recode(ces93$PESD2B, "0=1; 997:999=NA")
+#checks
+table(ces93$liberal_leader)
+
+#recode conservative leader (PESD2A)
+look_for(ces93, "Campbell")
+ces93$conservative_leader<-Recode(ces93$PESD2A, "0=1; 997:999=NA")
+#checks
+table(ces93$conservative_leader)
+
+#recode NDP leader (PESD2C)
+look_for(ces93, "McLaughlin")
+ces93$ndp_leader<-Recode(ces93$PESD2C, "0=1; 997:999=NA")
+#checks
+table(ces93$ndp_leader)
+
+#recode Bloc leader (PESD2E)
+look_for(ces93, "Bouchard")
+ces93$bloc_leader<-Recode(ces93$PESD2E, "0=1; 997:999=NA")
+#checks
+table(ces93$bloc_leader)
+
+#recode liberal rating (PESD2H)
+look_for(ces93, "liberal")
+ces93$liberal_rating<-Recode(ces93$PESD2H, "0=1; 997:999=NA")
+#checks
+table(ces93$liberal_rating)
+
+#recode conservative rating (PESD2G)
+look_for(ces93, "conservative")
+ces93$conservative_rating<-Recode(ces93$PESD2G, "0=1; 997:999=NA")
+#checks
+table(ces93$conservative_rating)
+
+#recode NDP rating (PESD2I)
+look_for(ces93, "new democratic")
+ces93$ndp_rating<-Recode(ces93$PESD2I, "0=1; 997:999=NA")
+#checks
+table(ces93$ndp_rating)
+
+#recode Bloc rating (PESD2K)
+look_for(ces93, "new democratic")
+ces93$bloc_rating<-Recode(ces93$PESD2K, "0=1; 997:999=NA")
+#checks
+table(ces93$bloc_rating)

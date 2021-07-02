@@ -5,6 +5,21 @@ library(stargazer)
 library(broom)
 library(nnet)
 
+# Recode leaders and party ratings to (0-1)
+ces$liberal_ratings<-(ces$liberal_rating /100)
+ces$conservative_ratings<-(ces$conservative_rating /100)
+ces$ndp_ratings<-(ces$ndp_rating /100)
+ces$bloc_ratings<-(ces$bloc_rating /100)
+ces$green_ratings<-(ces$green_rating /100)
+ces$liberal_leaders<-(ces$liberal_leader /100)
+ces$conservative_leaders<-(ces$conservative_leader /100)
+ces$ndp_leaders<-(ces$ndp_leader /100)
+ces$bloc_leaders<-(ces$bloc_leader /100)
+ces$green_leaders<-(ces$green_leader /100)
+table(ces$liberal_leaders)
+table(ces$conservative_leaders)
+table(ces$ndp_leaders, ces$election)
+
 # Recode Vote3 for big 3 parties
 ces$vote3<-Recode(as.factor(ces$vote), "1='Liberal' ; 2='Conservative' ; 3='NDP'", levels=c('Liberal', 'Conservative', 'NDP'))
 levels(ces$vote3)
@@ -143,6 +158,108 @@ ces %>%
 stargazer(conservative_models_2$model, type="html", out=here("Tables", "conservative_Models_1979_2019_1.html"),
           column.labels=c("1979", "1980", "1984", "1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), 
           star.cutoffs=c(0.05), title="Conservative Models 1979-2019", notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+# NDP 1979-2019 + Leadership
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+ndp_leaders+liberal_leaders+conservative_leaders, data=x)),
+         tidied=map(model, tidy), vote=rep('NDP', nrow(.)))->ndp_models_6
+
+stargazer(ndp_models_6$model, type="html", out=here("Tables", "NDP_Models_1979_2019_leadership_1.html"),
+          column.labels=c("1979", "1980", "1984", "1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), title="NDP Models leadership 1979-2019", notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+# Liberal 1979-2019 + Leadership
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+ndp_leaders+liberal_leaders+conservative_leaders, data=x)),
+         tidied=map(model, tidy), vote=rep('Liberal', nrow(.)))->liberal_models_6
+
+stargazer(liberal_models_6$model, type="html", out=here("Tables", "liberal_Models_1979_2019_leadership_1.html"),
+          column.labels=c("1979", "1980", "1984", "1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), title="Liberal Models leadership 1979-2019", notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+# Conservative 1979-2019 + Leadership
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+ndp_leaders+liberal_leaders+conservative_leaders, data=x)),
+         tidied=map(model, tidy), vote=rep('Conservative', nrow(.)))->conservative_models_6
+
+stargazer(conservative_models_6$model, type="html", out=here("Tables", "conservative_Models_1979_2019__leadership_1.html"),
+          column.labels=c("1979", "1980", "1984", "1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), title="Conservative Models leadership 1979-2019", notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+#### Market vs Moral party models ####
+
+# NDP 1988-2019
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2, data=x)),
+         tidied=map(model, tidy), vote=rep('NDP', nrow(.)))->ndp_models_3
+
+stargazer(ndp_models_3$model, type="html", out=here("Tables", "NDP_Models_1988_2019_1.html"),
+          column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), title="NDP Models 1988-2019", notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+# Liberal 1988-2019
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2, data=x)),
+         tidied=map(model, tidy), vote=rep('Liberal', nrow(.)))->liberal_models_3
+
+stargazer(liberal_models_3$model, type="html", out=here("Tables", "liberal_Models_1988_2019_1.html"),
+          column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), title="Liberal Models 1988-2019", notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+# Conservative 1988-2019
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2, data=x)),
+         tidied=map(model, tidy), vote=rep('Conservative', nrow(.)))->conservative_models_3
+
+stargazer(conservative_models_3$model, type="html", out=here("Tables", "conservative_Models_1988_2019_1.html"),
+          column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), title="Conservative Models 1988-2019", notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+# NDP 1988-2019 degree x redistro
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:redistribution, data=x)),
+         tidied=map(model, tidy), vote=rep('NDP', nrow(.)))->ndp_models_4
+
+stargazer(ndp_models_4$model, type="html", out=here("Tables", "NDP_Models_1988_2019_2.html"),
+          column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), title="NDP Models 1988-2019", notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+# Liberal 1988-2019 degree x redistro
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:redistribution, data=x)),
+         tidied=map(model, tidy), vote=rep('Liberal', nrow(.)))->liberal_models_4
+
+stargazer(liberal_models_4$model, type="html", out=here("Tables", "liberal_Models_1988_2019_2.html"),
+          column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), title="Liberal Models 1988-2019", notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+# Conservative 1988-2019 degree x redistro
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:redistribution, data=x)),
+         tidied=map(model, tidy), vote=rep('Conservative', nrow(.)))->conservative_models_4
+
+stargazer(conservative_models_4$model, type="html", out=here("Tables", "conservative_Models_1988_2019_2.html"),
+          column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), title="Conservative Models 1988-2019", notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
 
 #### NDP vs Libs/Right Models ####
 # NDP vs Right 1965-2019
