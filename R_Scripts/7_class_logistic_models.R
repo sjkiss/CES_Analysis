@@ -1009,21 +1009,6 @@ ces %>%
 #-------------------------------------------------------------------------------------------------
 #### Natural vs Unnatural voting ####
 
-#Create variables
-ces$left<-Recode(ces$vote, "1=1; 3=1; 5=1; 0=0; 2=0; 4=0; else=NA")
-
-table(ces$left, ces$election)
-table(ces$ndp, ces$election)
-ces$right<-Recode(ces$vote, "2=1; 0=0; 1=0; 3:5=0; else=NA")
-table(ces$right, ces$election)
-val_labels(ces$right)<-c(Right=1, Other=0)
-ces$upper_class<-Recode(ces$occupation, "1:2=1; 3:5=0; else=NA")
-table(ces$upper_class)
-ces$upper_class2<-Recode(ces$occupation3, "1:2=1; 3:6=0; else=NA")
-table(ces$upper_class2)
-
-table(ces$employment, ces$election)
-
 #Using working_class (6 categories)
 #recode Natural voting
 ces %>% 
@@ -1210,20 +1195,32 @@ stargazer(natmodel3$model, column.labels=c("1988", "1993", "1997", "2004", "2006
 ces %>% 
   filter(unnatural==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2+market_liberalism+immigration_rates, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->unnatmodel4
+#Get McFadden's
+library(DescTools)
+map(unnatmodel4$model, PseudoR2) %>%
+  unlist() %>% 
+  bind_cols(unnatmodel4, .)->unnatmodel4
+
+unnatmodel4<-rename(unnatmodel4, "McFadden"=6)
 
 ces %>% 
   filter(natural==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+traditionalism2+market_liberalism+immigration_rates, data=x, family="binomial")),
+  mutate(model=map(variables, function(x) glm(left~employment+degree+income+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x, family="binomial")),
          tidied=map(model, tidy), 
          vote=rep('Left', nrow(.)))->natmodel4
-
-stargazer(unnatmodel4$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model4.html"))
-stargazer(natmodel4$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model4.html"))
-
+map(natmodel4$model, PseudoR2) %>% 
+  unlist() %>% 
+  bind_cols(natmodel4, .)->natmodel4
+  natmodel4
+natmodel4<-rename(natmodel4, "McFadden"=6)
+stargazer(unnatmodel4$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model4.html"), covariate.labels=c("Employment", "Degree", "Income", "Redistribution", "Market Liberalism", "Moral Traditionalism", "Immigration Rates"), add.lines=list("PseudoR2"=c("PseudoR2", round(unnatmodel4$McFadden,2))), dep.var.caption=c("Cultural Voting"), dep.var.labels = c("Vote NDP"), single.row = T, digits=2)
+stargazer(natmodel4$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model4.html"), covariate.labels=c("Employment", "Degree", "Income", "Redistribution", "Market Liberalism", "Moral Traditionalism", "Immigration Rates"), add.lines=list("PseudoR2"=c("PseudoR2", round(natmodel4$McFadden,2))), dep.var.labels = c("Vote NDP"), dep.var.caption=c("Class Voting"), single.row=T, digits=2)
+natmodel4
+detach(package:DescTools)
 #------------------------------------------------------------------------------------------------
 #### Class Voting ####
 #M1 NDP class - basic
@@ -1570,20 +1567,20 @@ table(ces$occupation4)
 ces$vote
 
 
-#### Party Vote Coefficients of Working Class and Union ####
+#### Party Vote Coefficients of Working Class Education and Income ####
 
 # 1965-2019
 ces %>% 
   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) lm(ndp~as.factor(region2)+male+age+income+degree+union_both+as.factor(religion2)+working_class3, data=x)),
+  mutate(model=map(variables, function(x) lm(ndp~working_class3+income+degree+as.factor(region2)+male+age+as.factor(religion2), data=x)),
          tidied=map(model, tidy), 
          vote=rep('NDP', nrow(.)))->ndp_models_complete1
 
 ces %>% 
   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) lm(conservative~as.factor(region2)+male+age+income+degree+union_both+as.factor(religion2)+working_class3, data=x)), 
+  mutate(model=map(variables, function(x) lm(conservative~working_class3+income+degree+as.factor(region2)+male+age+as.factor(religion2), data=x)), 
          tidied=map(model, tidy),
          vote=rep('Conservative', nrow(.))  
   )->conservative_models_complete1
@@ -1591,7 +1588,7 @@ ces %>%
 ces %>% 
   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) lm(liberal~as.factor(region2)+male+age+income+degree+union_both+as.factor(religion2)+working_class3, data=x)), 
+  mutate(model=map(variables, function(x) lm(liberal~working_class3+income+degree+as.factor(region2)+male+age+as.factor(religion2), data=x)), 
          tidied=map(model, tidy),
          vote=rep('Liberal', nrow(.))  
   )->liberal_models_complete1
@@ -1625,51 +1622,52 @@ ndp_models_complete1 %>%
   bind_rows(., liberal_models_complete1) %>% 
   bind_rows(., conservative_models_complete1) %>%
   unnest(tidied) %>% 
-  filter(term=="working_class3"| term=="union_both") %>% 
-  mutate(term=Recode(term, "'working_class3'='Working Class'; 'union_both'='Union'")) %>% 
-  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "Union")))+
-  geom_point()+
-  labs(title="OLS Coefficients of Working Class and Union on Party Vote 1979-2019", alpha="Variable", color="Vote", x="Election", y="Estimate")+
-  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
-  ylim(c(-0.25,0.25))+
+  filter(term=="working_class3"| term=="degree") %>% 
+  mutate(term=Recode(term, "'working_class3'='Working Class'; 'degree'='Degree'; 'income'='Income'")) %>% 
+  ggplot(., aes(x=election, y=estimate, col=vote))+
+  geom_point(position=position_dodge(width=0.2))+
+  labs(title="OLS Coefficients of Working Class and Degree\n Vote 1979-2019", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0, position=position_dodge(width=0.2))+
+  ylim(c(-0.3,0.3))+
+  scale_y_continuous(breaks=seq(-0.2,0.2,by=0.1))+
   scale_color_manual(values=c("blue", "red", "orange"))+
-  facet_grid(rows=vars(vote), switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
-
-ggsave(here("Plots", "Vote_Coefficents_WC_Union_all_parties.png"))
+ # scale_alpha_discrete(range=c(0.4,1))+
+  facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))+guides(alpha="none", col="none")
+ggsave(here("Plots", "Vote_Coefficents_WC_income_degree_all_parties_1979_2019.png"), width=6, height=4)
 
 #Join all parties and plot degree and income coefficients
-ndp_models_complete1 %>% 
-  bind_rows(., liberal_models_complete1) %>% 
-  bind_rows(., conservative_models_complete1) %>%
-  unnest(tidied) %>% 
-  filter(term=="degree"| term=="income") %>% 
-  mutate(term=Recode(term, "'degree'='Education'; 'income'='Income'")) %>% 
-  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "Income")))+
-  geom_point()+
-  labs(title="OLS Coefficients of Education and Income on Party Vote 1979-2019", alpha="Variable", color="Vote", x="Election", y="Estimate")+
-  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
-  ylim(c(-0.25,0.25))+
-  scale_color_manual(values=c("blue", "red", "orange"))+
-  facet_grid(rows=vars(vote), switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
-
-ggsave(here("Plots", "Vote_Coefficents_Degree_Income_all_parties.png"))
-
-#Join all parties and plot Degree and Class coefficients
-ndp_models_complete1 %>% 
-  bind_rows(., liberal_models_complete1) %>% 
-  bind_rows(., conservative_models_complete1) %>%
-  unnest(tidied) %>% 
-  filter(term=="degree"| term=="working_class3") %>% 
-  mutate(term=Recode(term, "'degree'='Education'; 'working_class3'='Working Class'")) %>% 
-  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "Working Class")))+
-  geom_point()+
-  labs(title="OLS Coefficients of Education and Working Class on Party Vote 1979-2019", alpha="Variable", color="Vote", x="Election", y="Estimate")+
-  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
-  ylim(c(-0.25,0.25))+
-  scale_color_manual(values=c("blue", "red", "orange"))+
-  facet_grid(rows=vars(vote), switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
-
-ggsave(here("Plots", "Vote_Coefficents_Degree_WC_all_parties.png"))
+# ndp_models_complete1 %>% 
+#   bind_rows(., liberal_models_complete1) %>% 
+#   bind_rows(., conservative_models_complete1) %>%
+#   unnest(tidied) %>% 
+#   filter(term=="degree"| term=="income") %>% 
+#   mutate(term=Recode(term, "'degree'='Education'; 'income'='Income'")) %>% 
+#   ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "Income")))+
+#   geom_point()+
+#   labs(title="OLS Coefficients of Education and Income on Party Vote 1979-2019", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+#   geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+#   ylim(c(-0.25,0.25))+
+#   scale_color_manual(values=c("blue", "red", "orange"))+
+#   facet_grid(rows=vars(vote), switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+# 
+# ggsave(here("Plots", "Vote_Coefficents_Degree_Income_all_parties.png"))
+# 
+# #Join all parties and plot Degree and Class coefficients
+# ndp_models_complete1 %>% 
+#   bind_rows(., liberal_models_complete1) %>% 
+#   bind_rows(., conservative_models_complete1) %>%
+#   unnest(tidied) %>% 
+#   filter(term=="degree"| term=="working_class3") %>% 
+#   mutate(term=Recode(term, "'degree'='Education'; 'working_class3'='Working Class'")) %>% 
+#   ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "Working Class")))+
+#   geom_point()+
+#   labs(title="OLS Coefficients of Education and Working Class on Party Vote 1979-2019", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+#   geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+#   ylim(c(-0.25,0.25))+
+#   scale_color_manual(values=c("blue", "red", "orange"))+
+#   facet_grid(rows=vars(vote), switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+# 
+# ggsave(here("Plots", "Vote_Coefficents_Degree_WC_all_parties.png"))
 
 # 1965-2019
 ces %>% 
@@ -1773,21 +1771,25 @@ summarize(n=n()) %>%
 
 ces %>% 
   select(election, occupation4, vote, crime, market_liberalism, traditionalism2, redistribution, immigration_rates, quebec_accom, enviro, crime) %>% 
-  pivot_longer(cols=crime:enviro) %>% 
-  group_by(name) %>% 
-  mutate(pro=case_when(
+  rename(Election=election, Class=occupation4, Vote=vote, Crime=crime, `Market Liberalism`=market_liberalism, Traditionalism=traditionalism2, Redistribution=redistribution, `Immigration Rates`=immigration_rates, `Quebec Accommodation`=quebec_accom, Environment=enviro) %>% 
+  pivot_longer(cols=Crime:Environment) %>% 
+  group_by(name) %>%
+ # filter(Election>2004) %>% 
+  mutate(Pro=case_when(
     value>0.5~ 1,
     TRUE ~ 0
   )) %>% 
-  group_by(election, name, pro, vote) %>% 
-  filter(election>1984 &election!=2000) %>% 
-  filter(!is.na(vote)) %>% 
-  filter(vote > 0 &vote<5) %>% 
-  filter(occupation4=="Working_Class") %>% 
+  group_by(Election, name, Pro, Vote) %>% 
+  filter(Election>1984 &Election!=2000) %>% 
+  filter(!is.na(Vote)) %>% 
+  filter(Vote > 0 &Vote<5) %>% 
+  filter(Class=="Working_Class") %>% 
   summarize(n=n()) %>% 
-  mutate(percent=n/sum(n)) %>% 
-  ggplot(., aes(x=election, y=percent, fill=as_factor(vote)))+geom_col(position="dodge")+facet_wrap(~name)+scale_fill_manual(values=c('red', 'darkblue', 'orange', 'lightblue' ))
-
+  mutate(Percent=(n/sum(n))*100) %>% 
+  filter(Pro==1) %>% 
+  filter(!(Election==2019&str_detect(name, "Quebec"))) %>% 
+  ggplot(., aes(x=Election, y=Percent, fill=as_factor(Vote)))+geom_col(position=position_dodge2(width=0.9, preserve='single'))+facet_wrap(~name)+scale_fill_manual(values=c('red', 'darkblue', 'orange', 'lightblue' ), name="Vote")
+ggsave(filename=here('Plots', "vote_shares_policy_positions_working_class.png"), width=10, height=4)
 
 #### Average Scores For Working Class Versus Average ####
 
@@ -1828,3 +1830,14 @@ ggsave(here("Plots", "average_scores_raw_class_population.png"), width=6, height
 # model4<-glm(right~occupation2+as.numeric(election)+occupation2*as.numeric(election)+degree*as.numeric(election), data=ces)
 # 
 # stargazer(model2, model3, model4, type="text")
+
+table(ces$election, ces$quebec_accommodation)
+table(ces$election, ces$quebec_accom)
+names(ces)
+ces %>% 
+  select(election, vote2, degree, income) %>% 
+  group_by(election, degree, vote2) %>%  
+  filter(!is.na(degree)&!is.na(vote2)) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)) 
+

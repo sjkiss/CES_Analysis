@@ -521,9 +521,6 @@ names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988',
 #bind_rows binds the rows of each element in the list together
 #.id="survey"creates a new variable called "survey" and its values are the names of the list items. 
 
-names(ces.list)
-table(ces.list[["1984"]]$union_both)
-ces.list[["1984"]]
 
 library(haven)
 
@@ -608,6 +605,23 @@ ces %>%
 
 library(car)
 #To model party voting we need to create party vote dummy variables
+
+#This combines the NDP and Bloc into a left-vote 
+as_factor(ces$vote)
+ces %>% 
+  mutate(vote2=case_when(
+    vote==  1~"Liberal",
+    vote== 2~"Conservative",
+    vote== 3~"NDP", 
+    vote==  4~"BQ", 
+    vote== 5~"Green",
+    vote==  0~NA_character_
+  ))->ces
+ces$vote2<-factor(ces$vote2, levels=c("Conservative", "Liberal", "NDP", "BQ", "Green"))
+#ces$vote2<-Recode(as_factor(ces$vote), "'; ;1='Liberal' ; 2='Conservative' ; 3='Left' ; 5='Green'", levels=c('Conservative', 'Liberal', 'Left', 'Green'))
+table(ces$vote2, ces$election)
+levels(ces$vote2)
+
 ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
 ces$liberal<-Recode(ces$vote, "1=1; 2:5=0; NA=NA")
 ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
@@ -680,6 +694,21 @@ table(ces$working_class, ces$election)
 table(ces$working_class2, ces$election)
 table(ces$working_class3, ces$election)
 table(ces$working_class4, ces$election)
+
+#Create variables
+ces$left<-Recode(ces$vote, "1=1; 3=1; 5=1; 0=0; 2=0; 4=0; else=NA")
+
+table(ces$left, ces$election)
+table(ces$ndp, ces$election)
+ces$right<-Recode(ces$vote, "2=1; 0=0; 1=0; 3:5=0; else=NA")
+table(ces$right, ces$election)
+val_labels(ces$right)<-c(Right=1, Other=0)
+ces$upper_class<-Recode(ces$occupation, "1:2=1; 3:5=0; else=NA")
+table(ces$upper_class)
+ces$upper_class2<-Recode(ces$occupation3, "1:2=1; 3:6=0; else=NA")
+table(ces$upper_class2)
+
+table(ces$employment, ces$election)
 
 #### Set Theme ####
 theme_set(theme_bw())
