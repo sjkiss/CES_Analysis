@@ -90,7 +90,7 @@ ces %>%
   summarise_all(function(x) sum(is.na(x))) %>% 
   View()
 
-#------------------------------------------------------------------------------------------------
+
 #### Basic party models ####
 
 # NDP 1965-2019
@@ -161,7 +161,7 @@ stargazer(conservative_models_2$model, type="html", out=here("Tables", "conserva
 
 # NDP 1979-2019 + Leadership
 ces %>% 
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  filter(election>1980&election!=2000) %>%
   nest(variables=-election) %>% 
   mutate(model=map(variables, function(x) lm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+ndp_leaders+liberal_leaders+conservative_leaders, data=x)),
          tidied=map(model, tidy), vote=rep('NDP', nrow(.)))->ndp_models_6
@@ -171,8 +171,9 @@ stargazer(ndp_models_6$model, type="html", out=here("Tables", "NDP_Models_1979_2
           star.cutoffs=c(0.05), title="NDP Models leadership 1979-2019", notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 # Liberal 1979-2019 + Leadership
+
 ces %>% 
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  filter(election>1980&election!=2000) %>%
   nest(variables=-election) %>% 
   mutate(model=map(variables, function(x) lm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+ndp_leaders+liberal_leaders+conservative_leaders, data=x)),
          tidied=map(model, tidy), vote=rep('Liberal', nrow(.)))->liberal_models_6
@@ -183,7 +184,7 @@ stargazer(liberal_models_6$model, type="html", out=here("Tables", "liberal_Model
 
 # Conservative 1979-2019 + Leadership
 ces %>% 
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  filter(election>1980&election!=2000) %>%
   nest(variables=-election) %>% 
   mutate(model=map(variables, function(x) lm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+ndp_leaders+liberal_leaders+conservative_leaders, data=x)),
          tidied=map(model, tidy), vote=rep('Conservative', nrow(.)))->conservative_models_6
@@ -365,7 +366,7 @@ map(multinoms2, function(x) rep(nrow(x$fitted.values), 3)) %>%
   unlist()->n_obs
 stargazer(multinoms2, digits=2, single.row=T, out=here("Tables", "multinoms_1979_2019.html"), type="html", title="Multinomial Logistic Regression of Party Vote On Class, 1979-2019", add.lines=list(c("N", n_obs)))
 
-#------------------------------------------------------------------------------------------------
+
 #### Redistribution models ####
 
 table(ces$pro_redistribution, ces$election)
@@ -465,7 +466,7 @@ stargazer(ndp_QC_redistribution_models_2$model, column.labels=c("1988", "1993", 
 stargazer(conservative_ROC_redistribution_models_2$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_ROC_redistribution_inter_models_2.html"))
 stargazer(conservative_QC_redistribution_models_2$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_QC_redistribution_inter_models_2.html"))
 
-#------------------------------------------------------------------------------------------------
+
 #### Redistribution descriptives ####
 
 ces %>% 
@@ -593,7 +594,6 @@ ces %>%
   as.data.frame() %>%
   stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro_redistribution_Working_Class_Vote_by_election.html"))
 
-#------------------------------------------------------------------------------------------------
 #### Working Class descriptives ####
 
 #Share of Working class voting NDP
@@ -699,7 +699,6 @@ ces %>%
   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Conservative Voter % that are Working Class")
 ggsave(here("Plots", "Con_Voters_Working_Class_Percent.png"))
 
-#------------------------------------------------------------------------------------------------
 #### Market vs Moral descriptive graphs ####
 
 #Redistribution
@@ -1001,7 +1000,7 @@ ces %>%
   labs(title="Share of Anti-Quebec Accommodation Working Class voting for parties over time", x="Year", y="Percent")
 ggsave(here("Plots", "Party_shares_quebec_accom_WC_vote.png"))
 
-#-------------------------------------------------------------------------------------------------
+
 #### Variable descriptives - mean ratings ####
 
 #By class entire sample
@@ -1123,7 +1122,7 @@ ces %>%
   summarize(avg_age=mean(authoritarianism, na.rm=T)) %>% 
   ggplot(., aes(x=election, y=avg_age))+geom_point()+labs(title="Average authoritarian preference of WC respondents in ces studies")
 
-#-------------------------------------------------------------------------------------------------
+
 #### Natural vs Unnatural voting ####
 
 #Create variables
@@ -1341,7 +1340,7 @@ ces %>%
 stargazer(unnatmodel4$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "unnatural_model4.html"))
 stargazer(natmodel4$model, column.labels=c("1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "natural_model4.html"))
 
-#------------------------------------------------------------------------------------------------
+
 #### Class Voting ####
 #M1 NDP class - basic
 ces %>% 

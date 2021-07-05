@@ -1,5 +1,5 @@
 #File to Recode 1979 CES Data for 1979 election
-
+library(cesdata)
 #load data
 data("ces7980")
 
@@ -189,6 +189,7 @@ table(ces7980$liberal_leader)
 
 #recode conservative leader (V1264)
 look_for(ces7980, "Clark")
+
 ces7980$conservative_leader<-Recode(ces7980$V1264, "0=NA")
 #checks
 table(ces7980$conservative_leader)
