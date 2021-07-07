@@ -488,74 +488,87 @@ ces %>%
 ces %>% 
   filter(election>2003)->ces.5
 
-m1<-glm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.1, family="binomial")
-m2<-glm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.1, family="binomial")
-m3<-glm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.1, family="binomial")
+# 1965-2019
+m1<-lm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.1, family="binomial")
+m2<-lm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.1, family="binomial")
+m3<-lm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.1, family="binomial")
 
-m4<-glm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4), data=ces.2, family="binomial")
-m5<-glm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4), data=ces.2, family="binomial")
-m6<-glm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4), data=ces.2, family="binomial")
+# 1979-2019
+m4<-lm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4), data=ces.2, family="binomial")
+m5<-lm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4), data=ces.2, family="binomial")
+m6<-lm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4), data=ces.2, family="binomial")
 
-m7<-glm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4), data=ces.3, family="binomial")
-m8<-glm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4), data=ces.3, family="binomial")
-m9<-glm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4), data=ces.3, family="binomial")
+# 1988-2019
+m7<-lm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4), data=ces.3, family="binomial")
+m8<-lm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4), data=ces.3, family="binomial")
+m9<-lm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4), data=ces.3, family="binomial")
 
 #Pre-2004 Degree
 
-m37<-glm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.4, family="binomial")
-m38<-glm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.4, family="binomial")
-m39<-glm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.4, family="binomial")
+m37<-lm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.4, family="binomial")
+m38<-lm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.4, family="binomial")
+m39<-lm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.4, family="binomial")
 
 #Post-2004 Degree
 
-m40<-glm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.5, family="binomial")
-m41<-glm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.5, family="binomial")
-m42<-glm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.5, family="binomial")
+m40<-lm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.5, family="binomial")
+m41<-lm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.5, family="binomial")
+m42<-lm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.5, family="binomial")
 
 stargazer(m1, m2, m3, m4, m5, m6, m7, m8, m9, type="html", out=here("Tables", "Pooled_models.html"))
 stargazer(m37, m38, m39, m40, m41, m42, type="html", out=here("Tables", "Pooled_models_degree.html"), column.labels = c('1965-1997', '1965-1997', '1965-1997', '2004-2019','2004-2019', '2004-2019'))
 
-m10<-glm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2, data=ces.3, family="binomial")
-m11<-glm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2, data=ces.3, family="binomial")
-m12<-glm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2, data=ces.3, family="binomial")
+# 1988-2019 attitudinal models
+m10<-lm(ndp~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.3, family="binomial")
+m11<-lm(liberal~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.3, family="binomial")
+m12<-lm(conservative~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.3, family="binomial")
 
-m13<-glm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:redistribution, data=ces.3, family="binomial")
-m14<-glm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:redistribution, data=ces.3, family="binomial")
-m15<-glm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:redistribution, data=ces.3, family="binomial")
+m13<-lm(ndp~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.3, family="binomial")
+m14<-lm(liberal~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.3, family="binomial")
+m15<-lm(conservative~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.3, family="binomial")
 
-m16<-glm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:traditionalism2, data=ces.3, family="binomial")
-m17<-glm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:traditionalism2, data=ces.3, family="binomial")
-m18<-glm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:traditionalism2, data=ces.3, family="binomial")
+m16<-lm(ndp~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:traditionalism2, data=ces.3, family="binomial")
+m17<-lm(liberal~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:traditionalism2, data=ces.3, family="binomial")
+m18<-lm(conservative~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:traditionalism2, data=ces.3, family="binomial")
 
-stargazer(m10, m11, m12, m13, m14, m15, m16, m17, m18, type="html", out=here("Tables", "Pooled_models_1988_2019.html"))
+stargazer(m10, m11, m12, m13, m14, m15, m16, m17, m18, type="html", out=here("Tables", "Pooled_attitudinal_models_1988_2019.html"))
 
-m19<-glm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2, data=ces.4, family="binomial")
-m20<-glm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2, data=ces.4, family="binomial")
-m21<-glm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2, data=ces.4, family="binomial")
+m19<-lm(ndp~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.4, family="binomial")
+m20<-lm(liberal~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.4, family="binomial")
+m21<-lm(conservative~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.4, family="binomial")
 
-m22<-glm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:redistribution, data=ces.4, family="binomial")
-m23<-glm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:redistribution, data=ces.4, family="binomial")
-m24<-glm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:redistribution, data=ces.4, family="binomial")
+m22<-lm(ndp~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.4, family="binomial")
+m23<-lm(liberal~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.4, family="binomial")
+m24<-lm(conservative~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.4, family="binomial")
 
-m25<-glm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:traditionalism2, data=ces.4, family="binomial")
-m26<-glm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:traditionalism2, data=ces.4, family="binomial")
-m27<-glm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:traditionalism2, data=ces.4, family="binomial")
+m25<-lm(ndp~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:traditionalism2, data=ces.4, family="binomial")
+m26<-lm(liberal~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:traditionalism2, data=ces.4, family="binomial")
+m27<-lm(conservative~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:traditionalism2, data=ces.4, family="binomial")
 
-stargazer(m19, m20, m21, m22, m23, m24, m25, m26, m27, type="html", out=here("Tables", "Pooled_models_1988_1997.html"))
+stargazer(m19, m20, m21, m22, m23, m24, m25, m26, m27, type="html", out=here("Tables", "Pooled_attitudinal_models_1988_1997.html"))
 
-m28<-glm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2, data=ces.5, family="binomial")
-m29<-glm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2, data=ces.5, family="binomial")
-m30<-glm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2, data=ces.5, family="binomial")
+m28<-lm(ndp~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.5, family="binomial")
+m29<-lm(liberal~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.5, family="binomial")
+m30<-lm(conservative~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.5, family="binomial")
 
-m31<-glm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:redistribution, data=ces.5, family="binomial")
-m32<-glm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:redistribution, data=ces.5, family="binomial")
-m33<-glm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:redistribution, data=ces.5, family="binomial")
+m31<-lm(ndp~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.5, family="binomial")
+m32<-lm(liberal~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.5, family="binomial")
+m33<-lm(conservative~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.5, family="binomial")
 
-m34<-glm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:traditionalism2, data=ces.5, family="binomial")
-m35<-glm(liberal~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:traditionalism2, data=ces.5, family="binomial")
-m36<-glm(conservative~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+degree:traditionalism2, data=ces.5, family="binomial")
+m34<-lm(ndp~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:traditionalism2, data=ces.5, family="binomial")
+m35<-lm(liberal~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:traditionalism2, data=ces.5, family="binomial")
+m36<-lm(conservative~as.factor(region2)+age+male+as.factor(religion2)+degree+income+as.factor(occupation4)+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:traditionalism2, data=ces.5, family="binomial")
 
-stargazer(m29, m29, m30, m31, m32, m33, m34, m35, m36, type="html", out=here("Tables", "Pooled_models_2004_2019.html"))
+stargazer(m29, m29, m30, m31, m32, m33, m34, m35, m36, type="html", out=here("Tables", "Pooled_attitudinal_models_2004_2019.html"))
+
+stargazer(m19, m28, m22, m31, m25, m34, type="html", out=here("Tables", "NDP_Pooled_Models.html"), column.labels = c('1988-1997', '2004-2019', '1988-1997', '2004-2019', '1988-1997', '2004-2019'))
+stargazer(m20, m29, m23, m32, m26, m35, type="html", out=here("Tables", "Liberal_Pooled_Models.html"), column.labels = c('1988-1997', '2004-2019', '1988-1997', '2004-2019', '1988-1997', '2004-2019'))
+stargazer(m21, m30, m24, m33, m27, m36, type="html", out=here("Tables", "Conservative_Pooled_Models.html"), column.labels = c('1988-1997', '2004-2019', '1988-1997', '2004-2019', '1988-1997', '2004-2019'))
+
+#Without controls displaying
+stargazer(m19, m28, m22, m31, m25, m34, type="html", out=here("Tables", "NDP_Pooled_Models_2.html"), omit=c(1,2,3,4,5,6,7,8), column.labels = c('1988-1997', '2004-2019', '1988-1997', '2004-2019', '1988-1997', '2004-2019'))
+stargazer(m20, m29, m23, m32, m26, m35, type="html", out=here("Tables", "Liberal_Pooled_Models_2.html"), omit=c(1,2,3,4,5,6,7,8), column.labels = c('1988-1997', '2004-2019', '1988-1997', '2004-2019', '1988-1997', '2004-2019'))
+stargazer(m21, m30, m24, m33, m27, m36, type="html", out=here("Tables", "Conservative_Pooled_Models_2.html"), omit=c(1,2,3,4,5,6,7,8), column.labels = c('1988-1997', '2004-2019', '1988-1997', '2004-2019', '1988-1997', '2004-2019'))
 
 #### Multinomial Models (Big 3 parties) ####
 # 1965-2019
