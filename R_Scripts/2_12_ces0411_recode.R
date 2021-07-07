@@ -580,6 +580,59 @@ ces0411$quebec_accom04<-Recode(ces0411$ces04_CPS_F9, "1=0; 2=0.25; 3=0.5; 4=0.75
 #checks
 table(ces0411$quebec_accom04)
 
+#recode Liberal leader (ces04_PES_F2 & ces04_CPS_G2)
+look_for(ces0411, "Martin")
+ces0411$liberal_leader04<-Recode(ces0411$ces04_CPS_G2, "0=1; 996:999=NA")
+#checks
+table(ces0411$liberal_leader04)
+
+#recode conservative leader (ces04_PES_F1 & ces04_CPS_G1)
+look_for(ces0411, "Harper")
+ces0411$conservative_leader04<-Recode(ces0411$ces04_CPS_G1, "0=1; 996:999=NA")
+#checks
+table(ces0411$conservative_leader04)
+
+#recode NDP leader (ces04_PES_F3 & ces04_CPS_G3)
+look_for(ces0411, "Layton")
+ces0411$ndp_leader04<-Recode(ces0411$ces04_CPS_G3, "0=1; 996:999=NA")
+#checks
+table(ces0411$ndp_leader04)
+
+#recode Bloc leader (ces04_PES_F4 & ces04_CPS_G4)
+look_for(ces0411, "Duceppe")
+ces0411$bloc_leader04<-Recode(ces0411$ces04_CPS_G4, "0=1; 996:999=NA")
+#checks
+table(ces0411$bloc_leader04)
+
+#recode liberal rating (ces04_PES_C1B & ces04_CPS_G8)
+look_for(ces0411, "liberal")
+ces0411$liberal_rating04<-Recode(ces0411$ces04_CPS_G8, "0=1; 996:999=NA")
+#checks
+table(ces0411$liberal_rating04)
+
+#recode conservative rating (ces04_PES_C1A & ces04_CPS_G7)
+look_for(ces0411, "conservative")
+ces0411$conservative_rating04<-Recode(ces0411$ces04_CPS_G7, "0=1; 996:999=NA")
+#checks
+table(ces0411$conservative_rating04)
+
+#recode NDP rating (ces04_PES_C1C & ces04_CPS_G9)
+look_for(ces0411, "new democratic")
+ces0411$ndp_rating04<-Recode(ces0411$ces04_CPS_G9, "0=1; 996:999=NA")
+#checks
+table(ces0411$ndp_rating04)
+
+#recode Bloc rating (ces04_PES_C1E & ces04_CPS_G10)
+look_for(ces0411, "bloc")
+ces0411$bloc_rating04<-Recode(ces0411$ces04_CPS_G10, "0=1; 996:999=NA")
+#checks
+table(ces0411$bloc_rating04)
+
+#recode Green rating (ces04_CPS_G11)
+look_for(ces0411, "green")
+ces0411$green_rating04<-Recode(ces0411$ces04_CPS_G11, "0=1; 996:999=NA")
+#checks
+table(ces0411$green_rating04)
 
 ###Recode 2006 2nd ####
 
@@ -1173,6 +1226,60 @@ look_for(ces0411, "quebec")
 ces0411$quebec_accom06<-Recode(ces0411$ces06_CPS_F7, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA")
 #checks
 table(ces0411$quebec_accom06)
+
+#recode Liberal leader (ces06_PES_F2 & ces06_CPS_G2)
+look_for(ces0411, "Martin")
+ces0411$liberal_leader06<-Recode(ces0411$ces06_CPS_G2, "0=1; 996:999=NA")
+#checks
+table(ces0411$liberal_leader06)
+
+#recode conservative leader (ces06_PES_F1 & ces06_CPS_G1)
+look_for(ces0411, "Harper")
+ces0411$conservative_leader06<-Recode(ces0411$ces06_CPS_G1, "0=1; 996:999=NA")
+#checks
+table(ces0411$conservative_leader06)
+
+#recode NDP leader (ces06_PES_F3 & ces06_CPS_G3)
+look_for(ces0411, "Layton")
+ces0411$ndp_leader06<-Recode(ces0411$ces06_CPS_G3, "0=1; 996:999=NA")
+#checks
+table(ces0411$ndp_leader06)
+
+#recode Bloc leader (ces06_PES_F4 & ces06_CPS_G4)
+look_for(ces0411, "Duceppe")
+ces0411$bloc_leader06<-Recode(ces0411$ces06_CPS_G4, "0=1; 996:999=NA")
+#checks
+table(ces0411$bloc_leader06)
+
+#recode liberal rating (ces06_PES_C1B & ces06_CPS_G8)
+look_for(ces0411, "liberal")
+ces0411$liberal_rating06<-Recode(ces0411$ces06_CPS_G8, "0=1; 996:999=NA")
+#checks
+table(ces0411$liberal_rating06)
+
+#recode conservative rating (ces06_PES_C1A & ces06_CPS_G7)
+look_for(ces0411, "conservative")
+ces0411$conservative_rating06<-Recode(ces0411$ces06_CPS_G7, "0=1; 996:999=NA")
+#checks
+table(ces0411$conservative_rating06)
+
+#recode NDP rating (ces06_PES_C1C & ces06_CPS_G9)
+look_for(ces0411, "new democratic")
+ces0411$ndp_rating06<-Recode(ces0411$ces06_CPS_G9, "0=1; 996:999=NA")
+#checks
+table(ces0411$ndp_rating06)
+
+#recode Bloc rating (ces06_PES_C1E & ces06_CPS_G10)
+look_for(ces0411, "bloc")
+ces0411$bloc_rating06<-Recode(ces0411$ces06_CPS_G10, "0=1; 996:999=NA")
+#checks
+table(ces0411$bloc_rating06)
+
+#recode Green rating (ces06_PES_C1F & ces06_CPS_G11)
+look_for(ces0411, "green")
+ces0411$green_rating06<-Recode(ces0411$ces06_CPS_G11, "0=1; 996:999=NA")
+#checks
+table(ces0411$green_rating06)
 
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
@@ -1816,6 +1923,65 @@ ces0411$quebec_accom08<-Recode(ces0411$ces08_PES_F7, "1=0; 2=0.25; 3=0.5; 4=0.75
 #checks
 table(ces0411$quebec_accom08)
 
+#recode Liberal leader (ces08_PES_F2 & ces08_CPS_G2)
+look_for(ces0411, "Dion")
+ces0411$liberal_leader08<-Recode(ces0411$ces08_CPS_G2, "0=1; 996:999=NA")
+#checks
+table(ces0411$liberal_leader08)
+
+#recode conservative leader (ces08_PES_F1 & ces08_CPS_G1)
+look_for(ces0411, "Harper")
+ces0411$conservative_leader08<-Recode(ces0411$ces08_CPS_G1, "0=1; 996:999=NA")
+#checks
+table(ces0411$conservative_leader08)
+
+#recode NDP leader (ces08_PES_F3 & ces08_CPS_G3)
+look_for(ces0411, "Layton")
+ces0411$ndp_leader08<-Recode(ces0411$ces08_CPS_G3, "0=1; 996:999=NA")
+#checks
+table(ces0411$ndp_leader08)
+
+#recode Bloc leader (ces08_PES_F4 & ces08_CPS_G4)
+look_for(ces0411, "Duceppe")
+ces0411$bloc_leader08<-Recode(ces0411$ces08_CPS_G4, "0=1; 996:999=NA")
+#checks
+table(ces0411$bloc_leader08)
+
+#recode Green leader (ces08_PES_F5 & ces08_CPS_G5)
+look_for(ces0411, "May")
+ces0411$green_leader08<-Recode(ces0411$ces08_CPS_G5, "0=1; 996:999=NA")
+#checks
+table(ces0411$green_leader08)
+
+#recode liberal rating (ces08_PES_C1B & ces08_CPS_G8)
+look_for(ces0411, "liberal")
+ces0411$liberal_rating08<-Recode(ces0411$ces08_CPS_G8, "0=1; 996:999=NA")
+#checks
+table(ces0411$liberal_rating08)
+
+#recode conservative rating (ces08_PES_C1A & ces08_CPS_G7)
+look_for(ces0411, "conservative")
+ces0411$conservative_rating08<-Recode(ces0411$ces08_CPS_G7, "0=1; 996:999=NA")
+#checks
+table(ces0411$conservative_rating08)
+
+#recode NDP rating (ces08_PES_C1C & ces08_CPS_G9)
+look_for(ces0411, "new democratic")
+ces0411$ndp_rating08<-Recode(ces0411$ces08_CPS_G9, "0=1; 996:999=NA")
+#checks
+table(ces0411$ndp_rating08)
+
+#recode Bloc rating (ces08_PES_C1E & ces08_CPS_G10)
+look_for(ces0411, "bloc")
+ces0411$bloc_rating08<-Recode(ces0411$ces08_CPS_G10, "0=1; 996:999=NA")
+#checks
+table(ces0411$bloc_rating08)
+
+#recode Green rating (ces08_PES_C1F & ces08_CPS_G11)
+look_for(ces0411, "green")
+ces0411$green_rating08<-Recode(ces0411$ces08_CPS_G11, "0=1; 996:999=NA")
+#checks
+table(ces0411$green_rating08)
 
 ####Recode 2011 4th ####
 
@@ -2294,3 +2460,63 @@ look_for(ces0411, "quebec")
 ces0411$quebec_accom11<-Recode(ces0411$PES11_44, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA")
 #checks
 table(ces0411$quebec_accom11)
+
+#recode Liberal leader (CPS11_24)
+look_for(ces0411, "Ignatieff")
+ces0411$liberal_leader11<-Recode(ces0411$CPS11_24, "0=1; 996:999=NA")
+#checks
+table(ces0411$liberal_leader11)
+
+#recode conservative leader (CPS11_23)
+look_for(ces0411, "Harper")
+ces0411$conservative_leader11<-Recode(ces0411$CPS11_23, "0=1; 996:999=NA")
+#checks
+table(ces0411$conservative_leader11)
+
+#recode NDP leader (CPS11_25)
+look_for(ces0411, "Layton")
+ces0411$ndp_leader11<-Recode(ces0411$CPS11_25, "0=1; 996:999=NA")
+#checks
+table(ces0411$ndp_leader11)
+
+#recode Bloc leader (CPS11_26)
+look_for(ces0411, "Duceppe")
+ces0411$bloc_leader11<-Recode(ces0411$CPS11_26, "0=1; 996:999=NA")
+#checks
+table(ces0411$bloc_leader11)
+
+#recode Green leader (CPS11_27)
+look_for(ces0411, "May")
+ces0411$green_leader11<-Recode(ces0411$CPS11_27, "0=1; 996:999=NA")
+#checks
+table(ces0411$green_leader11)
+
+#recode liberal rating (CPS11_19)
+look_for(ces0411, "liberal")
+ces0411$liberal_rating11<-Recode(ces0411$CPS11_19, "0=1; 996:999=NA")
+#checks
+table(ces0411$liberal_rating11)
+
+#recode conservative rating (CPS11_18)
+look_for(ces0411, "conservative")
+ces0411$conservative_rating11<-Recode(ces0411$CPS11_18, "0=1; 996:999=NA")
+#checks
+table(ces0411$conservative_rating11)
+
+#recode NDP rating (CPS11_20)
+look_for(ces0411, "new democratic")
+ces0411$ndp_rating11<-Recode(ces0411$CPS11_20, "0=1; 996:999=NA")
+#checks
+table(ces0411$ndp_rating11)
+
+#recode Bloc rating (CPS11_21)
+look_for(ces0411, "bloc")
+ces0411$bloc_rating11<-Recode(ces0411$CPS11_21, "0=1; 996:999=NA")
+#checks
+table(ces0411$bloc_rating11)
+
+#recode Green rating (CPS11_22)
+look_for(ces0411, "green")
+ces0411$green_rating11<-Recode(ces0411$CPS11_22, "0=1; 996:999=NA")
+#checks
+table(ces0411$green_rating11)

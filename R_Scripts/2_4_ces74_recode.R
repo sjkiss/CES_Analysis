@@ -162,4 +162,40 @@ val_labels(ces74$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middl
 val_labels(ces74$religiosity)
 table(ces74$religiosity)
 
+#recode Liberal leader (V188)
+look_for(ces74, "Trudeau")
+ces74$liberal_leader<-Recode(ces74$V188, "0=NA")
+#checks
+table(ces74$liberal_leader)
+
+#recode conservative leader (V191)
+look_for(ces74, "Stanfield")
+ces74$conservative_leader<-Recode(ces74$V191, "0=NA")
+#checks
+table(ces74$conservative_leader)
+
+#recode NDP leader (V194)
+look_for(ces74, "Lewis")
+ces74$ndp_leader<-Recode(ces74$V194, "0=NA")
+#checks
+table(ces74$ndp_leader)
+
+#recode liberal rating (V190)
+look_for(ces74, "therm")
+ces74$liberal_rating<-Recode(ces74$V190, "0=NA")
+#checks
+table(ces74$liberal_rating)
+
+#recode conservative rating (V193)
+look_for(ces74, "therm")
+ces74$conservative_rating<-Recode(ces74$V193, "0=NA")
+#checks
+table(ces74$conservative_rating)
+
+#recode NDP rating (V196)
+look_for(ces74, "therm")
+ces74$ndp_rating<-Recode(ces74$V196, "0=NA")
+#checks
+table(ces74$ndp_rating)
+
 names(ces74)

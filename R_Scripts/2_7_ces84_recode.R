@@ -200,3 +200,21 @@ val_labels(ces84$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middl
 #checks
 val_labels(ces84$religiosity)
 table(ces84$religiosity)
+
+#recode Liberal leader (VAR301)
+look_for(ces84, "Turner")
+ces84$liberal_leader<-Recode(ces84$VAR301, "0=1; 997:999=NA")
+#checks
+table(ces84$liberal_leader)
+
+#recode conservative leader (VAR302)
+look_for(ces84, "Mulroney")
+ces84$conservative_leader<-Recode(ces84$VAR302, "0=1; 997:999=NA")
+#checks
+table(ces84$conservative_leader)
+
+#recode NDP leader (VAR303)
+look_for(ces84, "Broadbent")
+ces84$ndp_leader<-Recode(ces84$VAR303, "0=1; 997:999=NA")
+#checks
+table(ces84$ndp_leader)

@@ -487,3 +487,39 @@ look_for(ces88, "quebec")
 ces88$quebec_accom<-Recode(ces88$qa9, "1=1; 2=0; 3=0.5; 8=0.5; else=NA")
 #checks
 table(ces88$quebec_accom)
+
+#recode Liberal leader (xe2b)
+look_for(ces88, "Turner")
+ces88$liberal_leader<-Recode(ces88$xe2b, "0=1; 997:999=NA")
+#checks
+table(ces88$liberal_leader)
+
+#recode conservative leader (xe2a)
+look_for(ces88, "Mulroney")
+ces88$conservative_leader<-Recode(ces88$xe2a, "0=1; 997:999=NA")
+#checks
+table(ces88$conservative_leader)
+
+#recode NDP leader (xe2c)
+look_for(ces88, "Broadbent")
+ces88$ndp_leader<-Recode(ces88$xe2c, "0=1; 997:999=NA")
+#checks
+table(ces88$ndp_leader)
+
+#recode liberal rating (xe2e)
+look_for(ces88, "liberal")
+ces88$liberal_rating<-Recode(ces88$xe2e, "0=1; 997:999=NA")
+#checks
+table(ces88$liberal_rating)
+
+#recode conservative rating (xe2d)
+look_for(ces88, "conservative")
+ces88$conservative_rating<-Recode(ces88$xe2d, "0=1; 997:999=NA")
+#checks
+table(ces88$conservative_rating)
+
+#recode NDP rating (xe2f)
+look_for(ces88, "new democratic")
+ces88$ndp_rating<-Recode(ces88$xe2f, "0=1; 997:999=NA")
+#checks
+table(ces88$ndp_rating)

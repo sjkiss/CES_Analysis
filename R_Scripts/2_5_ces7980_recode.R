@@ -1,5 +1,5 @@
 #File to Recode 1979 CES Data for 1979 election
-
+library(cesdata)
 #load data
 data("ces7980")
 
@@ -181,6 +181,43 @@ val_labels(ces7980$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Mid
 val_labels(ces7980$religiosity)
 table(ces7980$religiosity)
 
+#recode Liberal leader (V1261)
+look_for(ces7980, "Trudeau")
+ces7980$liberal_leader<-Recode(ces7980$V1261, "0=NA")
+#checks
+table(ces7980$liberal_leader)
+
+#recode conservative leader (V1264)
+look_for(ces7980, "Clark")
+
+ces7980$conservative_leader<-Recode(ces7980$V1264, "0=NA")
+#checks
+table(ces7980$conservative_leader)
+
+#recode NDP leader (V1267)
+look_for(ces7980, "Broadbent")
+ces7980$ndp_leader<-Recode(ces7980$V1267, "0=NA")
+#checks
+table(ces7980$ndp_leader)
+
+#recode liberal rating (V1263)
+look_for(ces7980, "therm")
+ces7980$liberal_rating<-Recode(ces7980$V1263, "0=NA")
+#checks
+table(ces7980$liberal_rating)
+
+#recode conservative rating (V1266)
+look_for(ces7980, "therm")
+ces7980$conservative_rating<-Recode(ces7980$V1266, "0=NA")
+#checks
+table(ces7980$conservative_rating)
+
+#recode NDP rating (V1269)
+look_for(ces7980, "therm")
+ces7980$ndp_rating<-Recode(ces7980$V1269, "0=NA")
+#checks
+table(ces7980$ndp_rating)
+
 #--------------------------------------------------------------------------------------------------------------------
 ####1980
 #recode Gender (V2156)
@@ -261,6 +298,42 @@ val_labels(ces7980$vote80)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4,
 val_labels(ces7980$vote80)
 table(ces7980$vote80)
 table(ces7980$vote, ces7980$vote80)
+
+#recode Liberal leader (V2080)
+look_for(ces7980, "Trudeau")
+ces7980$liberal_leader80<-Recode(ces7980$V2080, "0=NA")
+#checks
+table(ces7980$liberal_leader80)
+
+#recode conservative leader (V2083)
+look_for(ces7980, "Clark")
+ces7980$conservative_leader80<-Recode(ces7980$V2083, "0=NA")
+#checks
+table(ces7980$conservative_leader80)
+
+#recode NDP leader (V2086)
+look_for(ces7980, "Broadbent")
+ces7980$ndp_leader80<-Recode(ces7980$V2086, "0=NA")
+#checks
+table(ces7980$ndp_leader80)
+
+#recode liberal rating (V2082)
+look_for(ces7980, "therm")
+ces7980$liberal_rating80<-Recode(ces7980$V2082, "0=NA")
+#checks
+table(ces7980$liberal_rating80)
+
+#recode conservative rating (V2085)
+look_for(ces7980, "therm")
+ces7980$conservative_rating80<-Recode(ces7980$V2085, "0=NA")
+#checks
+table(ces7980$conservative_rating80)
+
+#recode NDP rating (V2088)
+look_for(ces7980, "therm")
+ces7980$ndp_rating80<-Recode(ces7980$V2088, "0=NA")
+#checks
+table(ces7980$ndp_rating80)
 
 ##### See the script 1_master_file.R There I turned the values for the 79 variables into 1980 variables for the 1980 respondents
 # No Occupation variable
