@@ -487,9 +487,9 @@ ces %>%
 ces %>% 
   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000)->ces.3
 ces %>% 
-  filter(election<1998)->ces.4
+  filter(election<1998 &election> 1984)->ces.4
 ces %>% 
-  filter(election>2003)->ces.5
+  filter(election>2003 )->ces.5
 
 # 1965-2019
 m1<-lm(ndp~as.factor(region2)+age+male+degree+income+as.factor(religion2)+as.factor(occupation2), data=ces.1, family="binomial")
@@ -695,23 +695,6 @@ table(ces$working_class, ces$election)
 table(ces$working_class4, ces$election)
 library(knitr)
 library(kableExtra)
-
-# ces93$working_class<-Recode(ces93$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
-# ces97$working_class<-Recode(ces97$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
-# ces0411$working_class04<-Recode(ces0411$occupation04, "4:5=1; 3=0; 2=0; 1=0; else=NA")
-# ces0411$working_class06<-Recode(ces0411$occupation06, "4:5=1; 3=0; 2=0; 1=0; else=NA")
-# ces0411$working_class08<-Recode(ces0411$occupation08, "4:5=1; 3=0; 2=0; 1=0; else=NA")
-# ces0411$working_class11<-Recode(ces0411$occupation11, "4:5=1; 3=0; 2=0; 1=0; else=NA")
-# ces15phone$working_class<-Recode(ces15phone$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
-# ces19phone$working_class<-Recode(ces19phone$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
-table(ces93$working_class)
-table(ces97$working_class)
-table(ces0411$working_class04)
-table(ces0411$working_class06)
-table(ces0411$working_class08)
-table(ces0411$working_class11)
-table(ces15phone$working_class)
-table(ces19phone$working_class)
 
 #M1 NDP ROC
 ces %>% 
@@ -2240,34 +2223,30 @@ ces %>%
 #### Average Scores For Working Class Versus Average ####
 
 ces %>% 
-  select(election,  working_class4, vote, crime, redistribution, immigration_rates, market_liberalism,traditionalism2, enviro) %>%
-  rename(`Crime`=`crime`,Redistribution=redistribution, `Immigration Rates`=immigration_rates, `Market Liberalism`=market_liberalism, `Moral Traditionalism`=traditionalism2, Environmentalism=enviro) %>% 
+  select(election,  working_class4, degree, redistribution, immigration_rates, market_liberalism,traditionalism2) %>%
+  rename(Redistribution=redistribution, `Immigration Rates`=immigration_rates, `Market Liberalism`=market_liberalism, `Moral Traditionalism`=traditionalism2) %>% 
   mutate(Redistribution=skpersonal::revScale(Redistribution, reverse=T)) %>% 
-  pivot_longer(cols=4:9) %>% 
-  #filter(election>1984 &election!=2000) %>% 
-  group_by(election, working_class4, name) %>% 
-  summarize(average=mean(value, na.rm=T)) %>% 
-  arrange(election, name, working_class4) %>%
-  group_by(election, name) %>%
-  mutate(difference=average-lag(average)) ->average_views_scores
-table(ces$election, ces$working_class4)
-
-average_views_scores %>% 
-  filter(working_class4==1& election> 1984) %>%
-  ggplot(., aes(y=election, x=difference))+geom_point()+facet_grid(~fct_relevel(name, "Crime", "Immigration Rates", "Moral Traditionalism", "Market Liberalism", "Redistribution"))+theme(axis.text.x=element_text(angle=90))+labs(caption="Score above 0 means working class has more conservative views than the rest of thep opulation.")+scale_y_discrete(limits=rev)+xlim(c(-0.15,0.15))+geom_vline(xintercept=0, linetype=2)
-average_views_scores %>% 
-  ungroup() %>% 
-  mutate(working_class4=recode_factor(working_class4, "0"="Other", "1"="Working Class")) %>% 
-  rename(`Working Class`=working_class4) %>%
+  pivot_longer(cols=4:7) %>% 
+  pivot_longer(cols=2:3, names_to="Variable", values_to="Group") %>% 
   filter(election>1984 &election!=2000) %>% 
-  ggplot(., aes(y=election, x=average, col=`Working Class`))+geom_point()+facet_wrap(~fct_relevel(name, "Crime", "Immigration Rates", "Moral Traditionalism", "Market Liberalism", "Redistribution"), nrow=2)+theme(axis.text.x=element_text(angle=90))+scale_y_discrete(limits=rev)+
-  geom_vline(xintercept=0.5, linetype=2)+scale_color_grey(start=0.8, end=0.2, name="Class")+labs(y="Election", x="Average")
-ggsave(here("Plots", "average_scores_raw_class_population.png"), width=6, height=4)
+  group_by(election, Variable, Group, name) %>% 
+  summarize(average=mean(value, na.rm=T)) %>% 
+  arrange(election, Variable, name, Group) %>%
+  filter(!is.na(Group)) %>% 
+  group_by(election, name) %>% 
+  mutate(Variable=recode_factor(Variable, "degree"="Degree", "working_class4"="Class")) %>% 
+  mutate(Group=case_when(
+    Variable=="Degree" & Group==0 ~ "No Degree",
+    Variable=="Degree"& Group== 1 ~ "Degree",
+    Variable=="Class" & Group==0 ~ "Non Working Class",
+    Variable=="Class" & Group==1 ~ "Working Class"
+  )) %>% 
+#filter(Group!="No Degree" & Group!="Non Working Class") %>% 
+  ggplot(., aes(y=election, x=average, group=Variable, col=`Group`))+geom_point()+facet_wrap(Variable~fct_relevel(name, "Immigration Rates","Moral Traditionalism", "Market Liberalism", "Redistribution"), nrow=2)+theme(axis.text.x=element_text(angle=90))+scale_y_discrete(limits=rev)+scale_color_manual(values=rep(c('grey', 'black'),2))+
+  geom_vline(xintercept=0.5, linetype=2)+labs(y="Election", x="Average")
+ggsave(here("Plots", "average_scores_raw_class_degree_population.png"), width=10, height=4)
 
 
-table(ces$election, ces$quebec_accommodation)
-table(ces$election, ces$quebec_accom)
-names(ces)
 ces %>% 
   select(election, vote2, degree, income) %>% 
   group_by(election, degree, vote2) %>%  
