@@ -106,6 +106,11 @@ table(ces$quebec_accom, ces$election)
 ces$quebec_accommodation<-Recode(ces$quebec_accom, "0:0.25=0; 0.75:1=1; else=NA")
 table(ces$quebec_accommodation, ces$election)
 
+#Recode educat = education
+table(ces$education, ces$election)
+ces$educat<-Recode(ces$education, "0:0.25=0; 0.75:1=1; else=NA")
+table(ces$educat, ces$election)
+
 #By election
 summary(ces)
 
@@ -1318,6 +1323,31 @@ ces %>%
   scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
   labs(title="Share of Anti-Quebec Accommodation Working Class voting for parties over time", x="Year", y="Percent")
 ggsave(here("Plots", "Party_shares_quebec_accom_WC_vote.png"))
+
+#Education
+ces %>% 
+  group_by(election, educat, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(educat==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Pro-Education voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_education_vote.png"))
+
+ces %>% 
+  group_by(election, educat, working_class3, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)*100) %>%
+  filter(educat==1 & working_class3==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
+  geom_point()+
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Pro-Education Working Class voting for parties over time", x="Year", y="Percent")
+ggsave(here("Plots", "Party_shares_education_WC_vote.png"))
 
 #-------------------------------------------------------------------------------------------------
 #### Variable descriptives - mean ratings ####

@@ -487,3 +487,9 @@ look_for(ces88, "quebec")
 ces88$quebec_accom<-Recode(ces88$qa9, "1=1; 2=0; 3=0.5; 8=0.5; else=NA")
 #checks
 table(ces88$quebec_accom)
+
+#recode Education (qb1)
+look_for(ces88, "edu")
+ces88$education<-Recode(ces88$qb1, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
+#checks
+table(ces88$education, ces88$qb1 , useNA = "ifany" )

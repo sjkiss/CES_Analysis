@@ -290,6 +290,8 @@ ces04 %>%
   rename(quebec_accom=quebec_accom04)->ces04
 ces04 %>% 
   rename(religiosity=religiosity04)->ces04
+ces04 %>% 
+  rename(education=education04)->ces04
 table(ces04$survey, ces04$non_charter_language)
 
 #### Rename CES06 ####
@@ -353,6 +355,8 @@ ces06 %>%
   rename(quebec_accom=quebec_accom06)->ces06
 ces06 %>% 
   rename(religiosity=religiosity06)->ces06
+ces06 %>% 
+  rename(education=education06)->ces06
 table(ces06$survey, ces06$non_charter_language)
 
 #### Rename CES08 ####
@@ -416,6 +420,8 @@ ces08 %>%
   rename(quebec_accom=quebec_accom08)->ces08
 ces08 %>% 
   rename(religiosity=religiosity08)->ces08
+ces08 %>% 
+  rename(education=education08)->ces08
 table(ces08$survey, ces08$non_charter_language)
 
 #### Rename CES11 ####
@@ -479,6 +485,8 @@ ces11 %>%
   rename(quebec_accom=quebec_accom11)->ces11
 ces11 %>% 
   rename(religiosity=religiosity11)->ces11
+ces11 %>% 
+  rename(education=education11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -563,7 +571,7 @@ ces %>%
           "religiosity",
           "election", "size", "redistribution", "pro_redistribution",
           "market_liberalism", "traditionalism", "traditionalism2", "immigration_rates", "enviro", "death_penalty", 
-          "crime", "gay_rights", "abortion", "authoritarianism", "quebec_accom") )-> ces
+          "crime", "gay_rights", "abortion", "authoritarianism", "quebec_accom", "education",) )-> ces
 ##
 
 library(stringr)

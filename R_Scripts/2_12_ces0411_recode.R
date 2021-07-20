@@ -580,6 +580,12 @@ ces0411$quebec_accom04<-Recode(ces0411$ces04_CPS_F9, "1=0; 2=0.25; 3=0.5; 4=0.75
 #checks
 table(ces0411$quebec_accom04)
 
+#### recode Education (ces04_PES_D1D)#### 
+look_for(ces0411, "edu")
+ces0411$education04<-Recode(ces0411$ces04_PES_D1D, "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
+#checks
+table(ces0411$education04, ces0411$ces04_PES_D1D , useNA = "ifany" )
+
 
 ###Recode 2006 2nd ####
 
@@ -1173,6 +1179,12 @@ look_for(ces0411, "quebec")
 ces0411$quebec_accom06<-Recode(ces0411$ces06_CPS_F7, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA")
 #checks
 table(ces0411$quebec_accom06)
+
+#### recode Education (ces06_PES_D1D)#### 
+look_for(ces0411, "edu")
+ces0411$education06<-Recode(ces0411$ces06_PES_D1D, "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
+#checks
+table(ces0411$education06, ces0411$ces06_PES_D1D , useNA = "ifany" )
 
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
@@ -1816,6 +1828,11 @@ ces0411$quebec_accom08<-Recode(ces0411$ces08_PES_F7, "1=0; 2=0.25; 3=0.5; 4=0.75
 #checks
 table(ces0411$quebec_accom08)
 
+#### recode Education (ces08_PES_D1D)#### 
+look_for(ces0411, "edu")
+ces0411$education08<-Recode(ces0411$ces08_PES_D1D, "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
+#checks
+table(ces0411$education08, ces0411$ces08_PES_D1D , useNA = "ifany" )
 
 ####Recode 2011 4th ####
 
@@ -2294,3 +2311,9 @@ look_for(ces0411, "quebec")
 ces0411$quebec_accom11<-Recode(ces0411$PES11_44, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA")
 #checks
 table(ces0411$quebec_accom11)
+
+#### recode Education (CPS11_35)#### 
+look_for(ces0411, "edu")
+ces0411$education11<-Recode(ces0411$CPS11_35, "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
+#checks
+table(ces0411$education11, ces0411$CPS11_35 , useNA = "ifany" )
