@@ -580,6 +580,7 @@ ces0411$quebec_accom04<-Recode(ces0411$ces04_CPS_F9, "1=0; 2=0.25; 3=0.5; 4=0.75
 #checks
 table(ces0411$quebec_accom04)
 
+
 #recode Liberal leader (ces04_PES_F2 & ces04_CPS_G2)
 look_for(ces0411, "Martin")
 ces0411$liberal_leader04<-Recode(ces0411$ces04_CPS_G2, "0=1; 996:999=NA")
@@ -633,6 +634,14 @@ look_for(ces0411, "green")
 ces0411$green_rating04<-Recode(ces0411$ces04_CPS_G11, "0=1; 996:999=NA")
 #checks
 table(ces0411$green_rating04)
+
+#### recode Education (ces04_PES_D1D)#### 
+look_for(ces0411, "edu")
+ces0411$education04<-Recode(ces0411$ces04_PES_D1D, "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
+#checks
+table(ces0411$education04, ces0411$ces04_PES_D1D , useNA = "ifany" )
+
+
 
 ###Recode 2006 2nd ####
 
@@ -1227,6 +1236,7 @@ ces0411$quebec_accom06<-Recode(ces0411$ces06_CPS_F7, "1=0; 2=0.25; 3=0.5; 4=0.75
 #checks
 table(ces0411$quebec_accom06)
 
+
 #recode Liberal leader (ces06_PES_F2 & ces06_CPS_G2)
 look_for(ces0411, "Martin")
 ces0411$liberal_leader06<-Recode(ces0411$ces06_CPS_G2, "0=1; 996:999=NA")
@@ -1280,6 +1290,13 @@ look_for(ces0411, "green")
 ces0411$green_rating06<-Recode(ces0411$ces06_CPS_G11, "0=1; 996:999=NA")
 #checks
 table(ces0411$green_rating06)
+
+#### recode Education (ces06_PES_D1D)#### 
+look_for(ces0411, "edu")
+ces0411$education06<-Recode(ces0411$ces06_PES_D1D, "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
+#checks
+table(ces0411$education06, ces0411$ces06_PES_D1D , useNA = "ifany" )
+
 
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
@@ -1923,6 +1940,7 @@ ces0411$quebec_accom08<-Recode(ces0411$ces08_PES_F7, "1=0; 2=0.25; 3=0.5; 4=0.75
 #checks
 table(ces0411$quebec_accom08)
 
+
 #recode Liberal leader (ces08_PES_F2 & ces08_CPS_G2)
 look_for(ces0411, "Dion")
 ces0411$liberal_leader08<-Recode(ces0411$ces08_CPS_G2, "0=1; 996:999=NA")
@@ -1982,6 +2000,13 @@ look_for(ces0411, "green")
 ces0411$green_rating08<-Recode(ces0411$ces08_CPS_G11, "0=1; 996:999=NA")
 #checks
 table(ces0411$green_rating08)
+
+#### recode Education (ces08_PES_D1D)#### 
+look_for(ces0411, "edu")
+ces0411$education08<-Recode(ces0411$ces08_PES_D1D, "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
+#checks
+table(ces0411$education08, ces0411$ces08_PES_D1D , useNA = "ifany" )
+
 
 ####Recode 2011 4th ####
 
@@ -2461,6 +2486,7 @@ ces0411$quebec_accom11<-Recode(ces0411$PES11_44, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=
 #checks
 table(ces0411$quebec_accom11)
 
+
 #recode Liberal leader (CPS11_24)
 look_for(ces0411, "Ignatieff")
 ces0411$liberal_leader11<-Recode(ces0411$CPS11_24, "0=1; 996:999=NA")
@@ -2520,3 +2546,10 @@ look_for(ces0411, "green")
 ces0411$green_rating11<-Recode(ces0411$CPS11_22, "0=1; 996:999=NA")
 #checks
 table(ces0411$green_rating11)
+
+#### recode Education (CPS11_35)#### 
+look_for(ces0411, "edu")
+ces0411$education11<-Recode(ces0411$CPS11_35, "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
+#checks
+table(ces0411$education11, ces0411$CPS11_35 , useNA = "ifany" )
+

@@ -488,6 +488,7 @@ ces88$quebec_accom<-Recode(ces88$qa9, "1=1; 2=0; 3=0.5; 8=0.5; else=NA")
 #checks
 table(ces88$quebec_accom)
 
+
 #recode Liberal leader (xe2b)
 look_for(ces88, "Turner")
 ces88$liberal_leader<-Recode(ces88$xe2b, "0=1; 997:999=NA")
@@ -523,3 +524,10 @@ look_for(ces88, "new democratic")
 ces88$ndp_rating<-Recode(ces88$xe2f, "0=1; 997:999=NA")
 #checks
 table(ces88$ndp_rating)
+
+#recode Education (qb1)
+look_for(ces88, "edu")
+ces88$education<-Recode(ces88$qb1, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
+#checks
+table(ces88$education, ces88$qb1 , useNA = "ifany" )
+

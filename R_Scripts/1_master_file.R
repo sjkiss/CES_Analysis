@@ -311,6 +311,9 @@ ces04 %>%
   rename(bloc_rating=bloc_rating04)->ces04
 ces04 %>% 
   rename(green_rating=green_rating04)->ces04
+ces04 %>% 
+  rename(education=education04)->ces04
+
 table(ces04$survey, ces04$non_charter_language)
 
 #### Rename CES06 ####
@@ -394,6 +397,9 @@ ces06 %>%
   rename(bloc_rating=bloc_rating06)->ces06
 ces06 %>% 
   rename(green_rating=green_rating06)->ces06
+ces06 %>% 
+  rename(education=education06)->ces06
+
 table(ces06$survey, ces06$non_charter_language)
 
 #### Rename CES08 ####
@@ -477,6 +483,9 @@ ces08 %>%
   rename(bloc_rating=bloc_rating08)->ces08
 ces08 %>%  
   rename(green_rating=green_rating08)->ces08
+ces08 %>% 
+  rename(education=education08)->ces08
+
 table(ces08$survey, ces08$non_charter_language)
 
 #### Rename CES11 ####
@@ -560,6 +569,9 @@ ces11 %>%
   rename(bloc_rating=bloc_rating11)->ces11
 ces11 %>% 
   rename(green_rating=green_rating11)->ces11
+ces11 %>% 
+  rename(education=education11)->ces11
+
 
 #### Rejoin the Files To Make CES ####
 
@@ -644,9 +656,12 @@ ces %>%
           "religiosity",
           "election", "size", "redistribution", "pro_redistribution",
           "market_liberalism", "traditionalism", "traditionalism2", "immigration_rates", "enviro", "death_penalty", 
-          "crime", "gay_rights", "abortion", "authoritarianism", "quebec_accom",
+
+          "crime", "gay_rights", "abortion", "authoritarianism", "quebec_accom","education",
           "liberal_rating", "conservative_rating", "ndp_rating", "green_rating", "bloc_rating",
-          "liberal_leader", "conservative_leader", "ndp_leader", "green_leader", "bloc_leader") )-> ces
+          "liberal_leader", "conservative_leader", "ndp_leader", "green_leader", "bloc_leader"))-> ces
+
+
 ##
 
 library(stringr)
@@ -735,7 +750,7 @@ val_labels(ces$sector)<-c(Private=0, Public=1)
 val_labels(ces$vote)<-c(Conservative=2, Liberal=1, NDP=3, BQ=4, Green=5, Other=0)
 val_labels(ces$male)<-c(Female=0, Male=1)
 val_labels(ces$union_both)<-c(None=0, Union=1)
-val_labels(ces$degree)<-c(nodegree=0, degree=1)
+val_labels(ces$degree)<-c(`No degree`=0, Degree=1)
 val_labels(ces$region)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces$quebec)<-c(Other=0, Quebec=1)
 val_labels(ces$religion)<-c(None=0, Catholic=1, Protestant=2, Other=3)
@@ -745,7 +760,7 @@ val_labels(ces$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
 val_labels(ces$redistribution)<-c(Less=0, More=1)
-
+val_labels(ces$education)<-c(Less=0, Same=0.5, More=1)
 ####
 names(ces)
 

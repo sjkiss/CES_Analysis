@@ -508,6 +508,7 @@ ces93$quebec_accom<-Recode(ces93$PRC4, "1=1; 5=0; 3=0.5; 8=0.5; else=NA")
 #checks
 table(ces93$quebec_accom)
 
+
 #recode Liberal leader (PESD2B)
 look_for(ces93, "Chretien")
 ces93$liberal_leader<-Recode(ces93$PESD2B, "0=1; 997:999=NA")
@@ -555,3 +556,9 @@ look_for(ces93, "new democratic")
 ces93$bloc_rating<-Recode(ces93$PESD2K, "0=1; 997:999=NA")
 #checks
 table(ces93$bloc_rating)
+
+#recode Education (CPSL7F)
+look_for(ces93, "edu")
+ces93$education<-Recode(ces93$CPSL7F, "1=0; 3=0.5; 5=1; 8=0.5; else=NA")
+#checks
+table(ces93$education, ces93$CPSL7F , useNA = "ifany" )

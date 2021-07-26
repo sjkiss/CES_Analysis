@@ -484,6 +484,7 @@ ces97$quebec_accom<-Recode(ces97$cpse3a, "2=1; 1=0; 3=0.5; 8=0.5; else=NA")
 #checks
 table(ces97$quebec_accom)
 
+
 #recode Liberal leader (cpsd1b)
 look_for(ces97, "Chretien")
 ces97$liberal_leader<-Recode(ces97$cpsd1b, "0=1; 997:999=NA")
@@ -531,3 +532,10 @@ look_for(ces97, "bloc")
 ces97$bloc_rating<-Recode(ces97$cpsd1k, "0=1; 997:999=NA")
 #checks
 table(ces97$bloc_rating)
+
+#recode Education (pese6f)
+look_for(ces97, "edu")
+ces97$education<-Recode(ces97$pese6f, "1=0; 3=0.5; 5=1; 8=0.5; else=NA")
+#checks
+table(ces97$education, ces97$pese6f , useNA = "ifany" )
+

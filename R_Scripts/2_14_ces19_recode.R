@@ -613,9 +613,9 @@ table(ces19phone$justice , ces19phone$q27_c , useNA = "ifany" )
 #recode Education (q27_a)
 look_for(ces19phone, "education")
 ces19phone$education<-Recode(ces19phone$q27_a, "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
-val_labels(ces19phone$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
+#val_labels(ces19phone$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
-val_labels(ces19phone$education)
+#val_labels(ces19phone$education)
 table(ces19phone$education, ces19phone$q27_a , useNA = "ifany" )
 
 
