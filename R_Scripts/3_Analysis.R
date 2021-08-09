@@ -159,13 +159,19 @@ ces$redistibution<-as.numeric(ces$redistribution)
 ces$redistribution<-zap_labels(ces$redistibution)
 ces$income<-as.numeric(ces$income)
 
-#What we need is just 1988-2000 and 2004-2019, minus the BQ and the Greens
-ces %>% 
-  filter(election<1998 &election> 1984&vote2!="BQ"&vote2!="Green")->ces.1
-ces %>% 
-  filter(election>2003 &vote2!="BQ"&vote2!="Green")->ces.2
+#What we need is just 1988-1997 and 2004-2019,
+#cannot use 2000 because no class variable
+ces %>%
+ filter(election<2001 &election> 1984)->ces.1
+ces %>%
+ filter(election>2003)->ces.2
+
+#Check
+table(ces.1$election, ces.1$vote2)
+table(ces.2$election, ces.2$vote2)
+
 library(stargazer)
-#Relevel region2
+
 #### Pooled OLS Models####
 # NDP Models
 m19<-lm(ndp~region2+age+male+religion2+degree+income+occupation4+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.1)
