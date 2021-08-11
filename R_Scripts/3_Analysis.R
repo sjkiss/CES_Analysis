@@ -259,3 +259,11 @@ model.list %>%
 
 
 ggsave(filename=here("Plots", "degree_redistribution_interaction_ndp_conservative.png"), width=6, height=4 )
+
+ces.2 %>% 
+  select(working_class4, vote2, redistribution, immigration_rates, traditionalism2) %>% 
+  pivot_longer(cols=redistribution:traditionalism2) %>% 
+  group_by(working_class4, vote2, name) %>% 
+  summarize(average=mean(value, na.rm=T)) %>% 
+  filter(!is.na(vote2)) %>% 
+  ggplot(., aes(x=vote2, y=average))+geom_point()+facet_grid(name~as_factor(working_class4))+ylim(0,1)

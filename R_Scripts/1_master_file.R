@@ -761,6 +761,7 @@ val_labels(ces$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
 val_labels(ces$redistribution)<-c(Less=0, More=1)
 val_labels(ces$education)<-c(Less=0, Same=0.5, More=1)
+
 ####
 names(ces)
 
@@ -812,10 +813,12 @@ table(ces$upper_class2)
 table(ces$employment, ces$election)
 
 ces %>% 
-  mutate(`2004`=case_when(
+  mutate(`Period`=case_when(
     election>2000~1,
     election<2004~0
   ))->ces
+
+val_labels(ces$working_class4)<-c(`Other`=0, `Working  Class`=1)
 #### Set Theme ####
 theme_set(theme_bw())
 
