@@ -159,19 +159,13 @@ ces$redistibution<-as.numeric(ces$redistribution)
 ces$redistribution<-zap_labels(ces$redistibution)
 ces$income<-as.numeric(ces$income)
 
-#What we need is just 1988-1997 and 2004-2019,
-#cannot use 2000 because no class variable
-ces %>%
- filter(election<2001 &election> 1984)->ces.1
-ces %>%
- filter(election>2003)->ces.2
-
-#Check
-table(ces.1$election, ces.1$vote2)
-table(ces.2$election, ces.2$vote2)
-
+#What we need is just 1988-2000 and 2004-2019, minus the BQ and the Greens
+ces %>% 
+  filter(election<1998 &election> 1984&vote2!="BQ"&vote2!="Green")->ces.1
+ces %>% 
+  filter(election>2003 &vote2!="BQ"&vote2!="Green")->ces.2
 library(stargazer)
-
+#Relevel region2
 #### Pooled OLS Models####
 # NDP Models
 m19<-lm(ndp~region2+age+male+religion2+degree+income+occupation4+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.1)
@@ -203,9 +197,12 @@ m36<-lm(conservative~region2+age+male+religion2+degree+income+occupation4+redist
 
 
 #Storing these here to avoid having to retype. 
-#"Degree", "Income", "Class (Managers)", "Class (Professionals)", "Class (Self-Employed)", "Class(Routine Non-Manual)", 
+#"Degree", "Income", "Class (Managers)", "Class (Professionals)", "Class (Self-Employed)", "Class (Routine Non-Manual)", 
 summary(m19)
-stargazer(m19, m28, m20, m29,m21, m30, type="html", omit=c(1:8), out=here("Tables", "pooled_party_vote_choice.html"),  column.labels = c('1988-1997', '2004-2019', '1988-1997', '2004-2019', '1988-1997', '2004-2019'), covariate.labels=c("Degree", "Income", "Class (Managers)", "Class (Professionals)", "Class (Self-Employed)", "Class(Routine Non-Manual)", "Redistribution", "Market Liberalism", "Moral Traditionalism", "Immigration Rates"), dep.var.labels =c("NDP" ,"Liberals", "Conservatives"),star.cutoffs = c(0.05, 0.01, 0.001), single.row=F, font.size="small", digits=2)
+stargazer(m19, m28, m20, m29, m21, m30, type="html", omit=c(1:8), out=here("Tables", "pooled_party_vote_choice.html"),  column.labels = c('1988-1997', '2004-2019', '1988-1997', '2004-2019', '1988-1997', '2004-2019'), covariate.labels=c("Degree", "Income", "Class (Managers)", "Class (Professionals)", "Class (Self-Employed)", "Class (Routine Non-Manual)", "Redistribution", "Market Liberalism", "Moral Traditionalism", "Immigration Rates"), dep.var.labels =c("NDP" ,"Liberals", "Conservatives"),star.cutoffs = c(0.05, 0.01, 0.001), single.row=F, font.size="small", digits=2)
+
+# For Appendix (full controls displayed)
+stargazer(m19, m28, m20, m29, m21, m30, type="html", out=here("Tables", "pooled_party_vote_choice_full.html"),  column.labels = c('1988-1997', '2004-2019', '1988-1997', '2004-2019', '1988-1997', '2004-2019'), covariate.labels=c("Region (East", "Region (Ontario)", "Region (West)", "Age", "Male", "Religion (Catholic)", "Religion (Protestant)", "Religion (Other)", "Degree", "Income", "Class (Managers)", "Class (Professionals)", "Class (Self-Employed)", "Class (Routine Non-Manual)", "Redistribution", "Market Liberalism", "Moral Traditionalism", "Immigration Rates"), dep.var.labels =c("NDP" ,"Liberals", "Conservatives"),star.cutoffs = c(0.05, 0.01, 0.001), single.row=F, font.size="small", digits=2)
 
 #### ###
 #
