@@ -103,7 +103,7 @@ ndp_models_complete1 %>%
   geom_point()+
   labs(title="OLS Coefficients of Education and Working Class on Party Vote 1979-2019", alpha="Variable", color="Vote", x="Election", y="Estimate")+
   geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
-  ylim(c(-0.25,0.25))+
+  ylim(c(-0.3,0.3))+
   scale_color_manual(values=c("blue", "red", "orange"))+
   facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
 
