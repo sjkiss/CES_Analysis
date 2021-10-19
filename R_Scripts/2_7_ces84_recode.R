@@ -218,3 +218,20 @@ look_for(ces84, "Broadbent")
 ces84$ndp_leader<-Recode(ces84$VAR303, "0=1; 997:999=NA")
 #checks
 table(ces84$ndp_leader)
+
+#recode Ideology (VAR507)
+look_for(ces84, "scale")
+ces84$ideology<-Recode(ces84$VAR507 , "1=0; 2=0.17; 3=0.33; 4=0.5; 5=0.67; 6=0.83; 7=1; else=NA")
+val_labels(ces84$ideology)<-c(Left=0, Right=1)
+#checks
+val_labels(ces84$ideology)
+table(ces84$ideology, ces84$VAR507  , useNA = "ifany")
+
+#recode turnout (vAR124)
+look_for(ces84, "vote")
+ces84$turnout<-Recode(ces84$VAR124, "1=1; 2=0;  8=0; else=NA")
+val_labels(ces84$turnout)<-c(No=0, Yes=1)
+#checks
+val_labels(ces84$turnout)
+table(ces84$turnout)
+table(ces84$turnout, ces84$vote)

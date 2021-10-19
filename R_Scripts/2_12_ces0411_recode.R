@@ -641,7 +641,30 @@ ces0411$education04<-Recode(ces0411$ces04_PES_D1D, "3=0; 5=0.5; 1=1; 8=0.5; else
 #checks
 table(ces0411$education04, ces0411$ces04_PES_D1D , useNA = "ifany" )
 
+#### recode Personal Retrospective (ces04_CPS_F1) ####
+look_for(ces0411, "financial")
+ces0411$personal_retrospective04<-Recode(ces0411$ces04_CPS_F1, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$personal_retrospective04)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces0411$personal_retrospective04)
+table(ces0411$personal_retrospective04, ces0411$ces04_CPS_F1 , useNA = "ifany" )
 
+#### recode Ideology (ces04_MBS_H10) ####
+look_for(ces0411, "scale")
+ces0411$ideology04<-Recode(ces0411$ces04_MBS_H10, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
+val_labels(ces0411$ideology04)<-c(Left=0, Right=1)
+#checks
+val_labels(ces0411$ideology04)
+table(ces0411$ideology04, ces0411$ces04_MBS_H10 , useNA = "ifany")
+
+#### recode turnout (ces04_PES_A2A) ####
+look_for(ces0411, "vote")
+ces0411$turnout04<-Recode(ces0411$ces04_PES_A2A, "1=1; 5=0; 8=0; else=NA")
+val_labels(ces0411$turnout04)<-c(No=0, Yes=1)
+#checks
+val_labels(ces0411$turnout04)
+table(ces0411$turnout04)
+table(ces0411$turnout04, ces0411$vote04)
 
 ###Recode 2006 2nd ####
 
@@ -1297,6 +1320,28 @@ ces0411$education06<-Recode(ces0411$ces06_PES_D1D, "3=0; 5=0.5; 1=1; 8=0.5; else
 #checks
 table(ces0411$education06, ces0411$ces06_PES_D1D , useNA = "ifany" )
 
+#### recode Personal Retrospective (ces06_CPS_F1) ####
+look_for(ces0411, "financial")
+ces0411$personal_retrospective06<-Recode(ces0411$ces06_CPS_F1, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$personal_retrospective06)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces0411$personal_retrospective06)
+table(ces0411$personal_retrospective06, ces0411$ces06_CPS_F1 , useNA = "ifany" )
+
+#### #recode Immigrants take Jobs away (ces06_PES_G10)#### 
+look_for(ces0411, "jobs")
+ces0411$immigration_job06<-Recode(ces0411$ces06_PES_G10, "7=0; 5=0.25; 3=0.75; 1=1; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$immigration_job06, ces0411$ces06_PES_G10, useNA = "ifany" )
+
+#### recode turnout (ces06_PES_B1) ####
+look_for(ces0411, "vote")
+ces0411$turnout06<-Recode(ces0411$ces06_PES_B1, "1=1; 5=0; 8=0; else=NA")
+val_labels(ces0411$turnout06)<-c(No=0, Yes=1)
+#checks
+val_labels(ces0411$turnout06)
+table(ces0411$turnout06)
+table(ces0411$turnout06, ces0411$vote06)
 
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
@@ -2007,6 +2052,49 @@ ces0411$education08<-Recode(ces0411$ces08_PES_D1D, "3=0; 5=0.5; 1=1; 8=0.5; else
 #checks
 table(ces0411$education08, ces0411$ces08_PES_D1D , useNA = "ifany" )
 
+####recode Personal Retrospective (ces08_CPS_F1 & ces08_PES_F1N) ####
+look_for(ces0411, "financial")
+ces0411$personal_retrospective11<-Recode(ces0411$ces08_CPS_F1, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$personal_retrospective11)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces0411$personal_retrospective11)
+table(ces0411$personal_retrospective11, ces0411$CPS11_66 , useNA = "ifany" )
+
+ces0411 %>% 
+  mutate(personal_retrospective08=case_when(
+    ces08_CPS_F1==1 | ces08_PES_F1N==1~ 1,
+    ces08_CPS_F1==3 | ces08_PES_F1N==3~ 0,
+    ces08_CPS_F1==5 | ces08_PES_F1N==5~ 0.5,
+    ces08_CPS_F1==8 | ces08_PES_F1N==8~ 0.5,
+  ))->ces0411
+val_labels(ces0411$personal_retrospective08)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces0411$personal_retrospective08)
+table(ces0411$personal_retrospective08, ces0411$ces08_CPS_F1, ces0411$ces08_PES_F1N, useNA = "ifany" )
+table(ces0411$personal_retrospective08, useNA = "ifany" )
+
+#### recode Ideology (ces08_MBS_I12) ####
+look_for(ces0411, "scale")
+ces0411$ideology08<-Recode(ces0411$ces08_MBS_I12, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
+val_labels(ces0411$ideology08)<-c(Left=0, Right=1)
+#checks
+val_labels(ces0411$ideology08)
+table(ces0411$ideology08, ces0411$ces08_MBS_I12 , useNA = "ifany")
+
+#### #recode Immigrants take Jobs away (ces08_MBS_H10)#### 
+look_for(ces0411, "jobs")
+ces0411$immigration_job08<-Recode(ces0411$ces08_MBS_H10, "4=0; 3=0.25; 2=0.75; 1=1; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$immigration_job08, ces0411$ces08_MBS_H10, useNA = "ifany" )
+
+#### recode turnout (ces08_PES_B1) ####
+look_for(ces0411, "vote")
+ces0411$turnout08<-Recode(ces0411$ces08_PES_B1, "1=1; 5=0; 8=0; else=NA")
+val_labels(ces0411$turnout08)<-c(No=0, Yes=1)
+#checks
+val_labels(ces0411$turnout08)
+table(ces0411$turnout08)
+table(ces0411$turnout08, ces0411$vote08)
 
 ####Recode 2011 4th ####
 
@@ -2553,3 +2641,33 @@ ces0411$education11<-Recode(ces0411$CPS11_35, "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
 #checks
 table(ces0411$education11, ces0411$CPS11_35 , useNA = "ifany" )
 
+#### recode Personal Retrospective (CPS11_66) ####
+look_for(ces0411, "financial")
+ces0411$personal_retrospective11<-Recode(ces0411$CPS11_66, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$personal_retrospective11)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces0411$personal_retrospective11)
+table(ces0411$personal_retrospective11, ces0411$CPS11_66 , useNA = "ifany" )
+
+#### recode Ideology (MBS11_K5) ####
+look_for(ces0411, "scale")
+ces0411$ideology11<-Recode(ces0411$MBS11_K5, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
+val_labels(ces0411$ideology11)<-c(Left=0, Right=1)
+#checks
+val_labels(ces0411$ideology11)
+table(ces0411$ideology11, ces0411$MBS11_K5 , useNA = "ifany")
+
+#### #recode Immigrants take Jobs away (PES11_51)#### 
+look_for(ces0411, "jobs")
+ces0411$immigration_job11<-Recode(ces0411$PES11_51, "7=0; 5=0.25; 3=0.75; 1=1; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$immigration_job11, ces0411$PES11_51, useNA = "ifany" )
+
+#### recode turnout (PES11_3) ####
+look_for(ces0411, "vote")
+ces0411$turnout11<-Recode(ces0411$PES11_3, "1=1; 5=0; 8=0; else=NA")
+val_labels(ces0411$turnout11)<-c(No=0, Yes=1)
+#checks
+val_labels(ces0411$turnout11)
+table(ces0411$turnout11)
+table(ces0411$turnout11, ces0411$vote11)

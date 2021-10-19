@@ -200,3 +200,20 @@ look_for(ces68, "ndp")
 ces68$ndp_rating<-Recode(ces68$var225, "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
 #checks
 table(ces68$ndp_rating)
+
+#recode Personal Retrospective (var113)
+look_for(ces68, "financial")
+ces68$personal_retrospective<-Recode(ces68$var113, "1=1; 2=0; 3=0.5; 4=0.5; else=NA", as.numeric=T)
+val_labels(ces68$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces68$personal_retrospective)
+table(ces68$personal_retrospective, ces68$var113 , useNA = "ifany" )
+
+#recode turnout (var179)
+look_for(ces68, "vote")
+ces68$turnout<-Recode(ces68$var179, "1=1; 2=0;  8=0; else=NA")
+val_labels(ces68$turnout)<-c(No=0, Yes=1)
+#checks
+val_labels(ces68$turnout)
+table(ces68$turnout)
+table(ces68$turnout, ces68$vote)

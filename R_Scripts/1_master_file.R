@@ -122,7 +122,7 @@ table(ces80$vote, ces80$vote80)
 ##We just need to turn the variables that end with 80 into regularly named variables.
 
 ces80 %>% 
-  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size)->ces80
+  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size, ideology, turnout)->ces80
 names(ces80)
 
 ### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
@@ -313,6 +313,12 @@ ces04 %>%
   rename(green_rating=green_rating04)->ces04
 ces04 %>% 
   rename(education=education04)->ces04
+ces04 %>% 
+  rename(personal_retrospective=personal_retrospective04)->ces04
+ces04 %>% 
+  rename(ideology=ideology04)->ces04
+ces04 %>% 
+  rename(turnout=turnout04)->ces04
 
 table(ces04$survey, ces04$non_charter_language)
 
@@ -399,6 +405,12 @@ ces06 %>%
   rename(green_rating=green_rating06)->ces06
 ces06 %>% 
   rename(education=education06)->ces06
+ces06 %>% 
+  rename(personal_retrospective=personal_retrospective06)->ces06
+ces06 %>% 
+  rename(immigration_job=immigration_job06)->ces06
+ces06 %>% 
+  rename(turnout=turnout06)->ces06
 
 table(ces06$survey, ces06$non_charter_language)
 
@@ -485,6 +497,14 @@ ces08 %>%
   rename(green_rating=green_rating08)->ces08
 ces08 %>% 
   rename(education=education08)->ces08
+ces08 %>% 
+  rename(personal_retrospective=personal_retrospective08)->ces08
+ces08 %>% 
+  rename(ideology=ideology08)->ces08
+ces08 %>% 
+  rename(immigration_job=immigration_job08)->ces08
+ces08 %>% 
+  rename(turnout=turnout08)->ces08
 
 table(ces08$survey, ces08$non_charter_language)
 
@@ -571,7 +591,14 @@ ces11 %>%
   rename(green_rating=green_rating11)->ces11
 ces11 %>% 
   rename(education=education11)->ces11
-
+ces11 %>% 
+  rename(personal_retrospective=personal_retrospective11)->ces11
+ces11 %>% 
+  rename(ideology=ideology11)->ces11
+ces11 %>% 
+  rename(immigration_job=immigration_job11)->ces11
+ces11 %>% 
+  rename(turnout=turnout11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -656,7 +683,7 @@ ces %>%
           "religiosity",
           "election", "size", "redistribution", "pro_redistribution",
           "market_liberalism", "traditionalism", "traditionalism2", "immigration_rates", "enviro", "death_penalty", 
-
+          "personal_retrospective", "ideology", "immigration_job", "turnout",
           "crime", "gay_rights", "abortion", "authoritarianism", "quebec_accom","education",
           "liberal_rating", "conservative_rating", "ndp_rating", "green_rating", "bloc_rating",
           "liberal_leader", "conservative_leader", "ndp_leader", "green_leader", "bloc_leader"))-> ces

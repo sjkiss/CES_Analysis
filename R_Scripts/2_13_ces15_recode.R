@@ -221,38 +221,24 @@ val_labels(ces15phone$native)<-c(Foreign=0, Native=1)
 val_labels(ces15phone$native)
 table(ces15phone$native)
 
-#recode Ideology (MBS15_K5) (only 1250 respondents)
-look_for(ces15phone, "scale")
-ces15phone$ideology<-Recode(ces15phone$MBS15_K5, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
-val_labels(ces15phone$ideology)<-c(Left=0, Right=1)
-#checks
-val_labels(ces15phone$ideology)
-table(ces15phone$ideology)
-
 #recode Immigration sentiment (PES15_51, PES15_19, PES15_28) into an index 0-1
 #1 = pro-immigration sentiment 0 = anti-immigration sentiment
 look_for(ces15phone, "immigr")
-ces15phone$immigration_jobs<-Recode(ces15phone$PES15_51, "7=1; 5=0.75; 3=0.25; 1=0; 8=0.5; else=NA", as.numeric=T)
-#val_labels(ces15phone$immigration_jobs)<-c(Strongly_agree=0, Somewhat_agree=0.33, Somewhat_disagree=0.66, Strongly_disagree=1)
+ces15phone$immigration_jobs<-Recode(ces15phone$PES15_51, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
 #checks
-#val_labels(ces15phone$immigration_jobs)
-table(ces15phone$immigration_jobs)
+table(ces15phone$immigration_jobs, ces15phone$PES15_51, useNA = "ifany" )
 ces15phone$PES15_19
 
 ces15phone$immigration_feel<-car::Recode(as.numeric(ces15phone$PES15_19), "998:999=NA", as.numeric=T)
-
 ces15phone$immigration_feel<-ces15phone$immigration_feel /100
 summary(ces15phone$immigration_feel)
-class(ces15phone$immigration_feel)
 class(ces15phone$immigration_feel)
 #checks
 #val_labels(ces15phone$immigrations_feel)
 table(ces15phone$immigration_feel)
 
 ces15phone$immigration_rate<-Recode(ces15phone$PES15_28, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
-#val_labels(ces15phone$immigration_rate)<-c(Less=0, Same=0.5, More=1)
 #checks
-#val_labels(ces15phone$immigration_rate)
 table(ces15phone$immigration_rate)
 
 #Combine the 3 immigration variables and divide by 3
@@ -271,19 +257,16 @@ look_for(ces15phone, "minor")
 ces15phone$r_minorities_feel<-Recode(as.numeric(ces15phone$PES15_18), "998:999=NA")
 table(ces15phone$r_minorities_feel)
 ces15phone$minorities_feel<-(ces15phone$r_minorities_feel /100)
-summary(ces15phone$minorities_feel)
+summary(ces15phone$r_minorities_feel)
 #checks
+table(ces15phone$r_minorities_feel)
 #val_labels(ces15phone$minorities_feel)
-table(ces15phone$minorities_feel)
-ces15phone$minorities_help<-Recode(as.numeric(ces15phone$PES15_42), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 8=0.5; else=NA", as.numeric=T)
 
-#val_labels(ces15phone$minorities_help)<-c(Much_less=0, Somewhat_less=0.25, Same=0.5, Somewhat_more=0.75, Much_more=1)
+ces15phone$minorities_help<-Recode(as.numeric(ces15phone$PES15_42), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 8=0.5; else=NA", as.numeric=T)
 #checks
-#val_labels(ces15phone$minorities_help)
 table(ces15phone$minorities_help, useNA = "ifany" )
 
 #Combine the 2 racial minority variables and divide by 2
-
 ces15phone %>% 
   rowwise() %>% 
   mutate(minorities=mean(c_across(c(minorities_help, minorities_feel)), na.rm=T))->ces15phone
@@ -298,15 +281,12 @@ ces15phone %>%
   select(immigration_jobs, immigration_feel, immigration_rate) %>% 
   psych::alpha(.)
 
-
 ## Or Create a 5 variable immigration/racial minority sentiment index by dividing by 5
 ces15phone %>% 
   select(starts_with('immigration_'))
 #Remove value labels
 ces15phone %>% 
   mutate(across(.cols=starts_with('immigration_|minorities_'), remove_val_labels) )->ces15phone
-
-
 
 ces15phone %>% 
   mutate(immigration2=mean(c(immigration_jobs, immigration_feel, immigration_rate, minorities_feel, minorities_help), na.rm=T))->ces15phone
@@ -887,3 +867,27 @@ look_for(ces15phone, "quebec")
 ces15phone$quebec_accom<-Recode(ces15phone$PES15_44, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA")
 #checks
 table(ces15phone$quebec_accom)
+
+#recode Ideology (MBS15_K5) (only 1250 respondents)
+look_for(ces15phone, "scale")
+ces15phone$ideology<-Recode(ces15phone$MBS15_K5, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
+val_labels(ces15phone$ideology)<-c(Left=0, Right=1)
+#checks
+val_labels(ces15phone$ideology)
+table(ces15phone$ideology)
+
+#### recode Immigration sentiment (PES15_51) #### 
+look_for(ces15phone, "immigr")
+ces15phone$immigration_job<-Recode(ces15phone$PES15_51, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces15phone$immigration_job, ces15phone$PES15_51, useNA = "ifany" )
+
+#### recode turnout (PES15_3) ####
+look_for(ces15phone, "vote")
+ces15phone$turnout<-Recode(ces15phone$PES15_3, "1=1; 5=0; 8=0; else=NA")
+val_labels(ces15phone$turnout)<-c(No=0, Yes=1)
+#checks
+val_labels(ces15phone$turnout)
+table(ces15phone$turnout)
+table(ces15phone$turnout, ces15phone$vote)
+
