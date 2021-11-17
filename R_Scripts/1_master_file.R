@@ -641,16 +641,16 @@ names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988',
 #bind_rows binds the rows of each element in the list together
 #.id="survey"creates a new variable called "survey" and its values are the names of the list items. 
 
-
 library(haven)
 
 #Start with the data frame
 ces.list %>% 
-  #WE have to zap the value labels (get rid of them to enable row b inding)
+  #WE have to zap the value labels (get rid of them to enable row binding)
   map(., zap_labels) %>% 
   #bind rows creating id variable "election"
   bind_rows(., .id="election")->ces
 
+rm(ces.list)
 #Do a summary
 summary(ces)
 #Check the names
@@ -687,8 +687,6 @@ ces %>%
           "crime", "gay_rights", "abortion", "authoritarianism", "quebec_accom","education",
           "liberal_rating", "conservative_rating", "ndp_rating", "green_rating", "bloc_rating",
           "liberal_leader", "conservative_leader", "ndp_leader", "green_leader", "bloc_leader"))-> ces
-
-
 ##
 
 library(stringr)

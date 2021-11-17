@@ -60,7 +60,7 @@ ces %>%
 andersen4qc<-multinom(vote2 ~ as.factor(occupation4)+age+male+as.factor(religion2)+degree+relevel(as.factor(election), ref="1993"), data = subset(ces.out, quebec==1))
 #ROC
 andersen4roc<-multinom(vote2 ~ as.factor(occupation4)+age+male+as.factor(religion2)+degree+as.factor(election)+as.factor(region3), data = subset(ces.out, quebec!=1))
-
+library(stargazer)
 stargazer(andersen4qc, andersen4roc, digits=2,out=here("Tables", "andersen_replication_extension_1979_2019.html"),  type="html", column.labels=c("QC", "ROC"), column.separate = c(3,2), title="Multinomial Logistic Regression of Left Vote On Class, 1979-2019", covariate.labels=c('(Social Class) Managers', '(Social Class) Professionals','(Social Class) Self-Employed', '(Social Class) Routine Non Manual', 'Age', 'Male', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other', '(Education) Degree', '1979','1980' ,'1984','1988','1997', '2004', '2006','2008','2011','2015','2019','1980','1984' ,'1988','1993','1997', '2004', '2006','2008','2011','2015','2019', '(Region) Ontario','(Region) West'),
           add.lines=list(c("N"," ", nrow(andersen4qc$fitted.values), "", nrow(andersen4roc$fitted.values), " ")), 
           single.row = T, 
@@ -69,46 +69,134 @@ stargazer(andersen4qc, andersen4roc, digits=2,out=here("Tables", "andersen_repli
 
 #Load broom
 library(broom)
-# 1979 -2019
-ces %>% 
+#1979 -2019
+ces %>%
   filter(election> 1974 & election!=2000) %>%
-  nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) lm(ndp~region2+male+age+income+degree+union_both+as.factor(religion2)+working_class3, data=x)),
-         tidied=map(model, tidy), 
-         vote=rep('NDP', nrow(.)))->ndp_models_complete1
-ces %>% 
-  filter(election> 1974 & election!=2000) %>%
-  nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) lm(conservative~region2+male+age+income+degree+union_both+as.factor(religion2)+working_class3, data=x)), 
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(ndp~region2+male+age+income+degree+as.factor(religion2)+working_class3, data=x)),
          tidied=map(model, tidy),
-         vote=rep('Conservative', nrow(.))  
+         vote=rep('NDP', nrow(.)))->ndp_models_complete1
+ces %>%sess
+  filter(election> 1974 & election!=2000) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(conservative~region2+male+age+income+degree+as.factor(religion2)+working_class3, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Conservative', nrow(.))
   )->conservative_models_complete1
 
+ces %>%
+  filter(election> 1974 & election!=2000) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(liberal~region2+male+age+income+degree+as.factor(religion2)+working_class3, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Liberal', nrow(.))
+  )->liberal_models_complete1
+
+#Join all parties and plot Class coefficients
+ndp_models_complete1 %>%
+  bind_rows(., liberal_models_complete1) %>%
+  bind_rows(., conservative_models_complete1) %>%
+  unnest(tidied) %>%
+  filter(term="working_class3") %>%
+  mutate(term=Recode(term, "'working_class3'='Working Class'")) %>%
+  ggplot(., aes(x=election, y=estimate, col=vote))+
+  geom_point()+
+  labs(title="OLS Coefficients of Working Class on Party Vote 1979-2019", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+  ylim(c(-0.3,0.3))+
+  scale_color_manual(values=c("navy blue", "red", "orange"))+
+  facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+
+ggsave(here("Plots", "Vote_Coefficents_WC_all_parties.png"))
+
+# 1979 -2019 without union + no degree plot (Quebec)
 ces %>% 
   filter(election> 1974 & election!=2000) %>%
   nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) lm(liberal~region2+male+age+income+degree+union_both+as.factor(religion2)+working_class3, data=x)), 
+  mutate(model=map(variables, function(x) lm(ndp~quebec+male+age+income+degree+as.factor(religion2)+working_class3, data=x)),
+         tidied=map(model, tidy), 
+         vote=rep('NDP', nrow(.)))->ndp_models_complete_QC1
+ces %>% 
+  filter(election> 1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(conservative~quebec+region2+male+age+income+degree+as.factor(religion2)+working_class3, data=x)), 
+         tidied=map(model, tidy),
+         vote=rep('Conservative', nrow(.))  
+  )->conservative_models_complete_QC1
+
+ces %>% 
+  filter(election> 1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(liberal~quebec+male+age+income+degree+as.factor(religion2)+working_class3, data=x)), 
          tidied=map(model, tidy),
          vote=rep('Liberal', nrow(.))  
-  )->liberal_models_complete1
+  )->liberal_models_complete_QC1
 
-#Join all parties and plot Degree and Class coefficients
-ndp_models_complete1 %>% 
-  bind_rows(., liberal_models_complete1) %>% 
-  bind_rows(., conservative_models_complete1) %>%
+ces %>% 
+  filter(election> 1984 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(bloc~quebec+male+age+income+degree+as.factor(religion2)+working_class3, data=x)), 
+         tidied=map(model, tidy),
+         vote=rep('Bloc', nrow(.))  
+  )->bloc_models_complete_QC1
+
+# 1979 -2019 without union + no degree plot (ROC)
+ces %>% 
+  filter(election> 1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(ndp~region+male+age+income+degree+as.factor(religion2)+working_class3, data=x)),
+         tidied=map(model, tidy), 
+         vote=rep('NDP', nrow(.)))->ndp_models_complete_ROC1
+ces %>% 
+  filter(election> 1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(conservative~region+male+age+income+degree+as.factor(religion2)+working_class3, data=x)), 
+         tidied=map(model, tidy),
+         vote=rep('Conservative', nrow(.))  
+  )->conservative_models_complete_ROC1
+
+ces %>% 
+  filter(election> 1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(liberal~region+male+age+income+degree+as.factor(religion2)+working_class3, data=x)), 
+         tidied=map(model, tidy),
+         vote=rep('Liberal', nrow(.))  
+  )->liberal_models_complete_ROC1
+
+#Join all parties and plot Class coefficients  by QC
+ndp_models_complete_QC1 %>% 
+  bind_rows(., liberal_models_complete_QC1) %>% 
+  bind_rows(., conservative_models_complete_QC1) %>%
+  bind_rows(., bloc_models_complete_QC1) %>%
   unnest(tidied) %>% 
-  filter(term=="degree"| term=="working_class3") %>% 
-  mutate(term=Recode(term, "'degree'='Education'; 'working_class3'='Working Class'")) %>% 
+  filter(term=="working_class3") %>% 
+  mutate(term=Recode(term, "'working_class3'='Working Class'")) %>% 
   ggplot(., aes(x=election, y=estimate, col=vote))+
   geom_point()+
-  labs(title="OLS Coefficients of Education and Working Class on Party Vote 1979-2019", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  labs(title="OLS Coefficients of Working Class on Party Vote 1979-2019 for QC", alpha="Variable", color="Vote", x="Election", y="Estimate")+
   geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
-  ylim(c(-0.25,0.25))+
-  scale_color_manual(values=c("blue", "red", "orange"))+
+  ylim(c(-0.3,0.3))+
+  scale_color_manual(values=c("sky blue", "navy", "red", "orange"))+
   facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
 
-ggsave(here("Plots", "Vote_Coefficents_Degree_WC_all_parties.png"))
+ggsave(here("Plots", "Vote_Coefficents_WC_all_parties2_QC.png"))
 
+#Join all parties and plot Class coefficients by ROC
+ndp_models_complete_ROC1 %>% 
+  bind_rows(., liberal_models_complete_ROC1) %>% 
+  bind_rows(., conservative_models_complete_ROC1) %>%
+  unnest(tidied) %>% 
+  filter(term=="working_class3") %>% 
+  mutate(term=Recode(term, "'working_class3'='Working Class'")) %>% 
+  ggplot(., aes(x=election, y=estimate, col=vote))+
+  geom_point()+
+  labs(title="OLS Coefficients of Working Class on Party Vote 1979-2019 for ROC", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+  ylim(c(-0.3,0.3))+
+  scale_color_manual(values=c("navy", "red", "orange"))+
+  facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+
+ggsave(here("Plots", "Vote_Coefficents_WC_all_parties_ROC2.png"))
 
 #### Average Scores For Working Class Versus Average ####
 
@@ -147,9 +235,6 @@ ggsave(here("Plots", "average_scores_raw_class_degree_population.png"), width=10
 # ces %>% 
 #   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=2000)->ces.3
 
-
-
-
 ## These are some mslight modifications necessary; nothing huge.
 ## The one thing is to set Ontario to the reference category for the region2; it helps for predicted probabilities
 ces$region2<-factor(ces$region2, levels=c("Ontario", "Atlantic", "Quebec", "West"))
@@ -166,6 +251,7 @@ ces %>%
   filter(election>2003 &vote2!="BQ"&vote2!="Green")->ces.2
 library(stargazer)
 #Relevel region2
+
 #### Pooled OLS Models####
 # NDP Models
 m19<-lm(ndp~region2+age+male+religion2+degree+income+occupation4+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.1)
@@ -184,9 +270,7 @@ m32<-lm(liberal~region2+age+male+religion2+degree+income+occupation4+redistribut
 m26<-lm(liberal~region2+age+male+religion2+degree+income+occupation4+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:traditionalism2, data=ces.1)
 m35<-lm(liberal~region2+age+male+religion2+degree+income+occupation4+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:traditionalism2, data=ces.2)
 
-
 #Conservative Models
-
 m21<-lm(conservative~region2+age+male+religion2+degree+income+occupation4+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.1)
 m30<-lm(conservative~region2+age+male+religion2+degree+income+occupation4+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.2)
 m24<-lm(conservative~region2+age+male+religion2+degree+income+occupation4+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.1)
@@ -194,7 +278,6 @@ m33<-lm(conservative~region2+age+male+religion2+degree+income+occupation4+redist
 m27<-lm(conservative~region2+age+male+religion2+degree+income+occupation4+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:traditionalism2, data=ces.1)
 m36<-lm(conservative~region2+age+male+religion2+degree+income+occupation4+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:traditionalism2, data=ces.2)
 # 
-
 
 #Storing these here to avoid having to retype. 
 #"Degree", "Income", "Class (Managers)", "Class (Professionals)", "Class (Self-Employed)", "Class (Routine Non-Manual)", 
@@ -206,8 +289,6 @@ stargazer(m19, m28, m20, m29, m21, m30, type="html", out=here("Tables", "pooled_
 
 #### ###
 #
-
-
 
 interaction.models<-list(m22, m31, m25, m34, 
                          m23, m32, m26, m35, 
