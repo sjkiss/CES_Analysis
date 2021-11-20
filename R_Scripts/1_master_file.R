@@ -211,6 +211,8 @@ nrow(ces06)
 nrow(ces08)
 nrow(ces11)
 
+#Remove ces0411 for data saving
+rm(ces0411)
 #### STEP 3 RENAMING VARIABLES
 
 ### This is how we will rename the variables in each data frame.. removing the years. 
@@ -649,7 +651,8 @@ ces.list %>%
   map(., zap_labels) %>% 
   #bind rows creating id variable "election"
   bind_rows(., .id="election")->ces
-
+#Remove ces.list
+# We don't need it here
 rm(ces.list)
 #Do a summary
 summary(ces)
@@ -861,4 +864,4 @@ theme_set(theme_bw())
 
 table(ces$election, ces$occupation2)
 table(ces$election, ces$occupation)
-
+table(ces$election)

@@ -58,6 +58,7 @@ ggsave(filename=here("Plots", "canada_class_voting_1965_2019.png"), dpi=300,widt
 #This removes pre-1979 elections, The Green Party and the year 2000 for multinomial logit modelling. 
 ces %>% 
   filter(election> 1974&election!=2000  & vote2!="Green")->ces.out
+
 andersen4qc<-multinom(vote2 ~ as.factor(occupation4)+age+male+as.factor(religion2)+degree+relevel(as.factor(election), ref="1993"), data = subset(ces.out, quebec==1))
 #ROC
 andersen4roc<-multinom(vote2 ~ as.factor(occupation4)+age+male+as.factor(religion2)+degree+as.factor(election)+as.factor(region3), data = subset(ces.out, quebec!=1))
@@ -67,6 +68,10 @@ stargazer(andersen4qc, andersen4roc, digits=2,out=here("Tables", "andersen_repli
           single.row = T, 
           dep.var.labels=c("Right/Liberal", "Right/NDP", "Right/BQ", "Right/Liberal", "Right/NDP"), 
           star.cutoffs = c(0.05, 0.01, 0.001))
+
+# Remove ces.out
+# I don't think we need it. 
+rm(ces.out)
 
 #Load broom
 library(broom)
