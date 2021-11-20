@@ -1,5 +1,5 @@
 #ces19 precarity script coding
-
+#### Package Management ####
 #remotes::install_github("sjkiss/cesdata", force=T)
 library(cesdata)
 data("ces19_kiss")
@@ -7,7 +7,7 @@ library(tidyverse)
 library(haven)
 library(here)
 library(car)
-
+#### Data Import ####
 #Read in the data file 
 str(ces19_kiss)
 nrow(ces19_kiss)
@@ -15,7 +15,7 @@ nrow(ces19_kiss)
 #Just rename to cps to make it simpler
 cps<-ces19_kiss
 
-#### Variable Labels#### 
+#### Search For precarity variables#### 
 #search for our variables
 library(labelled)
 look_for(cps, "income") #income volatility is kiss_q1
@@ -38,6 +38,7 @@ cps %>%
   select(starts_with('kiss')) %>% 
   val_labels()
 
+#### Scaling Precarity Variables
 ## Note, low numbers are currently high risk, high numbers are low risk; we should reverse these and set 6 to missing 
 #this code takes 1q, sets 5 to be NA and reverses the values. 
 cps %>% 
@@ -72,6 +73,7 @@ table(cps$bus_prob,  useNA = "ifany" )
 table(cps$job_cons,  useNA = "ifany" )
 table(cps$bus_cons,  useNA = "ifany" )
 
+#### Combine Business and Job Loss and Consequence Variables 
 #Recode Probability of losing job or business (job_prob & bus_prob)
 cps %>% 
   mutate(probability=case_when(
@@ -94,6 +96,7 @@ cps %>%
   ))->cps
 table(cps$consequence, useNA = "ifany" )
 
+#### Combine Precarity Index
 #recode into a precarity index (combines volatility + probability + consequence)
 cps$precarity1<-cps$volatility
 cps$precarity2<-cps$probability
@@ -110,6 +113,7 @@ out %>%
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na<4)
 
+
 #Scale Averaging 
 cps %>% 
   rowwise() %>% 
@@ -121,6 +125,8 @@ cps %>%
 cps %>% 
   select(starts_with("precarity")) %>% 
   summary()
+
+
 #Check distribution
 qplot(cps$precarity, geom="histogram")
 table(cps$precarity, useNA="ifany")
@@ -193,7 +199,7 @@ table(cps$quebec , useNA = "ifany" )
 look_for(cps, "yob")
 table(cps$cps19_yob , useNA = "ifany" )
 cps$age2<-1919+cps$cps19_yob
-table(cps$age3)
+table(cps$age2)
 cps$age<-2019-cps$age2
 table(cps$age, cps$cps19_yob, useNA = "ifany")
 
@@ -204,6 +210,14 @@ val_labels(cps$religion)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 #checks
 val_labels(cps$religion)
 table(cps$religion , cps$cps19_religion, useNA = "ifany" )
+
+# Turn religion into factor with None as reference case
+cps$religion2<-Recode(as.factor(cps$religion), "0='None' ; 1='Catholic' ; 2='Protestant' ; 3='Other'", levels=c('None', 'Catholic', 'Protestant', 'Other'))
+levels(cps$religion2)
+table(cps$religion2)
+# Religion dummies
+cps$catholic<-Recode(cps$religion, "1=1; 2:3=0; 0=0; NA=NA")
+cps$no_religion<-Recode(cps$religion, "0=1; 1:3=0; NA=NA")
 
 #recode Language 
 look_for(cps, "language")
@@ -234,6 +248,26 @@ val_labels(cps$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green
 val_labels(cps$vote)
 table(cps$vote , cps$cps19_votechoice , useNA = "ifany" )
 
+#Recode voting
+cps$ndp<-Recode(cps$vote, "3=1; 0:2=0; 4:6=0; NA=NA")
+cps$liberal<-Recode(cps$vote, "1=1; 2:6=0; NA=NA")
+cps$conservative<-Recode(cps$vote, "0:1=0; 2=1; 3:6=0; NA=NA")
+cps$bloc<-Recode(cps$vote, "4=1; 0:3=0; 5:6=0; else=NA")
+cps$green<-Recode(cps$vote, "5=1; 0:4=0; 6=0; else=NA")
+cps$pparty<-Recode(cps$vote, "6=1; 0:5=0; else=NA")
+table(cps$ndp)
+table(cps$liberal)
+table(cps$conservative)
+table(cps$bloc)
+table(cps$green)
+table(cps$pparty)
+
+cps$left_vs_right<-Recode(cps$vote, "1=1; 2=0; 3=1; 5=1; 6=0; else=NA")
+cps$bloc_vs_right<-Recode(cps$vote, "4=1; 2=0; 6=0; else=NA")
+cps$right<-Recode(cps$vote, "2=1; 6=1; 1=0; 3:5=0; 0=0; else=NA")
+table(cps$left_vs_right)
+table(cps$bloc_vs_right)
+table(cps$right)
 #recode Income (cps19_income_cat)
 look_for(cps, "income")
 cps %>% 

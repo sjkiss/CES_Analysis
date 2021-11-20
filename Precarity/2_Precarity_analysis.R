@@ -1,38 +1,11 @@
 #ces19 precarity analysis
-
+library(here)
 library(stargazer)
 library(broom)
 library(nnet)
 library(purrr)
+source(here('Precarity/1_Precarity_recode.R'))
 
-#Recode voting
-cps$ndp<-Recode(cps$vote, "3=1; 0:2=0; 4:6=0; NA=NA")
-cps$liberal<-Recode(cps$vote, "1=1; 2:6=0; NA=NA")
-cps$conservative<-Recode(cps$vote, "0:1=0; 2=1; 3:6=0; NA=NA")
-cps$bloc<-Recode(cps$vote, "4=1; 0:3=0; 5:6=0; else=NA")
-cps$green<-Recode(cps$vote, "5=1; 0:4=0; 6=0; else=NA")
-cps$pparty<-Recode(cps$vote, "6=1; 0:5=0; else=NA")
-table(cps$ndp)
-table(cps$liberal)
-table(cps$conservative)
-table(cps$bloc)
-table(cps$green)
-table(cps$pparty)
-
-cps$left_vs_right<-Recode(cps$vote, "1=1; 2=0; 3=1; 5=1; 6=0; else=NA")
-cps$bloc_vs_right<-Recode(cps$vote, "4=1; 2=0; 6=0; else=NA")
-cps$right<-Recode(cps$vote, "2=1; 6=1; 1=0; 3:5=0; 0=0; else=NA")
-table(cps$left_vs_right)
-table(cps$bloc_vs_right)
-table(cps$right)
-
-# Turn religion into factor with None as reference case
-cps$religion2<-Recode(as.factor(cps$religion), "0='None' ; 1='Catholic' ; 2='Protestant' ; 3='Other'", levels=c('None', 'Catholic', 'Protestant', 'Other'))
-levels(cps$religion2)
-table(cps$religion2)
-# Religion dummies
-cps$catholic<-Recode(cps$religion, "1=1; 2:3=0; 0=0; NA=NA")
-cps$no_religion<-Recode(cps$religion, "0=1; 1:3=0; NA=NA")
 
 #### Correlations ####
 
@@ -74,7 +47,7 @@ m9<-glm(right~(age+degree+as.factor(income)+male+native+as.factor(region)+homeow
 m10<-glm(right~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner+ideology+volatility+probability+consequence+immigrants+feminists+satisfaction_demos), family="binomial", data=cps)
 m11<-glm(right~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner+ideology+volatility+probability+consequence+immigrants+feminists+satisfaction_demos+probability:satisfaction_demos), family="binomial", data=cps)
 
-stargazer(m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, type="html", out=here("Tables", "Precarity_models.html"))
+stargazer(m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, type="html", out=here("Precarity", "Tables", "Precarity_models.html"))
 
 #### Precarity models ####
 pm1<-lm(volatility~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner), data=cps)
@@ -84,7 +57,7 @@ pm3<-lm(volatility~(age+degree+as.factor(income)+male+native+as.factor(region)+h
 pm4<-lm(volatility~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner+ideology+immigrants+feminists), data=cps)
 pm5<-lm(volatility~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner+ideology+immigrants+feminists+minorities), data=cps)
 pm6<-lm(volatility~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner+ideology+immigrants+feminists+minorities+satisfaction_demos), data=cps)
-stargazer(pm1, pm2, pm3, pm4, pm5, pm6, type="html", out=here("Tables", "Volatility_models.html"))
+stargazer(pm1, pm2, pm3, pm4, pm5, pm6, type="html", out=here("Precarity", "Tables", "Volatility_models.html"))
 
 #### Probability models ####
 prm1<-lm(probability~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner), data=cps)
@@ -94,7 +67,7 @@ prm3<-lm(probability~(age+degree+as.factor(income)+male+native+as.factor(region)
 prm4<-lm(probability~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner+ideology+immigrants+feminists), data=cps)
 prm5<-lm(probability~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner+ideology+immigrants+feminists+minorities), data=cps)
 prm6<-lm(probability~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner+ideology+immigrants+feminists+minorities+satisfaction_demos), data=cps)
-stargazer(prm1, prm2, prm3, prm4, prm5, prm6, type="html", out=here("Tables", "Probability_models.html"))
+stargazer(prm1, prm2, prm3, prm4, prm5, prm6, type="html", out=here("Precarity", "Tables", "Probability_models.html"))
 
 #### Consequence models ####
 cm1<-lm(consequence~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner), data=cps)
@@ -104,7 +77,7 @@ cm3<-lm(consequence~(age+degree+as.factor(income)+male+native+as.factor(region)+
 cm4<-lm(consequence~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner+ideology+immigrants+feminists), data=cps)
 cm5<-lm(consequence~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner+ideology+immigrants+feminists+minorities), data=cps)
 cm6<-lm(consequence~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner+ideology+immigrants+feminists+minorities+satisfaction_demos), data=cps)
-stargazer(cm1, cm2, cm3, cm4, cm5, cm6, type="html", out=here("Tables", "Consequence_models.html"))
+stargazer(cm1, cm2, cm3, cm4, cm5, cm6, type="html", out=here("Precarity ", "Tables", "Consequence_models.html"))
 
 
 #### Descriptives ####
@@ -136,7 +109,7 @@ cps %>%
   geom_line()+
   geom_point()+
   labs(title="Party vote shares by probability of job/business loss", x="Probability of Job/Biz Loss", y="Percent")
-ggsave(here("Plots", "Party_shares_probability_vote.png"))
+ggsave(here("Precarity", "Plots", "Party_shares_probability_vote.png"))
 
 # Recode immigrants = anti_immigrants
 table(cps$immigrants)
@@ -153,7 +126,7 @@ cps %>%
   geom_line()+
   geom_point()+
   labs(title="Anti-immigrant party vote shares by probability of job/business loss", x="Probability of Job/Biz Loss", y="Percent")
-ggsave(here("Plots", "Party_shares_probability_immigrant_vote.png"))
+ggsave(here("Precarity", "Plots", "Party_shares_probability_immigrant_vote.png"))
 
 # Recode feminists = anti_feminists
 table(cps$feminists)
@@ -170,7 +143,7 @@ cps %>%
   geom_line()+
   geom_point()+
   labs(title="Anti-feminist party vote shares by probability of job/business loss", x="Probability of Job/Biz Loss", y="Percent")
-ggsave(here("Plots", "Party_shares_probability_feminist_vote.png"))
+ggsave(here("Precarity", "Plots", "Party_shares_probability_feminist_vote.png"))
 
 # Recode authoritarian = authoritarian2
 table(cps$authoritarian)
@@ -187,4 +160,18 @@ cps %>%
   geom_line()+
   geom_point()+
   labs(title="Authoritarian party vote shares by probability of job/business loss", x="Probability of Job/Biz Loss", y="Percent")
-ggsave(here("Plots", "Party_shares_probability_authoritarian_vote.png"))
+ggsave(here("Precarity", "Plots", "Party_shares_probability_authoritarian_vote.png"))
+
+#### Testing Probability of Job Loss With Years of Education
+cps$probability
+table(as_factor(cps$education))
+
+library(gt)
+library(knitr)
+library(xtable)
+library(kableExtra)
+save_kable(kable(cor(cps$education, cps$probability, use="complete.obs"),format="html" , caption="Correlation Between Years of Education And Probability of Job Loss"), file=here("Precarity", "Tables", "Correlation_years_education_probability_job_loss.html"))
+lookfor(cps, "employ")
+prop.table(table(as_factor(cps$cps19_employment), cps$probability),2)
+
+View(var_label(cps))

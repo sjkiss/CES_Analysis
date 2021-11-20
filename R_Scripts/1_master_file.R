@@ -836,3 +836,4 @@ theme_set(theme_bw())
 
 table(ces$election, ces$occupation2)
 table(ces$election, ces$occupation)
+
