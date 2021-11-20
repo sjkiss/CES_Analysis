@@ -531,3 +531,27 @@ ces88$education<-Recode(ces88$qb1, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
 #checks
 table(ces88$education, ces88$qb1 , useNA = "ifany" )
 
+#recode Personal Retrospective (c1)
+look_for(ces88, "financ")
+ces88$personal_retrospective<-Recode(ces88$c1, "1=1; 5=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces88$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces88$personal_retrospective)
+table(ces88$personal_retrospective, ces88$c1 , useNA = "ifany" )
+
+#recode Ideology (h5a)
+look_for(ces88, "self")
+ces88$ideology<-Recode(ces88$h5a , "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+val_labels(ces88$ideology)<-c(Left=0, Right=1)
+#checks
+val_labels(ces88$ideology)
+table(ces88$ideology, ces88$h5a  , useNA = "ifany")
+
+#recode turnout (xb1)
+look_for(ces88, "vote")
+ces88$turnout<-Recode(ces88$xb1, "1=1; 5=0;  8=0; else=NA")
+val_labels(ces88$turnout)<-c(No=0, Yes=1)
+#checks
+val_labels(ces88$turnout)
+table(ces88$turnout)
+table(ces88$turnout, ces88$vote)

@@ -128,3 +128,20 @@ val_labels(ces65$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middl
 #checks
 val_labels(ces65$religiosity)
 table(ces65$religiosity)
+
+#recode Personal Retrospective (v49)
+look_for(ces65, "situation")
+ces65$personal_retrospective<-Recode(ces65$v49, "1=1; 2=0; 3=0.5; else=NA", as.numeric=T)
+val_labels(ces65$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces65$personal_retrospective)
+table(ces65$personal_retrospective, ces65$v49 , useNA = "ifany" )
+
+#recode turnout (v262)
+look_for(ces65, "vote")
+ces65$turnout<-Recode(ces65$v262, "11:19=1; 0=0;98=0; else=NA")
+val_labels(ces65$turnout)<-c(No=0, Yes=1)
+#checks
+val_labels(ces65$turnout)
+table(ces65$turnout)
+table(ces65$turnout, ces65$vote)

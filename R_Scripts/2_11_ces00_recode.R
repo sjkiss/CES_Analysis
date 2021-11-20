@@ -543,3 +543,28 @@ look_for(ces00, "edu")
 ces00$education<-Recode(ces00$pesd1f, "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
 #checks
 table(ces00$education, ces00$pesd1f , useNA = "ifany" )
+
+#recode Personal Retrospective (cpsc1)
+look_for(ces00, "financ")
+ces00$personal_retrospective<-Recode(ces00$cpsc1, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces00$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces00$personal_retrospective)
+table(ces00$personal_retrospective, ces00$cpsc1 , useNA = "ifany" )
+
+#recode Ideology (cpspla36)
+look_for(ces00, "the left")
+ces00$ideology<-Recode(ces00$cpspla36, "1=0; 3=1; 5=0.5; else=NA")
+val_labels(ces00$ideology)<-c(Left=0, Right=1)
+#checks
+val_labels(ces00$ideology)
+table(ces00$ideology, ces00$cpspla36 , useNA = "ifany")
+
+#recode turnout (pesa2)
+look_for(ces00, "vote")
+ces00$turnout<-Recode(ces00$pesa2, "1=1; 5=0; 8=0; else=NA")
+val_labels(ces00$turnout)<-c(No=0, Yes=1)
+#checks
+val_labels(ces00$turnout)
+table(ces00$turnout)
+table(ces00$turnout, ces00$vote)

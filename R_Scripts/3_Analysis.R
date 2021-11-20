@@ -77,6 +77,7 @@ ces %>%
   mutate(model=map(variables, function(x) lm(ndp~region2+male+age+income+degree+as.factor(religion2)+working_class3, data=x)),
          tidied=map(model, tidy),
          vote=rep('NDP', nrow(.)))->ndp_models_complete1
+
 ces %>%
   filter(election> 1974 & election!=2000) %>%
   nest(variables=-election) %>%
@@ -105,6 +106,7 @@ ndp_models_complete1 %>%
   labs(title="OLS Coefficients of Working Class on Party Vote 1979-2019", alpha="Variable", color="Vote", x="Election", y="Estimate")+
   geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
   ylim(c(-0.3,0.3))+
+
   #scale_color_manual(values=c("navy blue", "red", "orange"))+
   #Turn to greyscale for printing in the journal; also we don't actually need the legend because the labels are on the side
   scale_color_grey(guide="none")+

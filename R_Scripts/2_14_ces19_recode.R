@@ -197,14 +197,6 @@ val_labels(ces19phone$native)<-c(Foreign=0, Native=1)
 val_labels(ces19phone$native)
 table(ces19phone$native , ces19phone$q64 , useNA = "ifany" )
 
-#recode Ideology (p42)
-look_for(ces19phone, "scale")
-ces19phone$ideology<-Recode(ces19phone$p42, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
-val_labels(ces19phone$ideology)<-c(Left=0, Right=1)
-#checks
-val_labels(ces19phone$ideology)
-table(ces19phone$ideology, ces19phone$p42 , useNA = "ifany" )
-
 #recode Immigration sentiment (p22_a, p22_b, p22_c, q39) into an index 0-1
 #1 = pro-immigration sentiment 0 = anti-immigration sentiment
 look_for(ces19phone, "immigr")
@@ -825,3 +817,26 @@ ces19phone %>%
 ces19phone %>% 
   select(author1, author2, author3, author4) %>% 
   cor(., use="complete.obs")
+
+#recode Ideology (p42)
+look_for(ces19phone, "scale")
+ces19phone$ideology<-Recode(ces19phone$p42, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
+val_labels(ces19phone$ideology)<-c(Left=0, Right=1)
+#checks
+val_labels(ces19phone$ideology)
+table(ces19phone$ideology, ces19phone$p42 , useNA = "ifany" )
+
+#### recode Immigration sentiment (p22_a) #### 
+look_for(ces19phone, "immigr")
+ces19phone$immigration_job<-Recode(ces19phone$p22_a, "1=0; 2=0.25; 3=0.75; 4=0; -9=0.5; else=NA", as.numeric=T)
+#checks
+table(ces19phone$immigration_job, ces19phone$p22_a, useNA = "ifany" )
+
+#### recode turnout (p2) ####
+look_for(ces19phone, "vote")
+ces19phone$turnout<-Recode(ces19phone$p2, "1=1; 2:5=0; -9=0; else=NA")
+val_labels(ces19phone$turnout)<-c(No=0, Yes=1)
+#checks
+val_labels(ces19phone$turnout)
+table(ces19phone$turnout)
+table(ces19phone$turnout, ces19phone$vote)

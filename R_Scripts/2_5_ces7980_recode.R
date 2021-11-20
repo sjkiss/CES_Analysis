@@ -218,6 +218,23 @@ ces7980$ndp_rating<-Recode(ces7980$V1269, "0=NA")
 #checks
 table(ces7980$ndp_rating)
 
+#recode Ideology (V1406)
+look_for(ces7980, "self")
+ces7980$ideology<-Recode(ces7980$V1406 , "1=0; 2=0.125; 3=0.25; 4=0.375; 5=0.5; 6=0.625; 7=0.75; 8=0.875; 9=1; else=NA")
+val_labels(ces7980$ideology)<-c(Left=0, Right=1)
+#checks
+val_labels(ces7980$ideology)
+table(ces7980$ideology, ces7980$V1406  , useNA = "ifany")
+
+#recode turnout (V1233)
+look_for(ces7980, "vote")
+ces7980$turnout<-Recode(ces7980$V1233, "1=1; 2=0;  8=0; else=NA")
+val_labels(ces7980$turnout)<-c(No=0, Yes=1)
+#checks
+val_labels(ces7980$turnout)
+table(ces7980$turnout)
+table(ces7980$turnout, ces7980$vote)
+
 #--------------------------------------------------------------------------------------------------------------------
 ####1980
 #recode Gender (V2156)
@@ -334,6 +351,15 @@ look_for(ces7980, "therm")
 ces7980$ndp_rating80<-Recode(ces7980$V2088, "0=NA")
 #checks
 table(ces7980$ndp_rating80)
+
+#recode turnout (V2061)
+look_for(ces7980, "vote")
+ces7980$turnout80<-Recode(ces7980$V2061, "1=1; 2=0;  8=0; else=NA")
+val_labels(ces7980$turnout80)<-c(No=0, Yes=1)
+#checks
+val_labels(ces7980$turnout80)
+table(ces7980$turnout80)
+table(ces7980$turnout80, ces7980$vote80)
 
 ##### See the script 1_master_file.R There I turned the values for the 79 variables into 1980 variables for the 1980 respondents
 # No Occupation variable

@@ -539,3 +539,35 @@ ces97$education<-Recode(ces97$pese6f, "1=0; 3=0.5; 5=1; 8=0.5; else=NA")
 #checks
 table(ces97$education, ces97$pese6f , useNA = "ifany" )
 
+#recode Personal Retrospective (cpsc1)
+look_for(ces97, "financ")
+ces97$personal_retrospective<-Recode(ces97$cpsc1, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces97$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces97$personal_retrospective)
+table(ces97$personal_retrospective, ces97$cpsc1 , useNA = "ifany" )
+
+#recode Ideology (mbsi16a)
+look_for(ces97, "the left")
+ces97$ideology<-Recode(ces97$mbsi16a , "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
+val_labels(ces97$ideology)<-c(Left=0, Right=1)
+#checks
+val_labels(ces97$ideology)
+table(ces97$ideology, ces97$mbsi16a  , useNA = "ifany")
+
+#recode turnout (pesa2a & pesa2b)
+look_for(ces97, "vote")
+ces97 %>% 
+  mutate(turnout=case_when(
+    pesa2a==1 ~1,
+    pesa2a==5 ~0,
+    pesa2a==8 ~0,
+    pesa2b==1 ~1,
+    pesa2b==5 ~0,
+    pesa2b==8 ~0,
+  ))->ces97
+val_labels(ces97$turnout)<-c(No=0, Yes=1)
+#checks
+val_labels(ces97$turnout)
+table(ces97$turnout)
+table(ces97$turnout, ces97$vote)

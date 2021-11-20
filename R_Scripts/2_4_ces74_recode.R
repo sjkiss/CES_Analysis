@@ -198,4 +198,13 @@ ces74$ndp_rating<-Recode(ces74$V196, "0=NA")
 #checks
 table(ces74$ndp_rating)
 
+#recode turnout (V161)
+look_for(ces74, "vote")
+ces74$turnout<-Recode(ces74$V161, "1=1; 2=0;  8=0; else=NA")
+val_labels(ces74$turnout)<-c(No=0, Yes=1)
+#checks
+val_labels(ces74$turnout)
+table(ces74$turnout)
+table(ces74$turnout, ces74$vote)
+
 names(ces74)
