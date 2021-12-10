@@ -644,19 +644,12 @@ names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988',
 #.id="survey"creates a new variable called "survey" and its values are the names of the list items. 
 
 library(haven)
-#Add the common variables we need from each data.frame in the combined data set here.
-common_vars<-c('male', 'union', 'region')
+
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
-  map(., zap_labels) %>%
-  #map_df does the select function on each item in ces.list
-  #It selects whatever is in common_vars, above
-  #It spits out a list of data_frames
-  map_df(., select, common_vars) %>% 
-  #bind_rows smushes all the data frames together, and creates a variable called election
-  #The value of which come from the name of the list item
-  #e.g. if a row comes from, it's value of election will be 2000
+  map(., zap_labels) %>% 
+  #bind rows creating id variable "election"
   bind_rows(., .id="election")->ces
 #Remove ces.list
 # We don't need it here
@@ -668,7 +661,35 @@ tail(names(ces))
 names(ces68)
 #You see how this has *all* the variables from both 1993 and 1997. 
 #So here we just select out names variables that we want. 
+# ces %>% 
+  # select(c("union", "degree", "survey"))-> ces
+###We forgot to include the new variable "election" in what is selected.
 
+ces %>% 
+  select(c("male", 
+           "union_both",
+           "union", 
+           "degree", 
+           "region", 
+           "quebec", 
+           "age", 
+           "religion",
+           "language", 
+           "employment", 
+           "sector",
+           "party_id", 
+           "vote", 
+           "occupation",
+          "income", 
+          "non_charter_language", 
+          "occupation3",
+          "religiosity",
+          "election", "size", "redistribution", "pro_redistribution",
+          "market_liberalism", "traditionalism", "traditionalism2", "immigration_rates", "enviro", "death_penalty", 
+          "personal_retrospective", "ideology", "immigration_job", "turnout",
+          "crime", "gay_rights", "abortion", "authoritarianism", "quebec_accom","education",
+          "liberal_rating", "conservative_rating", "ndp_rating", "green_rating", "bloc_rating",
+          "liberal_leader", "conservative_leader", "ndp_leader", "green_leader", "bloc_leader"))-> ces
 ##
 
 library(stringr)

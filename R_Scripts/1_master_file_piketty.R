@@ -615,6 +615,7 @@ ces11 %>%
 ces.list<-list(ces65, ces68, ces72_nov, ces74, ces79, ces80, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone, ces19phone, ces21)
 #WE are going to name each item in the list
 names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988', '1993', '1997', '2000', '2004', '2006', '2008', '2011', '2015', '2019', '2021')
+
 #removing election files
 #Remove these only if you run into memory troubles
 # rm(ces00)
@@ -653,11 +654,12 @@ ces.list %>%
   #map_df does the select function on each item in ces.list
   #It selects whatever is in common_vars, above
   #It spits out a list of data_frames
-  map_df(., select, common_vars) %>% 
+ map_df(., select, common_vars) %>% 
   #bind_rows smushes all the data frames together, and creates a variable called election
   #The value of which come from the name of the list item
   #e.g. if a row comes from, it's value of election will be 2000
-  bind_rows(., .id="election")->ces
+  bind_rows(., .id="election")->ces 
+
 #Remove ces.list
 # We don't need it here
 rm(ces.list)
