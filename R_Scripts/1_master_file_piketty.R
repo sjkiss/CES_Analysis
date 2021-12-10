@@ -841,6 +841,4 @@ theme_set(theme_bw())
 
 #source("R_scripts/8_analysis_script.R", echo=T)
 
-table(ces$election, ces$occupation2)
-table(ces$election, ces$occupation)
-table(ces$election)
+
