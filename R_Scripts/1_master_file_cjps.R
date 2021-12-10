@@ -644,16 +644,10 @@ names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988',
 #.id="survey"creates a new variable called "survey" and its values are the names of the list items. 
 
 library(haven)
-#Add the common variables we need from each data.frame in the combined data set here.
-common_vars<-c('male', 'union', 'region')
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
   map(., zap_labels) %>%
-  #map_df does the select function on each item in ces.list
-  #It selects whatever is in common_vars, above
-  #It spits out a list of data_frames
-  map_df(., select, common_vars) %>% 
   #bind_rows smushes all the data frames together, and creates a variable called election
   #The value of which come from the name of the list item
   #e.g. if a row comes from, it's value of election will be 2000
@@ -844,3 +838,4 @@ theme_set(theme_bw())
 table(ces$election, ces$occupation2)
 table(ces$election, ces$occupation)
 table(ces$election)
+ces$occupation2
