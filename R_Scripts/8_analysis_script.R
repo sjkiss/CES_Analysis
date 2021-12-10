@@ -1061,7 +1061,7 @@ library(DescTools)
 #### Pseudo R2 NDP ####
 #ROC
 roc %>% 
-  nest(-survey) %>% 
+  nest(-survey) %>%  
   mutate(ndp_demographics=map(data, function(x) glm(ndp~region3+working_class4+union_both+young+old+male+sector+catholic+no_religion+degree+vismin+low_income+high_income, family="binomial", data=x)), 
          ndp_values=map(data, function(x) glm(ndp~region3+working_class4+union_both+young+old+male+sector+catholic+no_religion+degree+vismin+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, family="binomial", data=x)),
          ndp_partisanship=map(data, function(x) glm(ndp~region3+working_class4+union_both+young+old+male+sector+catholic+no_religion+degree+vismin+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id, family="binomial", data=x)),

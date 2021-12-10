@@ -2245,6 +2245,7 @@ ces %>%
   filter(!is.na(vote)) %>% 
   filter(vote > 0 &vote<5) %>% 
   filter(occupation4=="Working_Class") %>% 
+ # filter(pro==1) %>% 
   summarize(n=n()) %>% 
   mutate(percent=n/sum(n)) %>% 
   ggplot(., aes(x=election, y=percent, fill=as_factor(vote)))+geom_col(position="dodge")+facet_wrap(~name)+scale_fill_manual(values=c('red', 'darkblue', 'orange', 'lightblue' ))
