@@ -828,7 +828,7 @@ table(ces19phone$ideology, ces19phone$p42 , useNA = "ifany" )
 
 #### recode Immigration sentiment (p22_a) #### 
 look_for(ces19phone, "immigr")
-ces19phone$immigration_job<-Recode(ces19phone$p22_a, "1=0; 2=0.25; 3=0.75; 4=0; -9=0.5; else=NA", as.numeric=T)
+ces19phone$immigration_job<-Recode(ces19phone$p22_a, "1=0; 2=0.25; 3=0.75; 4=1; -9=0.5; else=NA", as.numeric=T)
 #checks
 table(ces19phone$immigration_job, ces19phone$p22_a, useNA = "ifany" )
 
@@ -840,3 +840,9 @@ val_labels(ces19phone$turnout)<-c(No=0, Yes=1)
 val_labels(ces19phone$turnout)
 table(ces19phone$turnout)
 table(ces19phone$turnout, ces19phone$vote)
+
+# recode satisfaction with democracy (q6)
+look_for(ces19phone, "dem")
+ces19phone$satdem<-Recode(ces19phone$q6, "1=1; 2=0.75; 3=0.25; 4=0; -9=0.5; else=NA", as.numeric=T)
+#checks
+table(ces19phone$satdem, ces19phone$q6, useNA = "ifany" )

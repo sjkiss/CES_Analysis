@@ -891,3 +891,8 @@ val_labels(ces15phone$turnout)
 table(ces15phone$turnout)
 table(ces15phone$turnout, ces15phone$vote)
 
+#### recode satisfaction with democracy (CPS15_0) ####
+look_for(ces15phone, "dem")
+ces15phone$satdem<-Recode(ces15phone$CPS15_0, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces15phone$satdem, ces15phone$CPS15_0, useNA = "ifany" )

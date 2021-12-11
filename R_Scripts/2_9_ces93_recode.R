@@ -587,3 +587,9 @@ val_labels(ces93$turnout)<-c(No=0, Yes=1)
 val_labels(ces93$turnout)
 table(ces93$turnout)
 table(ces93$turnout, ces93$vote)
+
+# recode satisfaction with democracy (PESL5)
+look_for(ces93, "dem")
+ces93$satdem<-Recode(ces93$PESL5, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces93$satdem, ces93$PESL5, useNA = "ifany" )

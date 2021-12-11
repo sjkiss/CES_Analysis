@@ -666,6 +666,12 @@ val_labels(ces0411$turnout04)
 table(ces0411$turnout04)
 table(ces0411$turnout04, ces0411$vote04)
 
+#### recode satisfaction with democracy (ces04_CPS_B10) ####
+look_for(ces0411, "dem")
+ces0411$satdem04<-Recode(ces0411$ces04_CPS_B10, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$satdem04, ces0411$ces04_CPS_B10, useNA = "ifany" )
+
 ###Recode 2006 2nd ####
 
 # Gender done at top
@@ -1342,6 +1348,12 @@ val_labels(ces0411$turnout06)<-c(No=0, Yes=1)
 val_labels(ces0411$turnout06)
 table(ces0411$turnout06)
 table(ces0411$turnout06, ces0411$vote06)
+
+#### recode satisfaction with democracy (ces06_CPS_A1) ####
+look_for(ces0411, "dem")
+ces0411$satdem06<-Recode(ces0411$ces06_CPS_A1, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$satdem06, ces0411$ces06_CPS_A1, useNA = "ifany" )
 
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
@@ -2096,6 +2108,12 @@ val_labels(ces0411$turnout08)
 table(ces0411$turnout08)
 table(ces0411$turnout08, ces0411$vote08)
 
+#### recode satisfaction with democracy (ces08_CPS_A1) ####
+look_for(ces0411, "dem")
+ces0411$satdem08<-Recode(ces0411$ces08_CPS_A1, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$satdem08, ces0411$ces08_CPS_A1, useNA = "ifany" )
+
 ####Recode 2011 4th ####
 
 # Gender done at top
@@ -2671,3 +2689,9 @@ val_labels(ces0411$turnout11)<-c(No=0, Yes=1)
 val_labels(ces0411$turnout11)
 table(ces0411$turnout11)
 table(ces0411$turnout11, ces0411$vote11)
+
+#### recode satisfaction w democracy (CPS11_0) #### 
+look_for(ces0411, "dem")
+ces0411$satdem11<-Recode(ces0411$CPS11_0, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$satdem11, ces0411$CPS11_0, useNA = "ifany" )

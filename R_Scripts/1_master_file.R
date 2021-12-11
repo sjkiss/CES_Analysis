@@ -611,10 +611,16 @@ ces11 %>%
 #If one of the data frame has a variable that the other does not then it just fills the rows with missing values
 #I *think* that this is the quickest way forward. 
 
+#remove qi variable
+look_for(ces21, "qi")
+ces21$qi <- NULL
+look_for(ces21, "province")
+ces21$province <- NULL
+
 ##We are going to make a list of each survey
-ces.list<-list(ces65, ces68, ces72_nov, ces74, ces79, ces80, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone, ces19phone)
+ces.list<-list(ces65, ces68, ces72_nov, ces74, ces79, ces80, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone, ces19phone, ces21)
 #WE are going to name each item in the list
-names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988', '1993', '1997', '2000', '2004', '2006', '2008', '2011', '2015', '2019')
+names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988', '1993', '1997', '2000', '2004', '2006', '2008', '2011', '2015', '2019', '2021')
 #removing election files
 #Remove these only if you run into memory troubles
 # rm(ces00)
@@ -635,7 +641,7 @@ names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988',
 # rm(ces93)
 # rm(ces97)
 # rm(ces19phone)
-# 
+# rm(ces21)
 # str(ces.list)
 # str(ces.list$`2019`)
 # ces.list%>%
