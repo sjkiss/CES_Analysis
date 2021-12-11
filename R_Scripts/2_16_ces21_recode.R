@@ -232,7 +232,7 @@ table(ces21$conservative_rating)
 
 #recode NDP rating 
 ces21$NDP_rating<-Recode(ces21$cps21_party_rating_25, "-99=NA")
-table(ces21$NDP_therm)
+table(ces21$NDP_rating)
 
 #recode Bloc rating 
 ces21$bloc_rating<-Recode(ces21$cps21_party_rating_26, "-99=NA")
@@ -259,20 +259,20 @@ ces21$market2<-Recode(ces21$pes21_blame, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=
 #checks
 table(ces21$market1, ces21$pes21_privjobs , useNA = "ifany" )
 table(ces21$market2, ces21$pes21_blame , useNA = "ifany" )
-
+ces21$market1
 ces21 %>% 
   rowwise() %>% 
-  mutate(market_liberalism=mean(market1, market2), na.rm=T ) -> out
+  mutate(market_liberalism=mean(c_across(market1:market2), na.rm=T ))->out
 out %>% 
   ungroup() %>% 
   select(c(market1, market2, market_liberalism)) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<4)
+  filter(na>0, na<2)
 #Scale Averaging 
 ces21 %>% 
   rowwise() %>% 
   mutate(market_liberalism=mean(
-    c(market1, market2), na.rm=T  
+    c_across(market1:market2), na.rm=T  
   )) %>% 
   ungroup()->ces21
 
@@ -422,6 +422,7 @@ ces21 %>%
 ces21 %>% 
   select(starts_with("trad")) %>% 
   summary()
+tail(names(ces21))
 
 #Check distribution of traditionalism2
 qplot(ces21$traditionalism2, geom="histogram")
@@ -451,23 +452,26 @@ ces21 %>%
   mutate(authoritarianism=mean(
     c_across(author1:author4)
     , na.rm=T )) -> out
+tail(names(out))
 out %>% 
   ungroup() %>% 
   select(c(author1, author2, author3, author4, authoritarianism)) %>% 
   mutate(na=rowSums(is.na(.))) %>% 
   filter(na>0, na<6)
+names(out)
 #Scale Averaging 
 ces21 %>% 
   rowwise() %>% 
-  mutate(authoritarianism=mean(c(author1, author2, author3, author4)), na.rm=T  ) %>% 
+  mutate(authoritarianism=mean(c_across(author1:author4), na.rm=T  )) %>% 
   ungroup()->ces21
 
 ces21 %>% 
   select(starts_with("author")) %>% 
   summary()
+tail(names(ces21))
 #Check distribution of traditionalism
 qplot(ces21$authoritarianism, geom="histogram")
-table(ces21$authoritarianism, useNA="ifany")
+
 
 #Calculate Cronbach's alpha
 ces21 %>% 
