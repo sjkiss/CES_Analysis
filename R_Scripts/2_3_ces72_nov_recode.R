@@ -122,3 +122,13 @@ val_labels(ces72_nov$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle
 #checks
 val_labels(ces72_nov$income)
 table(ces72_nov$income)
+
+
+#Empty variables that are not available pre-88
+ces72_nov$redistribution<-rep(NA, nrow(ces72_nov))
+ces72_nov$market_liberalism<-rep(NA, nrow(ces72_nov))
+ces72_nov$traditionalism2<-rep(NA, nrow(ces72_nov))
+ces72_nov$immigration_rates<-rep(NA, nrow(ces72_nov))
+ces72_nov$turnout<-rep(NA, nrow(ces72_nov))
+ces72_nov$mip<-rep(NA, nrow(ces72_nov))
+

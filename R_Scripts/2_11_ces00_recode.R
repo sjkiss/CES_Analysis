@@ -569,6 +569,15 @@ val_labels(ces00$turnout)
 table(ces00$turnout)
 table(ces00$turnout, ces00$vote)
 
+#recode Most Important Question (cpsa1)
+look_for(ces00, "issue")
+ces00$mip<-Recode(ces00$cpsa1, "10:15=6; 16=4; 17=0; 20:27=10; 30:36=7; 40:42=0; 43:44=16; 45=0; 46=3; 47=11; 
+				                        48:49=0; 50:55=9; 56=0; 57=8; 58=15; 59=8; 60:63=15; 64=6; 65:69=8; 70=0; 
+				                        71=2; 72=15; 73:74=14; 75=1; 76=14; 80:88=16; 90=0; 91=3; 92=11; 93:96=0; 97=11; else=NA")
+val_labels(ces00$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10, 
+                         Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17)
+table(ces00$mip)
+
 # recode satisfaction with democracy (cpsa8)
 look_for(ces00, "dem")
 ces00$satdem<-Recode(ces00$cpsa8, "1=1; 3=0.75; 5=0.25; 7=0; 98=0.5; else=NA", as.numeric=T)

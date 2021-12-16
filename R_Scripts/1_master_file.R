@@ -321,6 +321,10 @@ ces04 %>%
   rename(ideology=ideology04)->ces04
 ces04 %>% 
   rename(turnout=turnout04)->ces04
+ces04 %>% 
+  rename(mip=mip04)->ces04
+ces04 %>% 
+  rename(satdem=satdem04)->ces04
 
 table(ces04$survey, ces04$non_charter_language)
 
@@ -413,6 +417,10 @@ ces06 %>%
   rename(immigration_job=immigration_job06)->ces06
 ces06 %>% 
   rename(turnout=turnout06)->ces06
+ces06 %>% 
+  rename(mip=mip06)->ces06
+ces06 %>% 
+  rename(satdem=satdem06)->ces06
 
 table(ces06$survey, ces06$non_charter_language)
 
@@ -507,6 +515,10 @@ ces08 %>%
   rename(immigration_job=immigration_job08)->ces08
 ces08 %>% 
   rename(turnout=turnout08)->ces08
+ces08 %>% 
+  rename(mip=mip08)->ces08
+ces08 %>% 
+  rename(satdem=satdem08)->ces08
 
 table(ces08$survey, ces08$non_charter_language)
 
@@ -601,6 +613,10 @@ ces11 %>%
   rename(immigration_job=immigration_job11)->ces11
 ces11 %>% 
   rename(turnout=turnout11)->ces11
+ces11 %>% 
+  rename(mip=mip11)->ces11
+ces11 %>% 
+  rename(satdem=satdem11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -692,7 +708,7 @@ ces %>%
           "religiosity",
           "election", "size", "redistribution", "pro_redistribution",
           "market_liberalism", "traditionalism", "traditionalism2", "immigration_rates", "enviro", "death_penalty", 
-          "personal_retrospective", "ideology", "immigration_job", "turnout",
+          "personal_retrospective", "ideology", "immigration_job", "turnout", "satdem", "mip",
           "crime", "gay_rights", "abortion", "authoritarianism", "quebec_accom","education",
           "liberal_rating", "conservative_rating", "ndp_rating", "green_rating", "bloc_rating",
           "liberal_leader", "conservative_leader", "ndp_leader", "green_leader", "bloc_leader"))-> ces

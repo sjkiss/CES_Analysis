@@ -217,3 +217,17 @@ val_labels(ces68$turnout)<-c(No=0, Yes=1)
 val_labels(ces68$turnout)
 table(ces68$turnout)
 table(ces68$turnout, ces68$vote)
+
+#recode Most Important Question (var031)
+look_for(ces68, "most")
+ces68$mip<-Recode(ces68$var031, "1=8; 2=15; 3=6; 4:5=7; 6=16; 7=0; 8=14; 9=16; 10=12; 11=9; 12=4; 
+		                            13=11; 14=6; 15=7; 16=14; 17=15; 18:19=0; else=NA")
+val_labels(ces68$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10, 
+                         Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16)
+table(ces68$mip)
+
+#Empty variables that are not available pre-88
+ces68$redistribution<-rep(NA, nrow(ces68))
+ces68$market_liberalism<-rep(NA, nrow(ces68))
+ces68$traditionalism2<-rep(NA, nrow(ces68))
+ces68$immigration_rates<-rep(NA, nrow(ces68))

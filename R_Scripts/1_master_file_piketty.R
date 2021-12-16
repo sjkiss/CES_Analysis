@@ -122,7 +122,7 @@ table(ces80$vote, ces80$vote80)
 ##We just need to turn the variables that end with 80 into regularly named variables.
 
 ces80 %>% 
-  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size, ideology, turnout)->ces80
+  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size, ideology, turnout, redistribution, market_liberalism, immigration_rates, traditionalism2)->ces80
 names(ces80)
 
 ### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
@@ -321,6 +321,10 @@ ces04 %>%
   rename(ideology=ideology04)->ces04
 ces04 %>% 
   rename(turnout=turnout04)->ces04
+ces04 %>% 
+  rename(mip=mip04)->ces04
+ces04 %>% 
+  rename(satdem=satdem04)->ces04
 
 table(ces04$survey, ces04$non_charter_language)
 
@@ -413,6 +417,10 @@ ces06 %>%
   rename(immigration_job=immigration_job06)->ces06
 ces06 %>% 
   rename(turnout=turnout06)->ces06
+ces06 %>% 
+  rename(mip=mip06)->ces06
+ces06 %>% 
+  rename(satdem=satdem06)->ces06
 
 table(ces06$survey, ces06$non_charter_language)
 
@@ -507,6 +515,10 @@ ces08 %>%
   rename(immigration_job=immigration_job08)->ces08
 ces08 %>% 
   rename(turnout=turnout08)->ces08
+ces08 %>% 
+  rename(mip=mip08)->ces08
+ces08 %>% 
+  rename(satdem=satdem08)->ces08
 
 table(ces08$survey, ces08$non_charter_language)
 
@@ -601,6 +613,10 @@ ces11 %>%
   rename(immigration_job=immigration_job11)->ces11
 ces11 %>% 
   rename(turnout=turnout11)->ces11
+ces11 %>% 
+  rename(mip=mip11)->ces11
+ces11 %>% 
+  rename(satdem=satdem11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -646,7 +662,8 @@ names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988',
 
 library(haven)
 #Add the common variables we need from each data.frame in the combined data set here.
-common_vars<-c('male', 'union', 'region')
+common_vars<-c('male', 'union_both', 'region', 'degree', 'quebec', 'age', 'religion', 'vote', 'income', 'redistribution', 'market_liberalism', 'immigration_rates', 'traditionalism2', 'turnout')
+
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
@@ -674,12 +691,12 @@ names(ces68)
 ##
 
 library(stringr)
-table(str_detect(names(ces0411), "survey"))
+#table(str_detect(names(ces0411), "survey"))
 table(str_detect(names(ces00), "survey"))
 
 names(ces)
 table(ces$election, ces$male, useNA = "ifany")
-table(ces$union)
+table(ces$union_both)
 
 #### Currently region is regions of English Canada only
 #### quebec is dichotomous Quebec v. non-quebec
@@ -755,7 +772,7 @@ ces$no_religion<-Recode(ces$religion, "0=1; 1:3=0; NA=NA")
 
 ### Value labels often go missing in the creation of the ces data frame
 ### assign value label
-val_labels(ces$sector)<-c(Private=0, Public=1)
+#val_labels(ces$sector)<-c(Private=0, Public=1)
 val_labels(ces$vote)<-c(Conservative=2, Liberal=1, NDP=3, BQ=4, Green=5, Other=0)
 val_labels(ces$male)<-c(Female=0, Male=1)
 val_labels(ces$union_both)<-c(None=0, Union=1)
@@ -763,48 +780,48 @@ val_labels(ces$degree)<-c(`No degree`=0, Degree=1)
 val_labels(ces$region)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces$quebec)<-c(Other=0, Quebec=1)
 val_labels(ces$religion)<-c(None=0, Catholic=1, Protestant=2, Other=3)
-val_labels(ces$language)<-c(French=0, English=1)
-val_labels(ces$non_charter_language)<-c(Charter=0, Non_Charter=1)
-val_labels(ces$employment)<-c(Unemployed=0, Employed=1)
-val_labels(ces$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#val_labels(ces$language)<-c(French=0, English=1)
+#val_labels(ces$non_charter_language)<-c(Charter=0, Non_Charter=1)
+#val_labels(ces$employment)<-c(Unemployed=0, Employed=1)
+#val_labels(ces$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
 val_labels(ces$redistribution)<-c(Less=0, More=1)
-val_labels(ces$education)<-c(Less=0, Same=0.5, More=1)
+#val_labels(ces$education)<-c(Less=0, Same=0.5, More=1)
 
 ####
 names(ces)
 
-#### Some occupation recodes (occupation 3 and 4 include self-employed) ####
-val_labels(ces$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
-ces$occupation2<-Recode(as.factor(ces$occupation), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual'))
-ces$occupation2<-fct_relevel(ces$occupation2, "Managers", "Professionals", "Routine_Nonmanual", 'Working_Class')
-val_labels(ces$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
-
-ces$occupation4<-Recode(as.factor(ces$occupation3), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'; 6='Self-Employed'", levels=c('Working_Class', 'Managers', 'Professionals','Self-Employed', 'Routine_Nonmanual')
-#ces$occupation4<-fct_relevel(ces$occupation4, "Managers", "Self-Employed", "Professionals", "Routine_Nonmanual", 'Working_Class')
-)
-
-table(ces$occupation, ces$election)
-table(ces$occupation2, ces$election)
-table(ces$occupation3, ces$election)
-table(ces$occupation4, ces$election)
-
-ces %>% 
-  select(occupation, occupation3, election) %>% 
-  group_by(election) %>% 
-  summarise_all(funs(sum(is.na(.))/length(.))) 
-prop.table(table(ces15phone$occupation, useNA = "ifany"))
-prop.table(table(ces19phone$occupation, useNA = "ifany"))
-
+# #### Some occupation recodes (occupation 3 and 4 include self-employed) ####
+# val_labels(ces$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+# ces$occupation2<-Recode(as.factor(ces$occupation), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual'))
+# ces$occupation2<-fct_relevel(ces$occupation2, "Managers", "Professionals", "Routine_Nonmanual", 'Working_Class')
+# val_labels(ces$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+# 
+# ces$occupation4<-Recode(as.factor(ces$occupation3), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'; 6='Self-Employed'", levels=c('Working_Class', 'Managers', 'Professionals','Self-Employed', 'Routine_Nonmanual')
+# #ces$occupation4<-fct_relevel(ces$occupation4, "Managers", "Self-Employed", "Professionals", "Routine_Nonmanual", 'Working_Class')
+# )
+# 
+# table(ces$occupation, ces$election)
+# table(ces$occupation2, ces$election)
+# table(ces$occupation3, ces$election)
+# table(ces$occupation4, ces$election)
+# 
+# ces %>% 
+#   select(occupation, occupation3, election) %>% 
+#   group_by(election) %>% 
+#   summarise_all(funs(sum(is.na(.))/length(.))) 
+# prop.table(table(ces15phone$occupation, useNA = "ifany"))
+# prop.table(table(ces19phone$occupation, useNA = "ifany"))
+# 
 # Working Class variables (3 and 4 include self-employed; 2 and 4 are dichotomous where everyone else is set to 0)
-ces$working_class<-Recode(ces$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
-ces$working_class2<-Recode(ces$occupation, "4:5=1; else=0")
-ces$working_class3<-Recode(ces$occupation3, "4:5=1; 3=0; 2=0; 1=0; 6=0; else=NA")
-ces$working_class4<-Recode(ces$occupation3, "4:5=1; else=0")
-table(ces$working_class, ces$election)
-table(ces$working_class2, ces$election)
-table(ces$working_class3, ces$election)
-table(ces$working_class4, ces$election)
+# ces$working_class<-Recode(ces$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
+# ces$working_class2<-Recode(ces$occupation, "4:5=1; else=0")
+# ces$working_class3<-Recode(ces$occupation3, "4:5=1; 3=0; 2=0; 1=0; 6=0; else=NA")
+# ces$working_class4<-Recode(ces$occupation3, "4:5=1; else=0")
+# table(ces$working_class, ces$election)
+# table(ces$working_class2, ces$election)
+# table(ces$working_class3, ces$election)
+# table(ces$working_class4, ces$election)
 
 #Create variables
 ces$left<-Recode(ces$vote, "1=1; 3=1; 5=1; 0=0; 2=0; 4=0; else=NA")
@@ -814,20 +831,21 @@ table(ces$ndp, ces$election)
 ces$right<-Recode(ces$vote, "2=1; 0=0; 1=0; 3:5=0; else=NA")
 table(ces$right, ces$election)
 val_labels(ces$right)<-c(Right=1, Other=0)
-ces$upper_class<-Recode(ces$occupation, "1:2=1; 3:5=0; else=NA")
-table(ces$upper_class)
-ces$upper_class2<-Recode(ces$occupation3, "1:2=1; 3:6=0; else=NA")
-table(ces$upper_class2)
+# ces$upper_class<-Recode(ces$occupation, "1:2=1; 3:5=0; else=NA")
+# table(ces$upper_class)
+# ces$upper_class2<-Recode(ces$occupation3, "1:2=1; 3:6=0; else=NA")
+# table(ces$upper_class2)
 
-table(ces$employment, ces$election)
+# #table(ces$employment, ces$election)
+# 
+# ces %>% 
+#   mutate(`Period`=case_when(
+#     election>2000~1,
+#     election<2004~0
+#   ))->ces
 
-ces %>% 
-  mutate(`Period`=case_when(
-    election>2000~1,
-    election<2004~0
-  ))->ces
+#val_labels(ces$working_class4)<-c(`Other`=0, `Working  Class`=1)
 
-val_labels(ces$working_class4)<-c(`Other`=0, `Working  Class`=1)
 #### Set Theme ####
 theme_set(theme_bw())
 
@@ -842,5 +860,3 @@ theme_set(theme_bw())
 #source("R_scripts/8_block_recursive_models.R", echo=T)
 
 #source("R_scripts/8_analysis_script.R", echo=T)
-
-
