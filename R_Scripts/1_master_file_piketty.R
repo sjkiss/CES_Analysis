@@ -671,11 +671,11 @@ ces.list %>%
   #map_df does the select function on each item in ces.list
   #It selects whatever is in common_vars, above
   #It spits out a list of data_frames
- map_df(., select, common_vars) %>% 
+ map_df(., select, all_of(common_vars)) %>% 
   #bind_rows smushes all the data frames together, and creates a variable called election
   #The value of which come from the name of the list item
   #e.g. if a row comes from, it's value of election will be 2000
-  bind_rows(., .id="election")->ces 
+  bind_rows(., .id="survey")->ces 
 
 #Remove ces.list
 # We don't need it here
@@ -685,10 +685,6 @@ summary(ces)
 #Check the names
 tail(names(ces))
 names(ces68)
-#You see how this has *all* the variables from both 1993 and 1997. 
-#So here we just select out names variables that we want. 
-
-##
 
 library(stringr)
 #table(str_detect(names(ces0411), "survey"))
@@ -784,7 +780,7 @@ val_labels(ces$religion)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 #val_labels(ces$non_charter_language)<-c(Charter=0, Non_Charter=1)
 #val_labels(ces$employment)<-c(Unemployed=0, Employed=1)
 #val_labels(ces$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
-val_labels(ces$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 val_labels(ces$redistribution)<-c(Less=0, More=1)
 #val_labels(ces$education)<-c(Less=0, Same=0.5, More=1)
 
@@ -860,3 +856,4 @@ theme_set(theme_bw())
 #source("R_scripts/8_block_recursive_models.R", echo=T)
 
 #source("R_scripts/8_analysis_script.R", echo=T)
+names(ces)
