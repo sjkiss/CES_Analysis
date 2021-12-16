@@ -208,16 +208,17 @@ table(ces74$turnout)
 table(ces74$turnout, ces74$vote)
 
 names(ces74)
-
+ces74$V92
+look_for(ces74, "issue")
 #recode Most Important Question (V92)
 look_for(ces74, "MOST IMPORTANT ISSUE")
-ces74$mip<-Recode(ces74$V92, "1:7=7; 8=14; 9=4; 10:12=9; 13=5; 14=6; 15=0; 16:17=7; 18=5; 19=6; 20:25=0; 26=11;
+ces74$mip<-Recode(ces74$V93, "1:7=7; 8=14; 9=4; 10:12=9; 13=5; 14=6; 15=0; 16:17=7; 18=5; 19=6; 20:25=0; 26=11;
 			                          27:30=15; 31=13; 32=4; 33=8; 34:36=16; 37=12; 38=16; 39=0; 40=12; 41=10; 
 			                          42:43=0; 44=10; 45:46=7; 47=6; 48:49=7; 50=15; 51=14; 52:53=1; 54=6; 
 			                          55=3; 56=14; 57=16; 58=14; 59=11; 60=12; 61=0; 62:63=11; 64=6; 65=11; else=NA")
 val_labels(ces74$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10, 
                          Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16)
-table(ces74$mip)
+
 
 #Empty variables that are not available pre-88
 ces74$redistribution<-rep(NA, nrow(ces74))
