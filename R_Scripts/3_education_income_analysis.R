@@ -71,6 +71,6 @@ combined_models %>%
   mutate(income_tidied=map(income, tidy)) %>% 
   unnest(income_tidied) %>%
   filter(term=="income") %>% 
-  ggplot(., aes(x=election, y=estimate, group=1))+geom_point()+facet_grid(~vote)+geom_smooth(method='lm', se=F)+labs(title="OLS coefficients of Income on Vote")
-ggsave(here("Plots", "piketty_ols_coefficients_degree_vote.png"))
+  ggplot(., aes(x=election, y=estimate, group=1))+geom_point()+facet_grid(~vote)+geom_smooth(method='lm', se=F)+labs(title="OLS coefficients of Income on Vote, 1965-2021")
+ggsave(here("Plots", "piketty_ols_coefficients_income_vote.png"))
 
