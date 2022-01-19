@@ -325,7 +325,8 @@ ces04 %>%
   rename(mip=mip04)->ces04
 ces04 %>% 
   rename(satdem=satdem04)->ces04
-
+ces04 %>% 
+  rename(welfare=welfare04)->ces04
 table(ces04$survey, ces04$non_charter_language)
 
 #### Rename CES06 ####
@@ -421,6 +422,8 @@ ces06 %>%
   rename(mip=mip06)->ces06
 ces06 %>% 
   rename(satdem=satdem06)->ces06
+ces06 %>% 
+  rename(welfare=welfare06)->ces06
 
 table(ces06$survey, ces06$non_charter_language)
 
@@ -519,6 +522,8 @@ ces08 %>%
   rename(mip=mip08)->ces08
 ces08 %>% 
   rename(satdem=satdem08)->ces08
+ces08 %>% 
+  rename(welfare=welfare08)->ces08
 
 table(ces08$survey, ces08$non_charter_language)
 
@@ -617,6 +622,8 @@ ces11 %>%
   rename(mip=mip11)->ces11
 ces11 %>% 
   rename(satdem=satdem11)->ces11
+ces11 %>% 
+  rename(welfare=welfare11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -747,7 +754,7 @@ ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:6=0; NA=NA")
 ces$liberal<-Recode(ces$vote, "1=1; 2:6=0; NA=NA")
 ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; 6=1; NA=NA")
 ces$bloc<-Recode(ces$vote, "4=1; 0:3=0; 5:6=0; else=NA")
-ces$green<-Recode(ces$vote, "5=1; 0:4=0; 6=1; else=NA")
+ces$green<-Recode(ces$vote, "5=1; 0:4=0; 6=0; else=NA")
 
 #Recode NDP vs Liberals/Right
 ces$ndp_vs_right<-Recode(ces$vote, "3=1; 2=0; 6=0; else=NA")

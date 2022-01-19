@@ -291,7 +291,55 @@ stargazer(green_models_complete4$model,
           title="Green Models 2004-2021", 
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
-##### Raw Vote
+# Attitudinal party vote models 1988-2021 (with Sector)
+ces %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(ndp~region2+male+age+income+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+sector, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('NDP', nrow(.)))->ndp_models_complete5
+
+ces %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(conservative~region2+male+age+income+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+sector, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Conservative', nrow(.))
+  )->conservative_models_complete5
+
+ces %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(liberal~region2+male+age+income+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+sector, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Liberal', nrow(.))
+  )->liberal_models_complete5
+
+stargazer(ndp_models_complete5$model, 
+          type="html", 
+          out=here("Tables", "NDP_Models_1988_2021_5.html"),
+          column.labels=c("1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), 
+          title="NDP Models 1988-2021", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(liberal_models_complete5$model, 
+          type="html", 
+          out=here("Tables", "liberal_Models_1988_2021_5.html"),
+          column.labels=c("1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), 
+          title="Liberal Models 1988-2021", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(conservative_models_complete5$model, 
+          type="html", 
+          out=here("Tables", "conservative_Models_1988_2021_5.html"),
+          column.labels=c("1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), 
+          title="Conservative Models 1988-2021", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+##### Raw Vote ####
 ces %>% 
   group_by(quebec, election, degree, vote) %>% 
   summarize(n=n()) %>% 
@@ -390,7 +438,7 @@ summary(m19)
 #stargazer(m19, m28, m20, m29, m21, m30, type="html", omit=c(1:8), out=here("Tables", "pooled_party_vote_choice.html"),  column.labels = c('1988-2000', '2004-2021', '1988-2000', '2004-2021', '1988-2000', '2004-2021'), covariate.labels=c("Degree", "Income", "Class (Managers)", "Class (Professionals)", "Class (Self-Employed)", "Class (Routine Non-Manual)", "Redistribution", "Market Liberalism", "Moral Traditionalism", "Immigration Rates"), dep.var.labels =c("NDP" ,"Liberals", "Conservatives"),star.cutoffs = c(0.05, 0.01, 0.001), single.row=F, font.size="small", digits=2)
 stargazer(m19, m28, m20, m29, m21, m30, type="html", omit=c(1:8), out=here("Tables", "pooled_party_vote_choice2.html"),  column.labels = c('1988-2000', '2004-2019', '1988-2000', '2004-2019', '1988-2000', '2004-2019'), dep.var.labels =c("NDP" ,"Liberals", "Conservatives"),star.cutoffs = c(0.05, 0.01, 0.001), single.row=F, font.size="small", digits=2)
 
-#### Turnout
+#### Turnout ####
 # Party Vote Shares by Degree & Income
 ces %>% 
   group_by(election, income, turnout) %>% 
@@ -466,3 +514,179 @@ stargazer(turnout_model3$model,
           title="Turnout Models 1965-2021", 
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
+#### welfare models ####
+# Attitudinal party vote models 1988-2021
+ces88$liberal<-Recode(ces88$vote, "1=1; 0=0; 2:5=0; else=NA")
+ces88$conservative<-Recode(ces88$vote, "2=1; 0:1=0; 3:5=0; else=NA")
+ces88$ndp<-Recode(ces88$vote, "3=1; 0:2=0; 4:5=0; else=NA")
+ces88 %>% 
+  mutate(region2=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces88
+ces88$region2<-factor(ces88$region2, levels=c("Quebec", "Atlantic", "Ontario", "West"))
+levels(ces88$region2)
+ces88$religion2<-Recode(as.factor(ces88$religion), "0='None' ; 1='Catholic' ; 2='Protestant' ; 3='Other'", levels=c('None', 'Catholic', 'Protestant', 'Other'))
+levels(ces88$religion2)
+
+ndp_welfare_1988<-glm(ndp~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces88, family="binomial")
+lib_welfare_1988<-glm(liberal~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces88, family="binomial")
+con_welfare_1988<-glm(conservative~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces88, family="binomial")
+
+ces93$liberal<-Recode(ces93$vote, "1=1; 0=0; 2:5=0; else=NA")
+ces93$conservative<-Recode(ces93$vote, "2=1; 0:1=0; 3:5=0; else=NA")
+ces93$ndp<-Recode(ces93$vote, "3=1; 0:2=0; 4:5=0; else=NA")
+ces93 %>% 
+  mutate(region2=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces93
+ces93$region2<-factor(ces93$region2, levels=c("Quebec", "Atlantic", "Ontario", "West"))
+levels(ces93$region2)
+ces93$religion2<-Recode(as.factor(ces93$religion), "0='None' ; 1='Catholic' ; 2='Protestant' ; 3='Other'", levels=c('None', 'Catholic', 'Protestant', 'Other'))
+levels(ces93$religion2)
+
+ndp_welfare_1993<-glm(ndp~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces93, family="binomial")
+lib_welfare_1993<-glm(liberal~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces93, family="binomial")
+con_welfare_1993<-glm(conservative~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces93, family="binomial")
+
+ces97$liberal<-Recode(ces97$vote, "1=1; 0=0; 2:5=0; else=NA")
+ces97$conservative<-Recode(ces97$vote, "2=1; 0:1=0; 3:5=0; else=NA")
+ces97$ndp<-Recode(ces97$vote, "3=1; 0:2=0; 4:5=0; else=NA")
+ces97 %>% 
+  mutate(region2=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces97
+ces97$region2<-factor(ces97$region2, levels=c("Quebec", "Atlantic", "Ontario", "West"))
+levels(ces97$region2)
+ces97$religion2<-Recode(as.factor(ces97$religion), "0='None' ; 1='Catholic' ; 2='Protestant' ; 3='Other'", levels=c('None', 'Catholic', 'Protestant', 'Other'))
+levels(ces97$religion2)
+
+ndp_welfare_1997<-glm(ndp~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces97, family="binomial")
+lib_welfare_1997<-glm(liberal~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces97, family="binomial")
+con_welfare_1997<-glm(conservative~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces97, family="binomial")
+
+ces00$liberal<-Recode(ces00$vote, "1=1; 0=0; 2:5=0; else=NA")
+ces00$conservative<-Recode(ces00$vote, "2=1; 0:1=0; 3:5=0; else=NA")
+ces00$ndp<-Recode(ces00$vote, "3=1; 0:2=0; 4:5=0; else=NA")
+ces00 %>% 
+  mutate(region2=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces00
+ces00$region2<-factor(ces00$region2, levels=c("Quebec", "Atlantic", "Ontario", "West"))
+levels(ces00$region2)
+ces00$religion2<-Recode(as.factor(ces00$religion), "0='None' ; 1='Catholic' ; 2='Protestant' ; 3='Other'", levels=c('None', 'Catholic', 'Protestant', 'Other'))
+levels(ces00$religion2)
+
+ndp_welfare_2000<-glm(ndp~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces00, family="binomial")
+lib_welfare_2000<-glm(liberal~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces00, family="binomial")
+con_welfare_2000<-glm(conservative~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces00, family="binomial")
+
+ces04$liberal<-Recode(ces04$vote, "1=1; 0=0; 2:5=0; else=NA")
+ces04$conservative<-Recode(ces04$vote, "2=1; 0:1=0; 3:5=0; else=NA")
+ces04$ndp<-Recode(ces04$vote, "3=1; 0:2=0; 4:5=0; else=NA")
+ces04 %>% 
+  mutate(region2=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces04
+ces04$region2<-factor(ces04$region2, levels=c("Quebec", "Atlantic", "Ontario", "West"))
+levels(ces04$region2)
+ces04$religion2<-Recode(as.factor(ces04$religion), "0='None' ; 1='Catholic' ; 2='Protestant' ; 3='Other'", levels=c('None', 'Catholic', 'Protestant', 'Other'))
+levels(ces04$religion2)
+
+ndp_welfare_2004<-glm(ndp~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces04, family="binomial")
+lib_welfare_2004<-glm(liberal~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces04, family="binomial")
+con_welfare_2004<-glm(conservative~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces04, family="binomial")
+
+ces06$liberal<-Recode(ces06$vote, "1=1; 0=0; 2:5=0; else=NA")
+ces06$conservative<-Recode(ces06$vote, "2=1; 0:1=0; 3:5=0; else=NA")
+ces06$ndp<-Recode(ces06$vote, "3=1; 0:2=0; 4:5=0; else=NA")
+ces06 %>% 
+  mutate(region2=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces06
+ces06$region2<-factor(ces06$region2, levels=c("Quebec", "Atlantic", "Ontario", "West"))
+levels(ces06$region2)
+ces06$religion2<-Recode(as.factor(ces06$religion), "0='None' ; 1='Catholic' ; 2='Protestant' ; 3='Other'", levels=c('None', 'Catholic', 'Protestant', 'Other'))
+levels(ces06$religion2)
+
+ndp_welfare_2006<-glm(ndp~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces06, family="binomial")
+lib_welfare_2006<-glm(liberal~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces06, family="binomial")
+con_welfare_2006<-glm(conservative~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces06, family="binomial")
+
+ces08$liberal<-Recode(ces08$vote, "1=1; 0=0; 2:5=0; else=NA")
+ces08$conservative<-Recode(ces08$vote, "2=1; 0:1=0; 3:5=0; else=NA")
+ces08$ndp<-Recode(ces08$vote, "3=1; 0:2=0; 4:5=0; else=NA")
+ces08 %>% 
+  mutate(region2=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces08
+ces08$region2<-factor(ces08$region2, levels=c("Quebec", "Atlantic", "Ontario", "West"))
+levels(ces08$region2)
+ces08$religion2<-Recode(as.factor(ces08$religion), "0='None' ; 1='Catholic' ; 2='Protestant' ; 3='Other'", levels=c('None', 'Catholic', 'Protestant', 'Other'))
+levels(ces08$religion2)
+
+ndp_welfare_2008<-glm(ndp~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces08, family="binomial")
+lib_welfare_2008<-glm(liberal~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces08, family="binomial")
+con_welfare_2008<-glm(conservative~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces08, family="binomial")
+
+ces11$liberal<-Recode(ces11$vote, "1=1; 0=0; 2:5=0; else=NA")
+ces11$conservative<-Recode(ces11$vote, "2=1; 0:1=0; 3:5=0; else=NA")
+ces11$ndp<-Recode(ces11$vote, "3=1; 0:2=0; 4:5=0; else=NA")
+ces11 %>% 
+  mutate(region2=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces11
+ces11$region2<-factor(ces11$region2, levels=c("Quebec", "Atlantic", "Ontario", "West"))
+levels(ces11$region2)
+ces11$religion2<-Recode(as.factor(ces11$religion), "0='None' ; 1='Catholic' ; 2='Protestant' ; 3='Other'", levels=c('None', 'Catholic', 'Protestant', 'Other'))
+levels(ces11$religion2)
+
+ndp_welfare_2011<-glm(ndp~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces11, family="binomial")
+lib_welfare_2011<-glm(liberal~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces11, family="binomial")
+con_welfare_2011<-glm(conservative~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces11, family="binomial")
+
+ces15phone$liberal<-Recode(ces15phone$vote, "1=1; 0=0; 2:5=0; else=NA")
+ces15phone$conservative<-Recode(ces15phone$vote, "2=1; 0:1=0; 3:5=0; else=NA")
+ces15phone$ndp<-Recode(ces15phone$vote, "3=1; 0:2=0; 4:5=0; else=NA")
+ces15phone %>% 
+  mutate(region2=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces15phone
+ces15phone$region2<-factor(ces15phone$region2, levels=c("Quebec", "Atlantic", "Ontario", "West"))
+levels(ces15phone$region2)
+ces15phone$religion2<-Recode(as.factor(ces15phone$religion), "0='None' ; 1='Catholic' ; 2='Protestant' ; 3='Other'", levels=c('None', 'Catholic', 'Protestant', 'Other'))
+levels(ces15phone$religion2)
+
+ndp_welfare_2015<-glm(ndp~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces15phone, family="binomial")
+lib_welfare_2015<-glm(liberal~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces15phone, family="binomial")
+con_welfare_2015<-glm(conservative~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+welfare, data=ces15phone, family="binomial")
+
+stargazer(ndp_welfare_1988, ndp_welfare_1993, ndp_welfare_1997, ndp_welfare_2000, ndp_welfare_2004, ndp_welfare_2006, ndp_welfare_2008, ndp_welfare_2011, ndp_welfare_2015, type="html", out=here("Tables", "ndp_welfare_models.html"))
+stargazer(lib_welfare_1988, lib_welfare_1993, lib_welfare_1997, lib_welfare_2000, lib_welfare_2004, lib_welfare_2006, lib_welfare_2008, lib_welfare_2011, lib_welfare_2015, type="html", out=here("Tables", "liberal_welfare_models.html"))
+stargazer(con_welfare_1988, con_welfare_1993, con_welfare_1997, con_welfare_2000, con_welfare_2004, con_welfare_2006, con_welfare_2008, con_welfare_2011, con_welfare_2015, type="html", out=here("Tables", "conservative_welfare_models.html"))

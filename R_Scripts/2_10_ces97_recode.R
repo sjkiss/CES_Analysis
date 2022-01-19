@@ -586,3 +586,11 @@ look_for(ces97, "dem")
 ces97$satdem<-Recode(ces97$cpsb9, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces97$satdem, ces97$cpsb9, useNA = "ifany" )
+
+#recode welfare (pese6b)
+look_for(ces97, "welfare")
+ces97$welfare<-Recode(ces97$pese6b, "1=1; 3=0.5; 8=0.5; 5=0; else=NA")
+#checks
+table(ces97$welfare)
+table(ces97$welfare, ces97$pese6b)
+

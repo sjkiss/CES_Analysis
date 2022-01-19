@@ -681,6 +681,13 @@ ces0411$satdem04<-Recode(ces0411$ces04_CPS_B10, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5
 #checks
 table(ces0411$satdem04, ces0411$ces04_CPS_B10, useNA = "ifany" )
 
+#recode welfare (ces04_PES_D1B)
+look_for(ces0411, "spend")
+ces0411$welfare04<-Recode(ces0411$ces04_PES_D1B, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$welfare04, ces0411$ces04_PES_D1B, useNA = "ifany" )
+
+#----------------------------------------------------------------------------
 ###Recode 2006 2nd ####
 
 # Gender done at top
@@ -1372,6 +1379,12 @@ look_for(ces0411, "dem")
 ces0411$satdem06<-Recode(ces0411$ces06_CPS_A1, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces0411$satdem06, ces0411$ces06_CPS_A1, useNA = "ifany" )
+
+#recode welfare (ces06_PES_D1B)
+look_for(ces0411, "spend")
+ces0411$welfare06<-Recode(ces0411$ces06_PES_D1B, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$welfare06, ces0411$ces06_PES_D1B, useNA = "ifany" )
 
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
@@ -2141,6 +2154,13 @@ ces0411$satdem08<-Recode(ces0411$ces08_CPS_A1, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5;
 #checks
 table(ces0411$satdem08, ces0411$ces08_CPS_A1, useNA = "ifany" )
 
+#recode welfare (ces08_PES_D1B)
+look_for(ces0411, "spend")
+ces0411$welfare08<-Recode(ces0411$ces08_PES_D1B, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$welfare08, ces0411$ces08_PES_D1B, useNA = "ifany" )
+
+#----------------------------------------------------------------------------
 ####Recode 2011 4th ####
 
 # Gender done at top
@@ -2731,3 +2751,9 @@ look_for(ces0411, "dem")
 ces0411$satdem11<-Recode(ces0411$CPS11_0, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces0411$satdem11, ces0411$CPS11_0, useNA = "ifany" )
+
+#recode welfare (CPS11_33)
+look_for(ces0411, "spend")
+ces0411$welfare11<-Recode(ces0411$CPS11_33, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$welfare11, ces0411$CPS11_33, useNA = "ifany" )

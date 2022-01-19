@@ -897,3 +897,10 @@ look_for(ces15phone, "dem")
 ces15phone$satdem<-Recode(ces15phone$CPS15_0, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces15phone$satdem, ces15phone$CPS15_0, useNA = "ifany" )
+
+#recode welfare (CPS15_33)
+look_for(ces15phone, "welfare")
+ces15phone$welfare<-Recode(ces15phone$CPS15_33, "1=0; 5=0.5; 8=0.5; 3=1; else=NA")
+#checks
+table(ces15phone$welfare)
+table(ces15phone$welfare, ces15phone$CPS15_33)
