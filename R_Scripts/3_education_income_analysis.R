@@ -529,3 +529,20 @@ combined_models %>%
   ggplot(., aes(x=election, y=estimate, group=1))+geom_point()+facet_grid(~vote)+geom_smooth(method='lm', se=F)+labs(title="OLS coefficients of Income on Vote, 1965-2021")
 ggsave(here("Plots", "piketty_ols_coefficients_income_vote.png"))
 
+#### First and Second Dimension ####
+
+ces %>% 
+  select(election, ndp, mip2, degree) %>% 
+  group_by(election, degree, mip2) %>% 
+  summarize(n=n()) %>% 
+  filter(!is.na(mip2)) %>% 
+  mutate(pct=n/sum(n)) %>% 
+  ggplot(., aes(x=election, y=pct, fill=as_factor(mip2)))+geom_col()+facet_grid(~as_factor(degree))
+
+as_factor(ces$mip2)
+table(as_factor(ces$mip2))
+ces %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(ndp~as_factor(mip2), data=x)))
+
+

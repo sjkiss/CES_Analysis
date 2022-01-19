@@ -769,10 +769,19 @@ table(ces$ndp_vs_liberal)
 ces$religion2<-Recode(as.factor(ces$religion), "0='None' ; 1='Catholic' ; 2='Protestant' ; 3='Other'", levels=c('None', 'Catholic', 'Protestant', 'Other'))
 levels(ces$religion2)
 table(ces$religion2)
+
 # Religion dummies
 ces$catholic<-Recode(ces$religion, "1=1; 2:3=0; 0=0; NA=NA")
 ces$no_religion<-Recode(ces$religion, "0=1; 1:3=0; NA=NA")
 
+# Reduce MIP
+
+val_labels(ces$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, 
+Taxes=9, Deficit_Debt=10, Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, 
+Free_Trade=17)
+
+ces$mip2<-Recode(ces$mip, "0=NA; 1=2; 2=2; 3=2; 4=2; 5=1; 6=1; 7=1; 8=1; 9=1; 10=1; 11=2; 12=2; 13=2; 14=2; 15=1; 16=1; 17=1")
+val_labels(ces$mip2)<-c(`First Dimension`=1, `Second Dimension`=2)
 ### Value labels often go missing in the creation of the ces data frame
 ### assign value label
 #val_labels(ces$sector)<-c(Private=0, Public=1)
