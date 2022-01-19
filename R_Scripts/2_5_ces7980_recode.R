@@ -8,6 +8,7 @@ look_for(ces7980, "sex")
 table(ces7980$V1537, ces7980$V4008)
 ces7980$male<-Recode(ces7980$V1537, "1=1; 2=0; 0=NA")
 val_labels(ces7980$male)<-c(Female=0, Male=1)
+
 #checks
 val_labels(ces7980$male)
 table(ces7980$male)
@@ -22,11 +23,11 @@ val_labels(ces7980$union)
 table(ces7980$union)
 
 #recode Union Combined (V1512 and V1514)
-ces7980 %>% 
+ces7980 %>%
   mutate(union_both=case_when(
     #If either one is union then one
     V1512==1 | V1514==1 ~ 1,
-    #If both are non union then 0 
+    #If both are non union then 0
         V1512==2 & V1514==2 ~ 0,
     #if one is don't know and one is refused then missing
     V1512>7 & V1514>7 ~ NA_real_
@@ -110,7 +111,7 @@ look_for(ces7980, "sector")
 look_for(ces7980, "company")
 ces7980$V1471
 table(ces7980$V1471)
-ces7980 %>% 
+ces7980 %>%
   mutate(sector=case_when(
     #teachers and nurses are added to public sector
     V1484==6925 ~ 1,
@@ -238,11 +239,11 @@ table(ces7980$turnout, ces7980$vote)
 #recode Most Important Question (V1154)
 look_for(ces7980, "MOST IMPORTANT ISSUE")
 ces7980$mip<-Recode(ces7980$V1154, "1:7=7; 8=3; 9:10=9; 11:12=7; 13=6; 14=8; 15:16=15; 17=12; 18=0; 19:20=5;
-					                          21=1; 22=12; 23=0; 24=4; 25:26=11; 27:28=16; 29:30=11; 31=14; 32:33=6; 
+					                          21=1; 22=12; 23=0; 24=4; 25:26=11; 27:28=16; 29:30=11; 31=14; 32:33=6;
 					                          34=0; 35=11; 36=16; 37=11; 38=3; 39=11; 40=0; 41=14; 42=5; 43=2; 44:46=14;
 					                          47=0; 48:60=7; 61=9; 62=0; 63=7; 64=15; 65=12; 66=1; 67:68=5; 69=5;
 					                          70=13; 71=76=0; 77:80=16; 81:82=15; 83=12; 84=3; 85=0; 86:87=2; else=NA")
-val_labels(ces7980$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10, 
+val_labels(ces7980$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
                          Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16)
 table(ces7980$mip)
 
@@ -382,14 +383,15 @@ table(ces7980$turnout80, ces7980$vote80)
 #recode Most Important Question (V2021)
 look_for(ces7980, "MOST IMPORTANT ISSUE")
 ces7980$mip80<-Recode(ces7980$V2021, "1=7; 2=6; 3:8=7; 9=9; 10:12=7; 15:17=15; 18=8; 19=6; 20:25=16; 29:31=12;
-					                            37:39=0; 40=11; 41:43=3; 50:51=5; 52=9; 53:61=5; 62=0; 63=13; 70:75=0;  
+					                            37:39=0; 40=11; 41:43=3; 50:51=5; 52=9; 53:61=5; 62=0; 63=13; 70:75=0;
 					                            76=11; 77=2; 78=14; 79=0; 80=2; 81=14; 87=0; else=NA")
-val_labels(ces7980$mip80)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10, 
+val_labels(ces7980$mip80)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
                            Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16)
 table(ces7980$mip80)
-
-#Empty variables that are not available pre-88
+# 
+# #Empty variables that are not available pre-88
 ces7980$redistribution<-rep(NA, nrow(ces7980))
 ces7980$market_liberalism<-rep(NA, nrow(ces7980))
 ces7980$traditionalism2<-rep(NA, nrow(ces7980))
 ces7980$immigration_rates<-rep(NA, nrow(ces7980))
+

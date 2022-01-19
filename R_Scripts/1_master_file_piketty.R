@@ -114,6 +114,8 @@ names(ces80)
 names(ces7980)
 ### We have all of the demographic variables from the ces79 questions stored in the ces80 data set. 
 ##Show this
+ces7980$male
+ces7980$male80
 table(ces80$male)
 ### Show that they are the same for the demographics
 table(ces80$male, ces80$male80)
@@ -123,7 +125,7 @@ table(ces80$vote, ces80$vote80)
 ##We just need to turn the variables that end with 80 into regularly named variables.
 
 ces80 %>% 
-  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size, ideology, turnout, redistribution, market_liberalism, immigration_rates, traditionalism2)->ces80
+  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size, ideology, turnout, redistribution, market_liberalism, immigration_rates, traditionalism2, mip=mip80)->ces80
 names(ces80)
 
 ### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
@@ -663,6 +665,7 @@ names(ces.list)<-c(1965, 1968, 1972,1974, 1979,1980, 1984, 1988, 1993, 1997, 200
 
 library(haven)
 #Add the common variables we need from each data.frame in the combined data set here.
+#common_vars<-c('male')
 common_vars<-c('male', 'union_both', 'region', 'degree', 'quebec', 'age', 'religion', 'vote', 'income', 'redistribution', 'market_liberalism', 'immigration_rates', 'traditionalism2', 'turnout', 'mip')
 
 #Start with the data frame
@@ -677,6 +680,7 @@ ces.list %>%
   #The value of which come from the name of the list item
   #e.g. if a row comes from, it's value of election will be 2000
   bind_rows(., .id="election")->ces 
+
 
 #Remove ces.list
 # We don't need it here

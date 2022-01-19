@@ -1,7 +1,7 @@
 #### OLS Degree+Income
 library(broom)
 library(stargazer)
-#### Party Share of Degree Holders
+#### Party Share of Degree Holders ####
 
 ces %>% 
   select(election, ndp, conservative, liberal, degree) %>% 
@@ -16,8 +16,6 @@ ces %>%
   ggplot(., aes(x=election, y=Percent, group=1))+geom_line()+facet_grid(~Vote)+labs(title="Share of Degree Voters per Party")
 ggsave(here("Plots", "piketty_degree_vote_1965_2021.png"))
 #Party Share of Top Income Holders and Bottom Income Holders
-#### Party Share of Degree Holders
-
 ces %>% 
   select(election, ndp, conservative, liberal, income) %>% 
   pivot_longer(., cols=ndp:liberal, names_to=c('Vote'), values_to=c('Party')) %>% 
@@ -35,7 +33,53 @@ ces %>%
 ~Vote)+labs(main="Share of Top Income Earners Minus Bottom income earners by Party")
 ggsave(here("Plots", "piketty_income_vote_1965_2021.png"))
 
-# Basic Party vote models 1965-2021
+##### Party Vote Share Degree holders by Issue ####
+ces %>% 
+  select(Election=election, degree, vote,  `Market Liberalism`=market_liberalism, `Moral Traditionalism`=traditionalism2, `Redistribution`=redistribution, `Immigration Rates`=immigration_rates) %>%
+  pivot_longer(cols=`Market Liberalism`:`Immigration Rates`) %>% 
+  group_by(name) %>% 
+  mutate(pro=case_when(
+    value>0.5~ 1,
+    TRUE ~ 0
+  )) %>% 
+  group_by(Election, degree, name, pro, vote) %>% 
+  filter(Election>1984) %>% 
+  filter(!is.na(vote)) %>% 
+  filter(vote > 0 &vote<5) %>% 
+  summarize(n=n()) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  # filter(Election==2015) %>% 
+  filter(degree==1) %>% 
+  ggplot(., aes(x=Election, y=percent, fill=as_factor(vote)))+geom_col(position="dodge")+
+  facet_wrap(~fct_relevel(name, "Moral Traditionalism", ))+
+  #scale_fill_grey(name="Vote") 
+  scale_fill_manual(values=c('red', 'darkblue', 'orange', 'lightblue' ), name="Vote")+theme(text = element_text(size = 20), axis.text.x = element_text(angle=90))  
+ggsave(filename=here("Plots", "party_vote_shares_issues_degree_1988_2021.png"), width=10, height=8, dpi=300)
+
+# Party Vote Share No-Degree holders by Issue
+ces %>% 
+  select(Election=election, degree, vote,  `Market Liberalism`=market_liberalism, `Moral Traditionalism`=traditionalism2, `Redistribution`=redistribution, `Immigration Rates`=immigration_rates) %>%
+  pivot_longer(cols=`Market Liberalism`:`Immigration Rates`) %>% 
+  group_by(name) %>% 
+  mutate(pro=case_when(
+    value>0.5~ 1,
+    TRUE ~ 0
+  )) %>% 
+  group_by(Election, degree, name, pro, vote) %>% 
+  filter(Election>1984) %>% 
+  filter(!is.na(vote)) %>% 
+  filter(vote > 0 &vote<5) %>% 
+  summarize(n=n()) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  # filter(Election==2015) %>% 
+  filter(degree==0) %>% 
+  ggplot(., aes(x=Election, y=percent, fill=as_factor(vote)))+geom_col(position="dodge")+
+  facet_wrap(~fct_relevel(name, "Moral Traditionalism", ))+
+  #scale_fill_grey(name="Vote") 
+  scale_fill_manual(values=c('red', 'darkblue', 'orange', 'lightblue' ), name="Vote")+theme(text = element_text(size = 20), axis.text.x = element_text(angle=90))  
+ggsave(filename=here("Plots", "party_vote_shares_no_degree_issues_1988_2021.png"), width=10, height=8, dpi=300)
+
+#### Basic Party vote models 1965-2021 ####
 ces %>%
   nest(variables=-election) %>%
   mutate(model=map(variables, function(x) lm(ndp~region2+male+age+income+degree+as.factor(religion2), data=x)),
@@ -132,7 +176,7 @@ ndp_models_complete1 %>%
   facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
 ggsave(here("Plots", "Vote_Coefficents_income_big3_parties.png"), dpi=300)
 
-# Attitudinal party vote models 1988-2021
+#### Attitudinal party vote models 1988-2021 ####
 ces %>%
   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984) %>%
   nest(variables=-election) %>%
@@ -196,7 +240,7 @@ stargazer(green_models_complete2$model,
           title="Green Models 2004-2021", 
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
-# Attitudinal party vote models 1988-2021 (Degree sub-sample)
+##### Attitudinal party vote models 1988-2021 (Degree sub-sample) ####
 ces %>%
   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & degree!=0) %>%
   nest(variables=-election) %>%
@@ -260,7 +304,7 @@ stargazer(green_models_complete3$model,
           title="Green Models 2004-2021", 
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
-# Attitudinal party vote models 1988-2021 (No Degree-holders sub-sample)
+#### Attitudinal party vote models 1988-2021 (No Degree-holders sub-sample)####
 ces %>%
   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & degree!=1) %>%
   nest(variables=-election) %>%
@@ -324,64 +368,8 @@ stargazer(green_models_complete4$model,
           title="Green Models 2004-2021", 
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
-##### Raw Vote
-ces %>% 
-  group_by(quebec, election, degree, vote) %>% 
-  summarize(n=n()) %>% 
-  mutate(pct=n/sum(n)*100) %>%
-  filter(degree==1 & (vote<5 & vote>0)) %>% 
-  filter(!is.na(quebec)) %>% 
-  ggplot(.,aes(x=as.factor(election), y=pct, linetype=as_factor(vote), group=as_factor(vote)))+
-  geom_line()+
-  scale_linetype_manual(values=c(2,3,6,1),  name="Vote")+theme(axis.text.x = element_text(angle = 90))+facet_grid(~as_factor(quebec))+
-  labs(x="Year", y="Percent")
-ggsave(here("Plots", "Party_shares_degree_vote.png"), dpi=300, width=12, height=4)
 
-# Party Vote Share Degree holders by Issue
-ces %>% 
-  select(Election=election, degree, vote,  `Market Liberalism`=market_liberalism, `Moral Traditionalism`=traditionalism2, `Redistribution`=redistribution, `Immigration Rates`=immigration_rates) %>%
-  pivot_longer(cols=`Market Liberalism`:`Immigration Rates`) %>% 
-  group_by(name) %>% 
-  mutate(pro=case_when(
-    value>0.5~ 1,
-    TRUE ~ 0
-  )) %>% 
-  group_by(Election, degree, name, pro, vote) %>% 
-  filter(Election>1984) %>% 
-  filter(!is.na(vote)) %>% 
-  filter(vote > 0 &vote<5) %>% 
-  summarize(n=n()) %>% 
-  mutate(percent=n/sum(n)) %>% 
-  # filter(Election==2015) %>% 
-  filter(degree==1) %>% 
-  ggplot(., aes(x=Election, y=percent, fill=as_factor(vote)))+geom_col(position="dodge")+
-  facet_wrap(~fct_relevel(name, "Moral Traditionalism", ))+
-  #scale_fill_grey(name="Vote") 
-  scale_fill_manual(values=c('red', 'darkblue', 'orange', 'lightblue' ), name="Vote")+theme(text = element_text(size = 20), axis.text.x = element_text(angle=90))  
-ggsave(filename=here("Plots", "party_vote_shares_issues_degree_1988_2021.png"), width=10, height=8, dpi=300)
-
-# Party Vote Share No-Degree holders by Issue
-ces %>% 
-  select(Election=election, degree, vote,  `Market Liberalism`=market_liberalism, `Moral Traditionalism`=traditionalism2, `Redistribution`=redistribution, `Immigration Rates`=immigration_rates) %>%
-  pivot_longer(cols=`Market Liberalism`:`Immigration Rates`) %>% 
-  group_by(name) %>% 
-  mutate(pro=case_when(
-    value>0.5~ 1,
-    TRUE ~ 0
-  )) %>% 
-  group_by(Election, degree, name, pro, vote) %>% 
-  filter(Election>1984) %>% 
-  filter(!is.na(vote)) %>% 
-  filter(vote > 0 &vote<5) %>% 
-  summarize(n=n()) %>% 
-  mutate(percent=n/sum(n)) %>% 
-  # filter(Election==2015) %>% 
-  filter(degree==0) %>% 
-  ggplot(., aes(x=Election, y=percent, fill=as_factor(vote)))+geom_col(position="dodge")+
-  facet_wrap(~fct_relevel(name, "Moral Traditionalism", ))+
-  #scale_fill_grey(name="Vote") 
-  scale_fill_manual(values=c('red', 'darkblue', 'orange', 'lightblue' ), name="Vote")+theme(text = element_text(size = 20), axis.text.x = element_text(angle=90))  
-ggsave(filename=here("Plots", "party_vote_shares_no_degree_issues_1988_2021.png"), width=10, height=8, dpi=300)
+ 
 
 #### Pooled OLS Models####
 
@@ -499,9 +487,9 @@ stargazer(turnout_model3$model,
           title="Turnout Models 1965-2021", 
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
-<<<<<<< HEAD
-#### Straight OLS NDP 
-library(broom)
+
+#### Straight OLS NDP ####
+
 ces %>% 
  nest(-election) %>% 
   mutate(degree=map(data, function(x) lm(ndp~degree, data=x))) %>% 

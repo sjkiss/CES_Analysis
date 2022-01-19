@@ -510,3 +510,7 @@ look_for(ces21, "dem")
 ces21$satdem<-Recode(ces21$cps21_demsat, "1=1; 2=0.75; 3=0.25; 4=0; 5=0.5; else=NA", as.numeric=T)
 #checks
 table(ces21$satdem, ces21$cps21_demsat, useNA = "ifany" )
+
+# Add mip as missing variable. 
+ces21$mip<-rep(NA, nrow(ces21))
+ces21$sector<-rep(NA, nrow(ces21))
