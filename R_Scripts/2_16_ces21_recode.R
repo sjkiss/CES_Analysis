@@ -253,9 +253,8 @@ library(psych)
 look_for(ces21, "leave")
 look_for(ces21, "blame")
 
-ces21$market1<-Recode(ces21$pes21_privjobs, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA", as.numeric=T)
-ces21$market2<-Recode(ces21$pes21_blame, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA", as.numeric=T)
-#val_labels(ces21$market1)<-c(Strongly_disagree=0, Somewhat_disagree=0.25, Neither=0.5, Somewhat_agree=0.75, Strongly_agree=1)
+ces21$market1<-Recode(ces21$pes21_privjobs, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
+ces21$market2<-Recode(ces21$pes21_blame, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
 #checks
 table(ces21$market1, ces21$pes21_privjobs , useNA = "ifany" )
 table(ces21$market2, ces21$pes21_blame , useNA = "ifany" )

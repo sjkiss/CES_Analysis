@@ -770,11 +770,11 @@ ces$vote2<-factor(ces$vote2, levels=c("Conservative", "Liberal", "NDP", "BQ", "G
 table(ces$vote2, ces$election)
 levels(ces$vote2)
 
-ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
-ces$liberal<-Recode(ces$vote, "1=1; 2:5=0; NA=NA")
-ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
-ces$bloc<-Recode(ces$vote, "4=1; 0:3=0; 5=0; else=NA")
-ces$green<-Recode(ces$vote, "5=1; 0:4=0; else=NA")
+ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:6=0; NA=NA")
+ces$liberal<-Recode(ces$vote, "1=1; 2:6=0; NA=NA")
+ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; 6=1; NA=NA")
+ces$bloc<-Recode(ces$vote, "4=1; 0:3=0; 6=0; else=NA")
+ces$green<-Recode(ces$vote, "5=1; 0:4=0; 6=0; else=NA")
 
 #Recode NDP vs Liberals/Right
 ces$ndp_vs_right<-Recode(ces$vote, "3=1; 2=0; else=NA")

@@ -273,6 +273,7 @@ ces19phone %>%
 
 #recode Previous Vote (q60)
 look_for(ces19phone, "party did you vote")
+ces19phone$q60
 ces19phone$past_vote<-Recode(ces19phone$q60, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; else=NA")
 val_labels(ces19phone$past_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks

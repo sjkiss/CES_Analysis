@@ -24,6 +24,7 @@ ces15phone %>%
   filter(is.na(PES15_NOC)==F&is.na(occupation)==T) %>% 
   select(PES15_NOC, occupation) %>% 
   print(n=264)
+
 ces19web %>% 
   filter(is.na(NOC)==F&is.na(occupation)==T) %>% 
   select(NOC, occupation)
@@ -662,7 +663,7 @@ names(ces.list)<-c(1965, 1968, 1972,1974, 1979,1980, 1984, 1988, 1993, 1997, 200
 
 library(haven)
 #Add the common variables we need from each data.frame in the combined data set here.
-common_vars<-c('male', 'union_both', 'region', 'degree', 'quebec', 'age', 'religion', 'vote', 'income', 'redistribution', 'market_liberalism', 'immigration_rates', 'traditionalism2', 'turnout')
+common_vars<-c('male', 'union_both', 'region', 'degree', 'quebec', 'age', 'religion', 'vote', 'income', 'redistribution', 'market_liberalism', 'immigration_rates', 'traditionalism2', 'turnout', 'mip')
 
 #Start with the data frame
 ces.list %>% 
@@ -744,14 +745,16 @@ table(ces$vote2, ces$election)
 
 ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:6=0; NA=NA")
 ces$liberal<-Recode(ces$vote, "1=1; 2:6=0; NA=NA")
-ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:6=0; NA=NA")
-ces$bloc<-Recode(ces$vote, "4=1; 0:3=0; 5=0;6=0; else=NA")
-ces$green<-Recode(ces$vote, "5=1; 0:4=0;6=0; else=NA")
+
+ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; 6=1; NA=NA")
+ces$bloc<-Recode(ces$vote, "4=1; 0:3=0; 5:6=0; else=NA")
+ces$green<-Recode(ces$vote, "5=1; 0:4=0; 6=0; else=NA")
+
 
 #Recode NDP vs Liberals/Right
-ces$ndp_vs_right<-Recode(ces$vote, "3=1; 2=0; else=NA")
-ces$liberal_vs_right<-Recode(ces$vote, "1=1; 2=0; else=NA")
-ces$bloc_vs_right<-Recode(ces$vote, "4=1; 2=0; else=NA")
+ces$ndp_vs_right<-Recode(ces$vote, "3=1; 2=0; 6=0; else=NA")
+ces$liberal_vs_right<-Recode(ces$vote, "1=1; 2=0; 6=0; else=NA")
+ces$bloc_vs_right<-Recode(ces$vote, "4=1; 2=0; 6=0; else=NA")
 ces$ndp_vs_liberal<-Recode(ces$vote, "3=1; 1=0; else=NA")
 table(ces$ndp_vs_right)
 table(ces$liberal_vs_right)
@@ -856,4 +859,3 @@ theme_set(theme_bw())
 #source("R_scripts/8_block_recursive_models.R", echo=T)
 
 #source("R_scripts/8_analysis_script.R", echo=T)
-names(ces)
