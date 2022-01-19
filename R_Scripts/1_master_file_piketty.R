@@ -24,6 +24,7 @@ ces15phone %>%
   filter(is.na(PES15_NOC)==F&is.na(occupation)==T) %>% 
   select(PES15_NOC, occupation) %>% 
   print(n=264)
+
 ces19web %>% 
   filter(is.na(NOC)==F&is.na(occupation)==T) %>% 
   select(NOC, occupation)
@@ -662,7 +663,7 @@ names(ces.list)<-c(1965, 1968, 1972,1974, 1979,1980, 1984, 1988, 1993, 1997, 200
 
 library(haven)
 #Add the common variables we need from each data.frame in the combined data set here.
-common_vars<-c('male', 'union_both', 'region', 'degree', 'quebec', 'age', 'religion', 'vote', 'income', 'redistribution', 'market_liberalism', 'immigration_rates', 'traditionalism2', 'turnout')
+common_vars<-c('male', 'union_both', 'region', 'degree', 'quebec', 'age', 'religion', 'vote', 'income', 'redistribution', 'market_liberalism', 'immigration_rates', 'traditionalism2', 'turnout', 'mip')
 
 #Start with the data frame
 ces.list %>% 
@@ -858,3 +859,4 @@ theme_set(theme_bw())
 
 #source("R_scripts/8_analysis_script.R", echo=T)
 names(ces)
+ces
