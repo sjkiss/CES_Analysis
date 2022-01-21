@@ -46,6 +46,7 @@ table(ces68$union, ces68$var363,useNA = "ifany")
 table(ces68$union_both, ces68$var379,useNA = "ifany")
 
 #recode Education (var334)
+
 ces68$degree<-Recode(ces68$var334, "17:20=1; 25:26=1; 1:16=0; 21:24=0; 27=0; 30=NA")
 val_labels(ces68$degree)<-c(nodegree=0, degree=1)
 #checks
