@@ -782,6 +782,10 @@ Free_Trade=17)
 
 ces$mip2<-Recode(ces$mip, "0=NA; 1=2; 2=2; 3=2; 4=2; 5=1; 6=1; 7=1; 8=1; 9=1; 10=1; 11=2; 12=2; 13=2; 14=2; 15=1; 16=1; 17=1")
 val_labels(ces$mip2)<-c(`First Dimension`=1, `Second Dimension`=2)
+
+ces$mip3<-Recode(ces$mip, "0=0; 1=2; 2=2; 3=0; 4=2; 5=1; 6=1; 7=1; 8=2; 9=1; 10=1; 11=0; 12=2; 13=2; 14=2; 15=2; 16=0; 17=1")
+val_labels(ces$mip3)<-c(`No Dimension`=0, `First Dimension`=1, `Second Dimension`=2)
+
 ### Value labels often go missing in the creation of the ces data frame
 ### assign value label
 #val_labels(ces$sector)<-c(Private=0, Public=1)

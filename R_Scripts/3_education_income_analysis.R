@@ -8,8 +8,8 @@ ces %>%
   pivot_longer(., cols=ndp:liberal, names_to=c('Vote'), values_to=c('Party')) %>% 
   group_by(election, degree,Vote, Party) %>% 
   summarize(n=n()) %>% 
-   filter(!is.na(Party)) %>% 
-   #filter(!is.na(degree)) %>% 
+  filter(!is.na(Party)) %>% 
+  #filter(!is.na(degree)) %>% 
   mutate(Percent=n/sum(n)) %>% 
   filter(degree==1) %>% 
   filter(Party==1) %>% 
@@ -30,7 +30,7 @@ ces %>%
   group_by(election,  Vote) %>% 
   mutate(difference=Percent-lag(Percent, 1)) %>% 
   ggplot(., aes(x=election, y=Percent, group=Vote))+geom_line()+facet_grid(
-~Vote)+labs(main="Share of Top Income Earners Minus Bottom income earners by Party")
+    ~Vote)+labs(main="Share of Top Income Earners Minus Bottom income earners by Party")
 ggsave(here("Plots", "piketty_income_vote_1965_2021.png"))
 
 ##### Party Vote Share Degree holders by Issue ####
@@ -369,7 +369,7 @@ stargazer(green_models_complete4$model,
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
 
- 
+
 
 #### Pooled OLS Models####
 
@@ -491,13 +491,13 @@ stargazer(turnout_model3$model,
 #### Straight OLS NDP ####
 
 ces %>% 
- nest(-election) %>% 
+  nest(-election) %>% 
   mutate(degree=map(data, function(x) lm(ndp~degree, data=x))) %>% 
   mutate(income=map(data, function(x) lm(ndp~income, data=x))) %>% 
   mutate(vote=rep('ndp', nrow(.)))->ndp_models
- 
 
-  
+
+
 ces %>% 
   nest(-election) %>% 
   mutate(degree=map(data, function(x) lm(liberal~degree, data=x))) %>% 
@@ -546,3 +546,74 @@ ces %>%
   mutate(model=map(variables, function(x) lm(ndp~as_factor(mip2), data=x)))
 
 
+ces %>% 
+  select(election, ndp, mip3, degree) %>% 
+  group_by(election, degree, mip3) %>% 
+  summarize(n=n()) %>% 
+  filter(!is.na(mip3)) %>% 
+  mutate(pct=n/sum(n)) %>% 
+  ggplot(., aes(x=election, y=pct, fill=as_factor(mip3)))+geom_col()+facet_grid(~as_factor(degree))
+
+ces %>% 
+  select(election, liberal, mip3, degree) %>% 
+  group_by(election, degree, mip3) %>% 
+  summarize(n=n()) %>% 
+  filter(!is.na(mip3)) %>% 
+  mutate(pct=n/sum(n)) %>% 
+  ggplot(., aes(x=election, y=pct, fill=as_factor(mip3)))+geom_col()+facet_grid(~as_factor(degree))
+
+#Share of 1st dimension degree holders
+ces %>% 
+  group_by(election, degree, mip3) %>% 
+  summarize(n=n()) %>% 
+  filter(is.na(degree)==F) %>% 
+  filter(is.na(mip3)==F) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  filter(degree==1) %>% 
+  filter(mip3==1) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(degree)))+geom_col(position="dodge")+labs(title="Share of 1st dimension Degree holders")
+ggsave(here("Plots", "MIP_degree_dimension1.png"))
+
+#Share of 2nd dimension degree holders
+ces %>% 
+  group_by(election, degree, mip3) %>% 
+  summarize(n=n()) %>% 
+  filter(is.na(degree)==F) %>% 
+  filter(is.na(mip3)==F) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  filter(degree==1) %>% 
+  filter(mip3==2) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(degree)))+geom_col(position="dodge")+labs(title="Share of 2nd dimension Degree holders")
+ggsave(here("Plots", "MIP_degree_dimension2.png"))
+
+#Share of 1st dimension non-degree holders
+ces %>% 
+  group_by(election, degree, mip3) %>% 
+  summarize(n=n()) %>% 
+  filter(is.na(degree)==F) %>% 
+  filter(is.na(mip3)==F) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  filter(degree==0) %>% 
+  filter(mip3==1) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(degree)))+geom_col(position="dodge")+labs(title="Share of 1st dimension non-Degree holders")
+ggsave(here("Plots", "MIP_nondegree_dimension1.png"))
+
+#Share of 2nd dimension non-degree holders
+ces %>% 
+  group_by(election, degree, mip3) %>% 
+  summarize(n=n()) %>% 
+  filter(is.na(degree)==F) %>% 
+  filter(is.na(mip3)==F) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  filter(degree==0) %>% 
+  filter(mip3==2) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(degree)))+geom_col(position="dodge")+labs(title="Share of 2nd dimension non-Degree holders")
+ggsave(here("Plots", "MIP_nondegree_dimension2.png"))
+
+ces %>% 
+  select(election, ndp, mip3, degree) %>% 
+  group_by(election, degree, mip3) %>% 
+  summarize(n=n()) %>% 
+  filter(!is.na(mip3)) %>% 
+  mutate(pct=n/sum(n)) %>% 
+  ggplot(., aes(x=election, y=pct, fill=as_factor(mip3)))+geom_col()+facet_grid(~as_factor(degree))
