@@ -29,7 +29,7 @@ canada %>%
     str_detect(partyname, "Canadian Reform Canadian Alliance")~'Conservative',
     str_detect(partyname, "Conservative")~'Conservative',
     str_detect(partyname, "Liberal")~'Liberal',
-    str_detect(partyname, "Social Credit")~'Conservative',
+    str_detect(partyname, "Social Credit")~'Social Credit',
     str_detect(partyname, "Bloc")~'Bloc',
     str_detect(partyname, "Green")~'Green',
   ), 
@@ -42,6 +42,6 @@ canada %>%
   #pivot_longer(., cols=c("first_dimension", "second_dimension")) %>% 
   ggplot(., aes(x=Date, y=ratio, col=Party))+geom_line()+
   theme_minimal()+geom_hline(yintercept=1, linetype=2)+
-  scale_color_manual(values=c("cyan", "orange", "blue", "darkgreen", "darkred"))+
+  scale_color_manual(values=c("cyan", "orange", "blue", "darkgreen", "darkred", "black"))+
   labs(title="Ratio of First Dimension to Second Dimension Proportions in Canadian platforms, 1965-2015", caption="A ratio of 1 indicates the platform mentioned first and second dimension issues equally.\nA ratio less than one suggests the platform prioritized second dimension issues.\n A ratio above one suggests the platform privileged first dimension issues.")
 
