@@ -672,7 +672,7 @@ common_vars<-c('male', 'union_both', 'region', 'degree', 'quebec', 'age', 'relig
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
   map(., zap_labels) %>%
-  #map_df does the select function on each item in ces.list
+  #map does the select function on each item in ces.list
   #It selects whatever is in common_vars, above
   #It spits out a list of data_frames
  map(., select, all_of(common_vars))%>%

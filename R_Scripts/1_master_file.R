@@ -122,8 +122,7 @@ table(ces80$vote, ces80$vote80)
 ##We just need to turn the variables that end with 80 into regularly named variables.
 
 ces80 %>% 
-  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size, ideology, turnout)->ces80
-names(ces80)
+  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size, ideology, turnout, redistribution, market_liberalism, immigration_rates, traditionalism2, mip=mip80)->ces80names(ces80)
 
 ### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
   ces93[!is.na(ces93$RTYPE4), ] -> ces93
@@ -627,16 +626,18 @@ ces11 %>%
 #If one of the data frame has a variable that the other does not then it just fills the rows with missing values
 #I *think* that this is the quickest way forward. 
 
-#remove qi variable
-look_for(ces21, "qi")
-ces21$qi <- NULL
-look_for(ces21, "province")
-ces21$province <- NULL
-
 ##We are going to make a list of each survey
 ces.list<-list(ces65, ces68, ces72_nov, ces74, ces79, ces80, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone, ces19phone, ces21)
 #WE are going to name each item in the list
-names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988', '1993', '1997', '2000', '2004', '2006', '2008', '2011', '2015', '2019', '2021')
+names(ces.list)<-c(1965, 1968, 1972,1974, 1979,1980, 1984, 1988, 1993, 1997, 2000, 2004, 2006, 2008, 2011, 2015, 2019, 2021)
+
+ces.list %>% 
+  map(., names)
+
+#Add the common variables we need from each data.frame in the combined data set here.
+#common_vars<-c('male')
+common_vars<-c('male', 'union_both', 'region', 'degree', 'quebec', 'age', 'religion', 'vote', 'income', 'redistribution', 'market_liberalism', 'immigration_rates', 'traditionalism2', 'turnout', 'mip')
+
 #removing election files
 #Remove these only if you run into memory troubles
 # rm(ces00)
@@ -668,11 +669,19 @@ names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988',
 library(haven)
 
 #Start with the data frame
+#Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
-  map(., zap_labels) %>% 
-  #bind rows creating id variable "election"
-  bind_rows(., .id="election")->ces
+  map(., zap_labels) %>%
+  #map_df does the select function on each item in ces.list
+  #It selects whatever is in common_vars, above
+  #It spits out a list of data_frames
+  map(., select, all_of(common_vars))%>%
+  #bind_rows smushes all the data frames together, and creates a variable called election
+  #The value of which come from the name of the list item
+  #e.g. if a row comes from, it's value of election will be 2000
+  bind_rows(., .id="election")->ces 
+names(ces19phone)
 #Remove ces.list
 # We don't need it here
 rm(ces.list)

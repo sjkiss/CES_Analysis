@@ -45,3 +45,4 @@ canada %>%
   scale_color_manual(values=c("cyan", "orange", "blue", "darkgreen", "darkred", "black"))+
   labs(title="Ratio of First Dimension to Second Dimension Proportions in Canadian platforms, 1965-2015", caption="A ratio of 1 indicates the platform mentioned first and second dimension issues equally.\nA ratio less than one suggests the platform prioritized second dimension issues.\n A ratio above one suggests the platform privileged first dimension issues.")
 
+cmp$per401
