@@ -820,6 +820,8 @@ ces$working_class<-Recode(ces$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
 ces$working_class2<-Recode(ces$occupation, "4:5=1; else=0")
 ces$working_class3<-Recode(ces$occupation3, "4:5=1; 3=0; 2=0; 1=0; 6=0; else=NA")
 ces$working_class4<-Recode(ces$occupation3, "4:5=1; else=0")
+val_labels(ces$working_class4)<-c(`Other`=0, `Working  Class`=1)
+
 table(ces$working_class, ces$election)
 table(ces$working_class2, ces$election)
 table(ces$working_class3, ces$election)
@@ -837,16 +839,33 @@ ces$upper_class<-Recode(ces$occupation, "1:2=1; 3:5=0; else=NA")
 table(ces$upper_class)
 ces$upper_class2<-Recode(ces$occupation3, "1:2=1; 3:6=0; else=NA")
 table(ces$upper_class2)
-
 table(ces$employment, ces$election)
+#### Time Variables
+library(tidyverse)
+ces$`1965`<-Recode(ces$election, "1965=1; else=0")
+ces$`1968`<-Recode(ces$election, "1968=1; else=0")
+ces$`1972`<-Recode(ces$election, "1972=1; else=0")
+ces$`1974`<-Recode(ces$election, "1974=1; else=0")
+ces$`1979`<-Recode(ces$election, "1979=1; else=0")
+ces$`1980`<-Recode(ces$election, "1980=1; else=0")
+ces$`1984`<-Recode(ces$election, "1984=1; else=0")
+ces$`1988`<-Recode(ces$election, "1988=1; else=0")
+ces$`1993`<-Recode(ces$election, "1993=1; else=0")
+ces$`1997`<-Recode(ces$election, "1997=1; else=0")
+ces$`2004`<-Recode(ces$election, "2004=1; else=0")
+ces$`2006`<-Recode(ces$election, "2006=1; else=0")
+ces$`2008`<-Recode(ces$election, "2008=1; else=0")
+ces$`2011`<-Recode(ces$election, "2011=1; else=0")
+ces$`2015`<-Recode(ces$election, "2015=1; else=0")
+ces$`2019`<-Recode(ces$election, "2019=1; else=0")
 
 ces %>% 
   mutate(`Period`=case_when(
     election>2000~1,
     election<2004~0
   ))->ces
+#### Can put decade recodes right here
 
-val_labels(ces$working_class4)<-c(`Other`=0, `Working  Class`=1)
 #### Set Theme ####
 theme_set(theme_bw())
 
