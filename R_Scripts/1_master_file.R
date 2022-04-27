@@ -654,7 +654,7 @@ common_vars<-c('male',
                'traditionalism',
                'traditionalism2', 
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 
-               'non_charter_language', 'language', 'employment')
+               'non_charter_language', 'language', 'employment', 'satdem', 'turnout')
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
@@ -834,4 +834,6 @@ theme_set(theme_bw())
 #source("R_scripts/8_block_recursive_models.R", echo=T)
 
 #source("R_scripts/8_analysis_script.R", echo=T)
-
+ces$satdem
+table(ces$election, ces$satdem)
+table(ces$election, ces$turnout)
