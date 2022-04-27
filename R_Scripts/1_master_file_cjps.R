@@ -321,6 +321,12 @@ ces04 %>%
   rename(ideology=ideology04)->ces04
 ces04 %>% 
   rename(turnout=turnout04)->ces04
+ces04 %>% 
+  rename(quebec_sov=quebec_sov04)->ces04
+ces04 %>% 
+  rename(prov_alienation=prov_alienation04)->ces04
+ces04 %>% 
+  rename(immigration_soc=immigration_soc04)->ces04
 
 table(ces04$survey, ces04$non_charter_language)
 
@@ -413,6 +419,12 @@ ces06 %>%
   rename(immigration_job=immigration_job06)->ces06
 ces06 %>% 
   rename(turnout=turnout06)->ces06
+ces06 %>%
+  rename(quebec_sov=quebec_sov06)->ces06
+ces06 %>%
+  rename(prov_alienation=prov_alienation06)->ces06
+ces06 %>%
+  rename(immigration_job=immigration_job06)->ces06
 
 table(ces06$survey, ces06$non_charter_language)
 
@@ -507,6 +519,14 @@ ces08 %>%
   rename(immigration_job=immigration_job08)->ces08
 ces08 %>% 
   rename(turnout=turnout08)->ces08
+ces08 %>% 
+  rename(quebec_sov=quebec_sov08)->ces08
+ces08 %>% 
+  rename(prov_alienation=prov_alienation08)->ces08
+ces08 %>% 
+  rename(immigration_soc=immigration_soc08)->ces08
+ces08 %>% 
+  rename(immigration_job=immigration_job08)->ces08
 
 table(ces08$survey, ces08$non_charter_language)
 
@@ -601,6 +621,14 @@ ces11 %>%
   rename(immigration_job=immigration_job11)->ces11
 ces11 %>% 
   rename(turnout=turnout11)->ces11
+ces11 %>% 
+  rename(quebec_sov=quebec_sov11)->ces11
+ces11 %>% 
+  rename(prov_alienation=prov_alienation11)->ces11
+ces11 %>% 
+  rename(immigration_soc=immigration_soc11)->ces11
+ces11 %>% 
+  rename(immigration_job=immigration_job11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -688,6 +716,7 @@ ces %>%
           "market_liberalism", "traditionalism", "traditionalism2", "immigration_rates", "enviro", "death_penalty", 
           "personal_retrospective", "ideology", "immigration_job", "turnout",
           "crime", "gay_rights", "abortion", "authoritarianism", "quebec_accom","education",
+          "quebec_sov", "prov_alienation", "immigration_soc", "immigration_job",
           "liberal_rating", "conservative_rating", "ndp_rating", "green_rating", "bloc_rating",
           "liberal_leader", "conservative_leader", "ndp_leader", "green_leader", "bloc_leader"))-> ces
 ##
@@ -865,6 +894,12 @@ ces %>%
     election<2004~0
   ))->ces
 #### Can put decade recodes right here
+ces$`1960s`<-Recode(ces$election, "1965=1; 1968=1; else=0")
+ces$`1970s`<-Recode(ces$election, "1972=1; 1974=1; 1979=1; else=0")
+ces$`1980s`<-Recode(ces$election, "1980=1; 1984=1; 1988=1; else=0")
+ces$`1990s`<-Recode(ces$election, "1993=1; 1997=1; else=0")
+ces$`2000s`<-Recode(ces$election, "2000=1; 2004=1; 2006=1; 2008=1; else=0")
+ces$`2010s`<-Recode(ces$election, "2011=1; 2015=1; 2019=1; else=0")
 
 #### Set Theme ####
 theme_set(theme_bw())

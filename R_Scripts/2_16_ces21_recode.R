@@ -360,8 +360,14 @@ ces21$lifestyles<-Recode(ces21$pes21_newerlife, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1
 #checks
 table(ces21$lifestyles, ces21$pes21_newerlife, useNA = "ifany")
 
+#recode Women (pes21_donew)
+look_for(ces21, "women")
+ces21$women<-Recode(ces21$pes21_donew, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces21$women, ces21$pes21_donew, useNA = "ifany")
+
 #recode Moral Trad (abortion, lifestyles, stay home, values, marriage, childen, morals)
-ces21$trad1<-ces21$lifestyles
+ces21$trad1<-ces21$women
 ces21$trad2<-ces21$gay_rights
 ces21$trad3<-ces21$abortion
 table(ces21$trad1)
@@ -402,7 +408,7 @@ ces21 %>%
   select(trad1, trad2, trad3) %>% 
   cor(., use="complete.obs")
 
-#recode Moral Traditionalism 2 (lifestyles & gay rights) (Left-Right)
+#recode Moral Traditionalism 2 (women & gay rights) (Left-Right)
 ces21 %>% 
   rowwise() %>% 
   mutate(traditionalism2=mean(c(trad1, trad2), na.rm=T )) -> out

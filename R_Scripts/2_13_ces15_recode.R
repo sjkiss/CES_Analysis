@@ -897,3 +897,21 @@ look_for(ces15phone, "dem")
 ces15phone$satdem<-Recode(ces15phone$CPS15_0, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces15phone$satdem, ces15phone$CPS15_0, useNA = "ifany" )
+
+# recode Quebec Sovereignty (CPS15_75) (Right=more sovereignty)
+look_for(ces15phone, "sovereignty")
+ces15phone$quebec_sov<-Recode(ces15phone$CPS15_75, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces15phone$quebec_sov, ces15phone$CPS15_75, useNA = "ifany" )
+
+# recode provincial alienation (PES15_38)
+look_for(ces15phone, "treat")
+ces15phone$prov_alienation<-Recode(ces15phone$PES15_38, "3=1; 1=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces15phone$prov_alienation, ces15phone$PES15_38, useNA = "ifany" )
+
+# recode immigration society (MBS15_I3)
+look_for(ces15phone, "fit")
+ces15phone$immigration_soc<-Recode(ces15phone$MBS15_I3, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces15phone$immigration_soc, ces15phone$MBS15_I3, useNA = "ifany" )

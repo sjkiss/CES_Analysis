@@ -184,7 +184,7 @@ ndp_models_complete1 %>%
   facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
 ggsave(here("Plots", "Vote_Coefficents_WC_all_parties.png"), dpi=300)
 
-# 1979 -2019 without union + no degree plot (Quebec)
+# 1979 -2019 without union plot (Quebec)
 ces %>% 
   filter(election> 1974 & election!=2000) %>%
   filter(quebec==1) %>% 
@@ -219,7 +219,7 @@ ces %>%
          vote=rep('Bloc', nrow(.))  
   )->bloc_models_complete_QC1
 
-# 1979 -2019 without union + no degree plot (ROC)
+# 1979 -2019 without union (ROC)
 ces %>% 
   filter(election> 1974 & election!=2000) %>%
   filter(quebec!=1) %>% 
@@ -257,7 +257,7 @@ ndp_models_complete_QC1 %>%
   geom_point()+
   labs(title="OLS Coefficients of Working Class on Party Vote 1979-2019 for QC", alpha="Variable", color="Vote", x="Election", y="Estimate")+
   geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
-  ylim(c(-0.3,0.3))+
+  ylim(c(-0.65,0.65))+
   scale_color_manual(values=c("sky blue", "navy", "red", "orange"))+
   facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
 
@@ -274,11 +274,72 @@ ndp_models_complete_ROC1 %>%
   geom_point()+
   labs(title="OLS Coefficients of Working Class on Party Vote 1979-2019 for ROC", alpha="Variable", color="Vote", x="Election", y="Estimate")+
   geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
-  ylim(c(-0.3,0.3))+
+  ylim(c(-0.65,0.65))+
   scale_color_manual(values=c("navy", "red", "orange"))+
   facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
 
-ggsave(here("Plots", "Vote_Coefficents_WC_all_parties_ROC2.png"))
+ggsave(here("Plots", "Vote_Coefficents_WC_all_parties2_ROC.png"))
+
+
+#### OLS model of party vote with union
+ces %>%
+  filter(election> 1974 & election!=2000) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(ndp~region2+male+age+income+degree+as.factor(religion2)+union_both+working_class3, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('NDP', nrow(.)))->ndp_models_complete2
+
+ces %>%
+  filter(election> 1974 & election!=2000) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(conservative~region2+male+age+income+degree+as.factor(religion2)+union_both+working_class3, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Conservative', nrow(.))
+  )->conservative_models_complete2
+
+ces %>%
+  filter(election> 1974 & election!=2000) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(liberal~region2+male+age+income+degree+as.factor(religion2)+union_both+working_class3, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Liberal', nrow(.))
+  )->liberal_models_complete2
+
+#Join all parties and plot Class coefficients - for WC
+ndp_models_complete2 %>%
+  bind_rows(., liberal_models_complete2) %>%
+  bind_rows(., conservative_models_complete2) %>%
+  unnest(tidied) %>%
+  filter(term=="working_class3") %>%
+  mutate(term=Recode(term, "'working_class3'='Working Class'")) %>%
+  ggplot(., aes(x=election, y=estimate, col=vote))+
+  geom_point()+
+  labs(title="OLS Coefficients of Working Class on Party Vote 1979-2019", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+  ylim(c(-0.3,0.3))+
+  scale_color_manual(values=c("navy blue", "red", "orange"))+
+  #Turn to greyscale for printing in the journal; also we don't actually need the legend because the labels are on the side
+  #scale_color_grey(guide="none")+
+  facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+ggsave(here("Plots", "Vote_Coefficents_WC_all_parties2.png"), dpi=300)
+
+#Join all parties and plot Class coefficients - for Union
+ndp_models_complete2 %>%
+  bind_rows(., liberal_models_complete2) %>%
+  bind_rows(., conservative_models_complete2) %>%
+  unnest(tidied) %>%
+  filter(term=="union_both") %>%
+  mutate(term=Recode(term, "'union_both'='Union members'")) %>%
+  ggplot(., aes(x=election, y=estimate, col=vote))+
+  geom_point()+
+  labs(title="OLS Coefficients of Union on Party Vote 1979-2019", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+  ylim(c(-0.3,0.3))+
+  scale_color_manual(values=c("navy blue", "red", "orange"))+
+  #Turn to greyscale for printing in the journal; also we don't actually need the legend because the labels are on the side
+  #scale_color_grey(guide="none")+
+  facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+ggsave(here("Plots", "Vote_Coefficents_union_all_parties.png"), dpi=300)
 
 #### Average Scores For Working Class Versus Average ####
 
@@ -288,7 +349,7 @@ ces %>%
   mutate(Redistribution=skpersonal::revScale(Redistribution, reverse=T)) %>% 
   pivot_longer(cols=4:7) %>% 
   pivot_longer(cols=2:3, names_to="Variable", values_to="Group") %>% 
-  filter(election>1984 &election!=2000) %>% 
+  filter(election>1988 &election!=2000) %>% 
   group_by(election, Variable, Group, name) %>% 
   summarize(average=mean(value, na.rm=T)) %>% 
   arrange(election, Variable, name, Group) %>%
@@ -435,7 +496,7 @@ ces %>%
     TRUE ~ 0
   )) %>% 
   group_by(Election, working_class4, name, pro, vote) %>% 
-  filter(Election>1984 &Election!=2000) %>% 
+  filter(Election>1988 &Election!=2000) %>% 
   filter(!is.na(vote)) %>% 
   filter(vote > 0 &vote<5) %>% 
   summarize(n=n()) %>% 
@@ -446,5 +507,110 @@ ces %>%
   facet_wrap(~fct_relevel(name, "Moral Traditionalism", ))+
   #scale_fill_grey(name="Vote") 
   scale_fill_manual(values=c('red', 'darkblue', 'orange', 'lightblue' ), name="Vote")+theme(text = element_text(size = 20), axis.text.x = element_text(angle=90))  
-ggsave(filename=here("Plots", "party_vote_shares_issues_1988_2019.png"), width=10, height=8, dpi=300) 
+ggsave(filename=here("Plots", "party_vote_shares_issues_1993_2019.png"), width=10, height=10, dpi=300) 
 
+
+#### Decade Pooled OLS Models - Table 2####
+
+#### Create region2 which is one region variable for all of Canada
+ces %>% 
+  mutate(region4=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces
+
+####Turn region4 into factor with Ontario as reference case
+ces$region4<-factor(ces$region4, levels=c("Atlantic", "Quebec", "Ontario", "West"))
+levels(ces$region4)
+
+# NDP models
+ces %>%
+  filter(working_class4==1 & `1990s`==1) %>%
+  nest(variables=-'1990s') %>%
+  mutate(model=map(variables, function(x) lm(ndp~as.factor(region4)+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+`1993`+`1997`, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('ndp', nrow(.))
+  )->ndp_1990s
+
+ces %>%
+  filter(working_class4==1 & `2000s`==1) %>%
+  nest(variables=-'2000s') %>%
+  mutate(model=map(variables, function(x) lm(ndp~as.factor(region4)+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+`2004`+`2006`+`2008`, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('ndp', nrow(.))
+  )->ndp_2000s
+
+ces %>%
+  filter(working_class4==1 & `2010s`==1) %>%
+  nest(variables=-'2010s') %>%
+  mutate(model=map(variables, function(x) lm(ndp~as.factor(region4)+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+`2011`+`2015`+`2019`, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('ndp', nrow(.))
+  )->ndp_2010s
+
+# Liberal models
+ces %>%
+  filter(working_class4==1 & `1990s`==1) %>%
+  nest(variables=-'1990s') %>%
+  mutate(model=map(variables, function(x) lm(liberal~as.factor(region4)+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+`1993`+`1997`, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('liberal', nrow(.))
+  )->liberal_1990s
+
+ces %>%
+  filter(working_class4==1 & `2000s`==1) %>%
+  nest(variables=-'2000s') %>%
+  mutate(model=map(variables, function(x) lm(liberal~as.factor(region4)+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+`2004`+`2006`+`2008`, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('liberal', nrow(.))
+  )->liberal_2000s
+
+ces %>%
+  filter(working_class4==1 & `2010s`==1) %>%
+  nest(variables=-'2010s') %>%
+  mutate(model=map(variables, function(x) lm(liberal~as.factor(region4)+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+`2011`+`2015`+`2019`, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('liberal', nrow(.))
+  )->liberal_2010s
+
+# Conservative models
+ces %>%
+  filter(working_class4==1 & `1990s`==1) %>%
+  nest(variables=-'1990s') %>%
+  mutate(model=map(variables, function(x) lm(conservative~as.factor(region4)+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+`1993`+`1997`, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('conservative', nrow(.))
+  )->conservative_1990s
+
+ces %>%
+  filter(working_class4==1 & `2000s`==1) %>%
+  nest(variables=-'2000s') %>%
+  mutate(model=map(variables, function(x) lm(conservative~as.factor(region4)+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+`2004`+`2006`+`2008`, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('conservative', nrow(.))
+  )->conservative_2000s
+
+ces %>%
+  filter(working_class4==1 & `2010s`==1) %>%
+  nest(variables=-'2010s') %>%
+  mutate(model=map(variables, function(x) lm(conservative~as.factor(region4)+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates+`2011`+`2015`+`2019`, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('conservative', nrow(.))
+  )->conservative_2010s
+
+stargazer(ndp_1990s$model, ndp_2000s$model, ndp_2010s$model, liberal_1990s$model, liberal_2000s$model, liberal_2010s$model, conservative_1990s$model, conservative_2000s$model, conservative_2010s$model, type="html", omit=c(16:22), out=here("Tables", "decade_party_vote_choice.html"),  column.labels = c('1990s', '2000s', '2010s', '1990s', '2000s', '2010s', '1990s', '2000s', '2010s'), dep.var.labels =c("NDP" ,"Liberals", "Conservatives"),star.cutoffs = c(0.05, 0.01, 0.001), single.row=F, font.size="small", digits=2)
+
+# stargazer(ndp_1990s$model, 
+#           type="html", 
+#           out=here("Tables", "NDP_Models_1990s.html"),
+#           column.labels=c("1990s"), 
+#           star.cutoffs=c(0.05), 
+#           title="NDP Models 1990s", 
+#           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+# 
+# decades<-list(ndp_1990s, ndp_2000s)
+# map(decades, function(x) rep(nrow(x$fitted.values), 2)) %>% 
+#   unlist()->n_obs
+# stargazer(decades, digits=2, single.row=T, out=here("Tables", "decade_party_vote_choice.html"), type="html", title="Party Vote by Decade", add.lines=list(c("N", n_obs)))
