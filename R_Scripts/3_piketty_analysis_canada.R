@@ -1,5 +1,6 @@
 #### This script is for preparing our analysis of the Piketty Hypothesis in the Canadian context
-
+library(broom)
+library(stargazer)
 
 #### First cut Degree and Income gap for left-right block
 
