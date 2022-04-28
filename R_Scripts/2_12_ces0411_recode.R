@@ -681,6 +681,24 @@ ces0411$satdem04<-Recode(ces0411$ces04_CPS_B10, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5
 #checks
 table(ces0411$satdem04, ces0411$ces04_CPS_B10, useNA = "ifany" )
 
+#### recode Quebec Sovereignty (ces04_PES_C10) (Quebec only & Right=more sovereignty) ####
+look_for(ces0411, "quebec")
+ces0411$quebec_sov04<-Recode(ces0411$ces04_PES_C10, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces0411$quebec_sov04, ces0411$ces04_PES_C10, useNA = "ifany" )
+
+#### recode provincial alienation (ces04_CPS_P5) ####
+look_for(ces0411, "treat")
+ces0411$prov_alienation04<-Recode(ces0411$ces04_CPS_P5, "3=1; 1=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$prov_alienation04, ces0411$ces04_CPS_P5, useNA = "ifany" )
+
+#### recode immigration society (ces04_MBS_G3) ####
+look_for(ces0411, "fit")
+ces0411$immigration_soc04<-Recode(ces0411$ces04_MBS_G3, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$immigration_soc04, ces0411$ces04_MBS_G3, useNA = "ifany" )
+
 ###Recode 2006 2nd ####
 
 # Gender done at top
@@ -1372,6 +1390,18 @@ look_for(ces0411, "dem")
 ces0411$satdem06<-Recode(ces0411$ces06_CPS_A1, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces0411$satdem06, ces0411$ces06_CPS_A1, useNA = "ifany" )
+
+#### recode Quebec Sovereignty (ces06_CPS_I8) (Quebec only & Right=more sovereignty) ####
+look_for(ces0411, "quebec")
+ces0411$quebec_sov06<-Recode(ces0411$ces06_CPS_I8, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces0411$quebec_sov06, ces0411$ces06_CPS_I8, useNA = "ifany" )
+
+#### recode provincial alienation (ces06_CPS_I12) ####
+look_for(ces0411, "treat")
+ces0411$prov_alienation06<-Recode(ces0411$ces06_CPS_I12, "3=1; 1=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$prov_alienation06, ces0411$ces06_CPS_I12, useNA = "ifany" )
 
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
@@ -2141,6 +2171,24 @@ ces0411$satdem08<-Recode(ces0411$ces08_CPS_A1, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5;
 #checks
 table(ces0411$satdem08, ces0411$ces08_CPS_A1, useNA = "ifany" )
 
+#### recode Quebec Sovereignty (ces08_CPS_Q9) (Quebec only & Right=more sovereignty) ####
+look_for(ces0411, "quebec")
+ces0411$quebec_sov08<-Recode(ces0411$ces08_CPS_Q9, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces0411$quebec_sov08, ces0411$ces08_CPS_Q9, useNA = "ifany" )
+
+#### recode provincial alienation (ces08_PES_P12) ####
+look_for(ces0411, "treat")
+ces0411$prov_alienation08<-Recode(ces0411$ces08_PES_P12, "3=1; 1=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$prov_alienation08, ces0411$ces08_PES_P12, useNA = "ifany" )
+
+#### recode immigration society (ces08_MBS_H3 ) ####
+look_for(ces0411, "fit")
+ces0411$immigration_soc08<-Recode(ces0411$ces08_MBS_H3 , "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$immigration_soc08, ces0411$ces08_MBS_H3 , useNA = "ifany" )
+
 ####Recode 2011 4th ####
 
 # Gender done at top
@@ -2731,3 +2779,21 @@ look_for(ces0411, "dem")
 ces0411$satdem11<-Recode(ces0411$CPS11_0, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces0411$satdem11, ces0411$CPS11_0, useNA = "ifany" )
+
+#### recode Quebec Sovereignty (CPS11_75) (Quebec only & Right=more sovereignty) ####
+look_for(ces0411, "sovereignty")
+ces0411$quebec_sov11<-Recode(ces0411$CPS11_75, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces0411$quebec_sov11, ces0411$CPS11_75, useNA = "ifany" )
+
+#### recode provincial alienation (PES11_38) ####
+look_for(ces0411, "treat")
+ces0411$prov_alienation11<-Recode(ces0411$PES11_38, "3=1; 1=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$prov_alienation11, ces0411$PES11_38, useNA = "ifany" )
+
+#### recode immigration society (MBS11_I3 ) ####
+look_for(ces0411, "fit")
+ces0411$immigration_soc11<-Recode(ces0411$MBS11_I3 , "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$immigration_soc11, ces0411$MBS11_I3 , useNA = "ifany" )

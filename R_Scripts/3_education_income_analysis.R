@@ -176,16 +176,16 @@ ndp_models_complete1 %>%
   facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
 ggsave(here("Plots", "Vote_Coefficents_income_big3_parties.png"), dpi=300)
 
-#### Attitudinal party vote models 1988-2021 ####
+#### Attitudinal party vote models 1993-2021 ####
 ces %>%
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984) %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988) %>%
   nest(variables=-election) %>%
   mutate(model=map(variables, function(x) lm(ndp~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x)),
          tidied=map(model, tidy),
          vote=rep('NDP', nrow(.)))->ndp_models_complete2
 
 ces %>%
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984) %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988) %>%
   nest(variables=-election) %>%
   mutate(model=map(variables, function(x) lm(conservative~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x)),
          tidied=map(model, tidy),
@@ -193,7 +193,7 @@ ces %>%
   )->conservative_models_complete2
 
 ces %>%
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984) %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988) %>%
   nest(variables=-election) %>%
   mutate(model=map(variables, function(x) lm(liberal~region2+male+age+income+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x)),
          tidied=map(model, tidy),
@@ -211,7 +211,7 @@ ces %>%
 stargazer(ndp_models_complete2$model, 
           type="html", 
           out=here("Tables", "NDP_Models_1988_2021_2.html"),
-          column.labels=c("1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
+          column.labels=c("1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
           star.cutoffs=c(0.05), 
           title="NDP Models 1988-2021", 
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
@@ -219,7 +219,7 @@ stargazer(ndp_models_complete2$model,
 stargazer(liberal_models_complete2$model, 
           type="html", 
           out=here("Tables", "liberal_Models_1988_2021_2.html"),
-          column.labels=c("1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
+          column.labels=c("1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
           star.cutoffs=c(0.05), 
           title="Liberal Models 1988-2021", 
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
@@ -227,7 +227,7 @@ stargazer(liberal_models_complete2$model,
 stargazer(conservative_models_complete2$model, 
           type="html", 
           out=here("Tables", "conservative_Models_1988_2021_2.html"),
-          column.labels=c("1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
+          column.labels=c("1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
           star.cutoffs=c(0.05), 
           title="Conservative Models 1988-2021", 
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
@@ -240,16 +240,16 @@ stargazer(green_models_complete2$model,
           title="Green Models 2004-2021", 
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
-##### Attitudinal party vote models 1988-2021 (Degree sub-sample) ####
+##### Attitudinal party vote models 1993-2021 (Degree sub-sample) ####
 ces %>%
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & degree!=0) %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & degree!=0) %>%
   nest(variables=-election) %>%
   mutate(model=map(variables, function(x) lm(ndp~region2+male+age+income+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x)),
          tidied=map(model, tidy),
          vote=rep('NDP', nrow(.)))->ndp_models_complete3
 
 ces %>%
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & degree!=0) %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & degree!=0) %>%
   nest(variables=-election) %>%
   mutate(model=map(variables, function(x) lm(conservative~region2+male+age+income+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x)),
          tidied=map(model, tidy),
@@ -257,7 +257,7 @@ ces %>%
   )->conservative_models_complete3
 
 ces %>%
-  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & degree!=0) %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & degree!=0) %>%
   nest(variables=-election) %>%
   mutate(model=map(variables, function(x) lm(liberal~region2+male+age+income+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x)),
          tidied=map(model, tidy),
@@ -304,7 +304,7 @@ stargazer(green_models_complete3$model,
           title="Green Models 2004-2021", 
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
-#### Attitudinal party vote models 1988-2021 (No Degree-holders sub-sample)####
+#### Attitudinal party vote models 1993-2021 (No Degree-holders sub-sample)####
 ces %>%
   filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & degree!=1) %>%
   nest(variables=-election) %>%
@@ -368,8 +368,171 @@ stargazer(green_models_complete4$model,
           title="Green Models 2004-2021", 
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
+##### Attitudinal party vote models 1993-2021 (Low income sub-sample) ####
+ces %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & income!=2 & income!=3 & income!=4 & income!=5) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(ndp~region2+male+age+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('NDP', nrow(.)))->ndp_models_complete5
 
+ces %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & income!=2 & income!=3 & income!=4 & income!=5) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(conservative~region2+male+age+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Conservative', nrow(.))
+  )->conservative_models_complete5
+
+ces %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & income!=2 & income!=3 & income!=4 & income!=5) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(liberal~region2+male+age+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Liberal', nrow(.))
+  )->liberal_models_complete5
+
+ces %>%
+  filter(election>2003 & income!=2 & income!=3 & income!=4 & income!=5) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(green~region2+male+age+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Green', nrow(.))
+  )->green_models_complete5
+
+stargazer(ndp_models_complete5$model, 
+          type="html", 
+          out=here("Tables", "NDP_Models_1993_2021_5.html"),
+          column.labels=c("1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
+          star.cutoffs=c(0.05), 
+          title="NDP Models 1993-2021", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(liberal_models_complete5$model, 
+          type="html", 
+          out=here("Tables", "liberal_Models_1993_2021_5.html"),
+          column.labels=c("1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
+          star.cutoffs=c(0.05), 
+          title="Liberal Models 1993-2021", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(conservative_models_complete5$model, 
+          type="html", 
+          out=here("Tables", "conservative_Models_1993_2021_5.html"),
+          column.labels=c("1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
+          star.cutoffs=c(0.05), 
+          title="Conservative Models 1993-2021", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+##### Attitudinal party vote models 1993-2021 (High income sub-sample) ####
+ces %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & income!=2 & income!=3 & income!=4 & income!=1) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(ndp~region2+male+age+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('NDP', nrow(.)))->ndp_models_complete6
+
+ces %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & income!=2 & income!=3 & income!=4 & income!=1) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(conservative~region2+male+age+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Conservative', nrow(.))
+  )->conservative_models_complete6
+
+ces %>%
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & income!=2 & income!=3 & income!=4 & income!=1) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(liberal~region2+male+age+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Liberal', nrow(.))
+  )->liberal_models_complete6
+
+ces %>%
+  filter(election>2003 & income!=2 & income!=3 & income!=4 & income!=1) %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(green~region2+male+age+degree+as.factor(religion2)+redistribution+market_liberalism+traditionalism2+immigration_rates, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Green', nrow(.))
+  )->green_models_complete6
+
+stargazer(ndp_models_complete6$model, 
+          type="html", 
+          out=here("Tables", "NDP_Models_1993_2021_6.html"),
+          column.labels=c("1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
+          star.cutoffs=c(0.05), 
+          title="NDP Models 1993-2021", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(liberal_models_complete6$model, 
+          type="html", 
+          out=here("Tables", "liberal_Models_1993_2021_6.html"),
+          column.labels=c("1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
+          star.cutoffs=c(0.05), 
+          title="Liberal Models 1993-2021", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(conservative_models_complete6$model, 
+          type="html", 
+          out=here("Tables", "conservative_Models_1993_2021_6.html"),
+          column.labels=c("1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
+          star.cutoffs=c(0.05), 
+          title="Conservative Models 1993-2021", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+# Redistribution coefficients 1993-2021
+ndp_models_complete3 %>%
+  bind_rows(., liberal_models_complete3) %>%
+  bind_rows(., conservative_models_complete3) %>%
+  unnest(tidied) %>%
+  filter(term=="redistribution") %>%
+  mutate(term=Recode(term, "'redistribution'='Redistribution'")) %>%
+  ggplot(., aes(x=election, y=estimate, col=vote))+
+  geom_point()+
+  labs(title="OLS Redistribution Party Vote Coefficients 1993-2021", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+  ylim(c(-0.6,0.6))+
+  scale_color_manual(values=c("navy blue", "red", "orange"))+
+  #Turn to greyscale for printing in the journal; also we don't actually need the legend because the labels are on the side
+  #scale_color_grey(guide="none")+
+  facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+ggsave(here("Plots", "Redistribution_Coefficents_big3_parties.png"), dpi=300)
  
+# Moral Traditionalism coefficients 1993-2021
+ndp_models_complete3 %>%
+  bind_rows(., liberal_models_complete3) %>%
+  bind_rows(., conservative_models_complete3) %>%
+  unnest(tidied) %>%
+  filter(term=="traditionalism2") %>%
+  mutate(term=Recode(term, "'traditionalism2'='Moral Traditionalism'")) %>%
+  ggplot(., aes(x=election, y=estimate, col=vote))+
+  geom_point()+
+  labs(title="OLS Traditionalism Party Vote Coefficients 1993-2021", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+  ylim(c(-0.5,0.5))+
+  scale_color_manual(values=c("navy blue", "red", "orange"))+
+  #Turn to greyscale for printing in the journal; also we don't actually need the legend because the labels are on the side
+  #scale_color_grey(guide="none")+
+  facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+ggsave(here("Plots", "Traditionalism_Coefficents_big3_parties.png"), dpi=300)
+
+# Immigration coefficients 1993-2021
+ndp_models_complete3 %>%
+  bind_rows(., liberal_models_complete3) %>%
+  bind_rows(., conservative_models_complete3) %>%
+  unnest(tidied) %>%
+  filter(term=="immigration_rates") %>%
+  mutate(term=Recode(term, "'immigration_rates'='Immigration'")) %>%
+  ggplot(., aes(x=election, y=estimate, col=vote))+
+  geom_point()+
+  labs(title="OLS Immigration Party Vote Coefficients 1993-2021", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+  ylim(c(-0.4,0.4))+
+  scale_color_manual(values=c("navy blue", "red", "orange"))+
+  #Turn to greyscale for printing in the journal; also we don't actually need the legend because the labels are on the side
+  #scale_color_grey(guide="none")+
+  facet_grid(vote~term, switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+ggsave(here("Plots", "Immigration_Coefficents_big3_parties.png"), dpi=300)
 
 #### Pooled OLS Models####
 
@@ -530,9 +693,9 @@ combined_models %>%
 ggsave(here("Plots", "piketty_ols_coefficients_income_vote.png"))
 
 #### First and Second Dimension ####
-
+# Degree
 ces %>% 
-  select(election, ndp, mip2, degree) %>% 
+  select(election, mip2, degree) %>% 
   group_by(election, degree, mip2) %>% 
   summarize(n=n()) %>% 
   filter(!is.na(mip2)) %>% 
@@ -544,5 +707,67 @@ table(as_factor(ces$mip2))
 ces %>%
   nest(variables=-election) %>%
   mutate(model=map(variables, function(x) lm(ndp~as_factor(mip2), data=x)))
+
+# Income
+ces %>% 
+  select(election, mip2, income) %>% 
+  group_by(election, income, mip2) %>% 
+  summarize(n=n()) %>% 
+  filter(!is.na(mip2)) %>% 
+  mutate(pct=n/sum(n)) %>% 
+  ggplot(., aes(x=election, y=pct, fill=as_factor(mip2)))+geom_col()+facet_grid(~as_factor(income))
+
+as_factor(ces$mip2)
+table(as_factor(ces$mip2))
+ces %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(ndp~as_factor(mip2), data=x)))
+
+#### Average Scores For Degree Versus Average ####
+
+ces %>% 
+  select(election, degree, redistribution, immigration_rates, market_liberalism, traditionalism2) %>%
+  rename(Redistribution=redistribution, `Immigration Rates`=immigration_rates, `Market Liberalism`=market_liberalism, `Moral Traditionalism`=traditionalism2) %>% 
+  #  mutate(Redistribution=skpersonal::revScale(Redistribution, reverse=T)) %>% 
+  pivot_longer(cols=3:6) %>% 
+  pivot_longer(cols=2, names_to="Variable", values_to="Group") %>% 
+  filter(election>1988) %>% 
+  group_by(election, Variable, Group, name) %>% 
+  summarize(average=mean(value, na.rm=T)) %>% 
+  arrange(election, Variable, name, Group) %>%
+  filter(!is.na(Group)) %>% 
+  group_by(election, name) %>% 
+  mutate(Variable=recode_factor(Variable, "degree"="Degree")) %>% 
+  mutate(Group=case_when(
+    Variable=="Degree" & Group==0 ~ "No Degree",
+    Variable=="Degree" & Group==1 ~ "Degree",
+  )) %>%
+#  filter(Group=="No Degree") %>% 
+  ggplot(., aes(y=election, x=average, group=Variable, col=`Group`))+geom_point()+facet_wrap(~fct_relevel(name, "Immigration Rates","Moral Traditionalism", "Market Liberalism", "Redistribution"), nrow=2)+theme(axis.text.x=element_text(angle=90))+scale_y_discrete(limits=rev)+scale_color_manual(values=rep(c('grey', 'black'),2))+
+  geom_vline(xintercept=0.5, linetype=2)+labs(y="Election", x="Average")
+
+#### Average Scores For Income ####
+
+ces %>% 
+  select(election, income, redistribution, immigration_rates, market_liberalism, traditionalism2) %>%
+  rename(Redistribution=redistribution, `Immigration Rates`=immigration_rates, `Market Liberalism`=market_liberalism, `Moral Traditionalism`=traditionalism2) %>% 
+  #  mutate(Redistribution=skpersonal::revScale(Redistribution, reverse=T)) %>% 
+  pivot_longer(cols=3:6) %>% 
+  pivot_longer(cols=2, names_to="Variable", values_to="Group") %>% 
+  filter(election>1988) %>% 
+  group_by(election, Variable, Group, name) %>% 
+  summarize(average=mean(value, na.rm=T)) %>% 
+  arrange(election, Variable, name, Group) %>%
+  filter(!is.na(Group)) %>% 
+  group_by(election, name) %>% 
+  mutate(Variable=recode_factor(Variable, "income"="Income")) %>% 
+  mutate(Group=case_when(
+    Variable=="Income" & Group==1 ~ "Low Income",
+    Variable=="Income" & Group==5 ~ "High Income",
+  )) %>%
+  filter(Variable=="Income") %>%
+#    filter(Group=="Low Income" , "High Income") %>% 
+  ggplot(., aes(y=election, x=average, group=Variable, col=`Group`))+geom_point()+facet_wrap(~fct_relevel(name, "Immigration Rates","Moral Traditionalism", "Market Liberalism", "Redistribution"), nrow=2)+theme(axis.text.x=element_text(angle=90))+scale_y_discrete(limits=rev)+scale_color_manual(values=rep(c('grey', 'black'),2))+
+  geom_vline(xintercept=0.5, linetype=2)+labs(y="Election", x="Average")
 
 

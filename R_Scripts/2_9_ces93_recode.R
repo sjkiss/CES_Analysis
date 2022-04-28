@@ -602,3 +602,15 @@ look_for(ces93, "dem")
 ces93$satdem<-Recode(ces93$PESL5, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces93$satdem, ces93$PESL5, useNA = "ifany" )
+
+#recode Quebec Sovereignty (CPSG11) (Quebec only & Right=more sovereignty)
+look_for(ces93, "sovereignty")
+ces93$quebec_sov<-Recode(ces93$CPSG11, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces93$quebec_sov, ces93$CPSG11, useNA = "ifany" )
+
+# recode immigration society (MBSG6)
+look_for(ces93, "fit")
+ces93$immigration_soc<-Recode(ces93$MBSG6, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces93$immigration_soc, ces93$MBSG6, useNA = "ifany" )

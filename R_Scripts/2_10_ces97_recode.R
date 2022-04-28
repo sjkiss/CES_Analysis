@@ -586,3 +586,21 @@ look_for(ces97, "dem")
 ces97$satdem<-Recode(ces97$cpsb9, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces97$satdem, ces97$cpsb9, useNA = "ifany" )
+
+#recode Quebec Sovereignty (pese10) (Quebec only & Right=more sovereignty)
+look_for(ces97, "sovereignty")
+ces97$quebec_sov<-Recode(ces97$pese10, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces97$quebec_sov, ces97$pese10, useNA = "ifany" )
+
+# recode provincial alienation (cpsj12)
+look_for(ces97, "treat")
+ces97$prov_alienation<-Recode(ces97$cpsj12, "3=1; 1=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces97$prov_alienation, ces97$cpsj12, useNA = "ifany" )
+
+# recode immigration society (mbsg4)
+look_for(ces97, "fit")
+ces97$immigration_soc<-Recode(ces97$mbsg4, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces97$immigration_soc, ces97$mbsg4, useNA = "ifany" )
