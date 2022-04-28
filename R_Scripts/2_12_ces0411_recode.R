@@ -699,6 +699,12 @@ ces0411$immigration_soc04<-Recode(ces0411$ces04_MBS_G3, "1=1; 2=0.75; 3=0.25; 4=
 #checks
 table(ces0411$immigration_soc04, ces0411$ces04_MBS_G3, useNA = "ifany" )
 
+#recode welfare (ces04_PES_D1B)
+look_for(ces0411, "spend")
+ces0411$welfare04<-Recode(ces0411$ces04_PES_D1B, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$welfare04, ces0411$ces04_PES_D1B, useNA = "ifany" )
+
 ###Recode 2006 2nd ####
 
 # Gender done at top
@@ -1402,6 +1408,12 @@ look_for(ces0411, "treat")
 ces0411$prov_alienation06<-Recode(ces0411$ces06_CPS_I12, "3=1; 1=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces0411$prov_alienation06, ces0411$ces06_CPS_I12, useNA = "ifany" )
+
+#recode welfare (ces06_PES_D1B)
+look_for(ces0411, "spend")
+ces0411$welfare06<-Recode(ces0411$ces06_PES_D1B, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$welfare06, ces0411$ces06_PES_D1B, useNA = "ifany" )
 
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
@@ -2189,6 +2201,12 @@ ces0411$immigration_soc08<-Recode(ces0411$ces08_MBS_H3 , "1=1; 2=0.75; 3=0.25; 4
 #checks
 table(ces0411$immigration_soc08, ces0411$ces08_MBS_H3 , useNA = "ifany" )
 
+#recode welfare (ces08_PES_D1B)
+look_for(ces0411, "spend")
+ces0411$welfare08<-Recode(ces0411$ces08_PES_D1B, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$welfare08, ces0411$ces08_PES_D1B, useNA = "ifany" )
+
 ####Recode 2011 4th ####
 
 # Gender done at top
@@ -2797,3 +2815,9 @@ look_for(ces0411, "fit")
 ces0411$immigration_soc11<-Recode(ces0411$MBS11_I3 , "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces0411$immigration_soc11, ces0411$MBS11_I3 , useNA = "ifany" )
+
+#recode welfare (CPS11_33)
+look_for(ces0411, "spend")
+ces0411$welfare11<-Recode(ces0411$CPS11_33, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$welfare11, ces0411$CPS11_33, useNA = "ifany" )

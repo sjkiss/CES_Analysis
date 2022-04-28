@@ -604,3 +604,10 @@ look_for(ces97, "fit")
 ces97$immigration_soc<-Recode(ces97$mbsg4, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces97$immigration_soc, ces97$mbsg4, useNA = "ifany" )
+
+#recode welfare (pese6b)
+look_for(ces97, "welfare")
+ces97$welfare<-Recode(ces97$pese6b, "1=1; 3=0.5; 8=0.5; 5=0; else=NA")
+#checks
+table(ces97$welfare)
+table(ces97$welfare, ces97$pese6b)

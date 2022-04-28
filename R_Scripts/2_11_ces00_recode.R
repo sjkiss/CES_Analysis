@@ -602,3 +602,10 @@ ces00$immigration_soc<-Recode(ces00$mbse3, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; els
 #checks
 table(ces00$immigration_soc, ces00$mbse3, useNA = "ifany" )
 
+#recode welfare (pesd1b )
+look_for(ces00, "welfare")
+ces00$welfare<-Recode(ces00$pesd1b , "1=0; 5=0.5; 8=0.5; 3=1; else=NA")
+#checks
+table(ces00$welfare)
+table(ces00$welfare, ces00$pesd1b )
+

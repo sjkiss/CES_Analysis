@@ -564,3 +564,10 @@ ces88$mip<-Recode(ces88$l1a, "1=14; 2=10; 3=12; 4=15; 5=12; 6=10; 7=7; 8=6; 9= 5
 val_labels(ces88$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10, 
                          Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17)
 table(ces88$mip)
+
+#recode welfare (qb6)
+look_for(ces88, "welfare")
+ces88$welfare<-Recode(ces88$qb6, "1=1; 2=0.75; 8=0.5; 3=0.25; 4=0; else=NA")
+#checks
+table(ces88$welfare)
+table(ces88$welfare, ces88$qb6)

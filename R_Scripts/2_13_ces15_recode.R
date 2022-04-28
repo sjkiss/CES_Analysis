@@ -915,3 +915,10 @@ look_for(ces15phone, "fit")
 ces15phone$immigration_soc<-Recode(ces15phone$MBS15_I3, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces15phone$immigration_soc, ces15phone$MBS15_I3, useNA = "ifany" )
+
+#recode welfare (CPS15_33)
+look_for(ces15phone, "welfare")
+ces15phone$welfare<-Recode(ces15phone$CPS15_33, "1=0; 5=0.5; 8=0.5; 3=1; else=NA")
+#checks
+table(ces15phone$welfare)
+table(ces15phone$welfare, ces15phone$CPS15_33)

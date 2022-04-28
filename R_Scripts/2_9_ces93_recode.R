@@ -614,3 +614,10 @@ look_for(ces93, "fit")
 ces93$immigration_soc<-Recode(ces93$MBSG6, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces93$immigration_soc, ces93$MBSG6, useNA = "ifany" )
+
+#recode welfare (CPSL7B)
+look_for(ces93, "welfare")
+ces93$welfare<-Recode(ces93$CPSL7B, "1=1; 3=0.5; 8=0.5; 5=0; else=NA")
+#checks
+table(ces93$welfare)
+table(ces93$welfare, ces93$CPSL7B)
