@@ -829,7 +829,8 @@ table(ces19phone$ideology, ces19phone$p42 , useNA = "ifany" )
 
 #### recode Immigration sentiment (p22_a) #### 
 look_for(ces19phone, "immigr")
-ces19phone$immigration_job<-Recode(ces19phone$p22_a, "1=0; 2=0.25; 3=0.75; 4=1; -9=0.5; else=NA", as.numeric=T)
+#ces19phone$immigration_job<-Recode(ces19phone$p22_a, "1=0; 2=0.25; 3=0.75; 4=1; -9=0.5; else=NA", as.numeric=T)
+ces19phone$immigration_job<-Recode(ces19phone$p22_a, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
 #checks
 table(ces19phone$immigration_job, ces19phone$p22_a, useNA = "ifany" )
 
@@ -847,3 +848,9 @@ look_for(ces19phone, "dem")
 ces19phone$satdem<-Recode(ces19phone$q6, "1=1; 2=0.75; 3=0.25; 4=0; -9=0.5; else=NA", as.numeric=T)
 #checks
 table(ces19phone$satdem, ces19phone$q6, useNA = "ifany" )
+
+# recode immigration society (p22_b)
+look_for(ces19phone, "culture")
+ces19phone$immigration_soc<-Recode(ces19phone$p22_b, "5=0; 4=0.25; 2=0.75; 1=1; 3=0.5; -9=0.5; else=NA", as.numeric=T)
+#checks
+table(ces19phone$immigration_soc, ces19phone$p22_b, useNA = "ifany" )
