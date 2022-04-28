@@ -1,6 +1,7 @@
 
 #### Andersen Replication and extension
 library(nnet)
+library(ggeffects)
 ces %>% 
   filter(election!=2000&quebec==0&election!=2021) %>% 
   nest(-election) %>% 
@@ -17,6 +18,7 @@ ces %>%
 
 #ggsave(here("Plots", "class_voting_roc_2019.png"), width=10, height=3)
 #Now QC 2019
+
 ces %>% 
   filter(election!=2000&quebec==1&election!=2021) %>% 
   nest(-election) %>% 

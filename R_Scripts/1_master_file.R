@@ -655,7 +655,7 @@ common_vars<-c('male',
                'traditionalism',
                'traditionalism2', 
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 
-               'non_charter_language', 'language', 'employment', 'satdem', 'turnout')
+               'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id')
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
