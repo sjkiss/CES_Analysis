@@ -611,3 +611,9 @@ ces97$welfare<-Recode(ces97$pese6b, "1=1; 3=0.5; 8=0.5; 5=0; else=NA")
 #checks
 table(ces97$welfare)
 table(ces97$welfare, ces97$pese6b)
+
+#recode Postgrad (cpsm3)
+look_for(ces97, "education")
+ces97$postgrad<-Recode(ces97$cpsm3, "10:11=1; 1:9=0; else=NA")
+#checks
+table(ces97$postgrad)

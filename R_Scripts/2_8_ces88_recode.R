@@ -571,3 +571,9 @@ ces88$welfare<-Recode(ces88$qb6, "1=1; 2=0.75; 8=0.5; 3=0.25; 4=0; else=NA")
 #checks
 table(ces88$welfare)
 table(ces88$welfare, ces88$qb6)
+
+#recode Postgrad (n3)
+look_for(ces88, "education")
+ces88$postgrad<-Recode(ces88$n3, "10:11=1; 1:9=0; else=NA")
+#checks
+table(ces88$postgrad)

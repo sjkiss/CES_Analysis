@@ -705,6 +705,12 @@ ces0411$welfare04<-Recode(ces0411$ces04_PES_D1B, "1=0; 3=1; 5=0.5; 8=0.5; else=N
 #checks
 table(ces0411$welfare04, ces0411$ces04_PES_D1B, useNA = "ifany" )
 
+#### Postgrad (ces04_CPS_S3) ####
+look_for(ces0411, "education")
+ces0411$postgrad04<-Recode(ces0411$ces04_CPS_S3, "10:11=1; 1:9=0; else=NA")
+#checks
+table(ces0411$postgrad04)
+
 ###Recode 2006 2nd ####
 
 # Gender done at top
@@ -1414,6 +1420,19 @@ look_for(ces0411, "spend")
 ces0411$welfare06<-Recode(ces0411$ces06_PES_D1B, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces0411$welfare06, ces0411$ces06_PES_D1B, useNA = "ifany" )
+
+#### Postgrad (ces06_CPS_S3) ####
+look_for(ces0411, "education")
+ces0411 %>% 
+  mutate(postgrad06=case_when(
+    ces06_CPS_S3 >0 & ces06_CPS_S3 <10 ~ 0,
+    ces06_CPS_S3 >9 & ces06_CPS_S3 <12 ~ 1,
+    (ces04_CPS_S3 >0 & ces04_CPS_S3 <10) & ces06_RECALL==1~ 0,
+    (ces04_CPS_S3 >9 & ces04_CPS_S3 <12) & ces06_RECALL==1~ 1,
+  ))->ces0411
+
+#checks
+table(ces0411$postgrad06)
 
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
@@ -2207,6 +2226,18 @@ ces0411$welfare08<-Recode(ces0411$ces08_PES_D1B, "1=0; 3=1; 5=0.5; 8=0.5; else=N
 #checks
 table(ces0411$welfare08, ces0411$ces08_PES_D1B, useNA = "ifany" )
 
+#### recode Postgrad (ces08_CPS_S3)#### 
+look_for(ces0411, "education")
+ces0411 %>% 
+  mutate(postgrad08=case_when(
+    ces08_CPS_S3 >0 & ces08_CPS_S3 <10 ~ 0,
+    ces08_CPS_S3 >9 & ces08_CPS_S3 <12 ~ 1,
+    # (ces04_CPS_S3 >0 & ces04_CPS_S3 <9) & ces08_CPS_REPLICATE==9999 ~ 0,
+    # (ces04_CPS_S3 >8 & ces04_CPS_S3 <12) & ces08_CPS_REPLICATE==9999 ~ 1,
+  ))->ces0411
+#checks
+table(ces0411$postgrad08)
+
 ####Recode 2011 4th ####
 
 # Gender done at top
@@ -2821,3 +2852,9 @@ look_for(ces0411, "spend")
 ces0411$welfare11<-Recode(ces0411$CPS11_33, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces0411$welfare11, ces0411$CPS11_33, useNA = "ifany" )
+
+#### recode Postgrad (CPS11_79) ####
+look_for(ces0411, "education")
+ces0411$postgrad11<-Recode(ces0411$CPS11_79, "10:11=1; 1:8=0; else=NA")
+#checks
+table(ces0411$postgrad11, useNA = "ifany" )

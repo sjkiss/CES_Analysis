@@ -922,3 +922,9 @@ ces15phone$welfare<-Recode(ces15phone$CPS15_33, "1=0; 5=0.5; 8=0.5; 3=1; else=NA
 #checks
 table(ces15phone$welfare)
 table(ces15phone$welfare, ces15phone$CPS15_33)
+
+#recode Postgrad (CPS15_79)
+look_for(ces15phone, "education")
+ces15phone$postgrad<-Recode(ces15phone$CPS15_79, "10:11=1; 1:9=0; else=NA")
+#checks
+table(ces15phone$postgrad)

@@ -854,3 +854,9 @@ look_for(ces19phone, "culture")
 ces19phone$immigration_soc<-Recode(ces19phone$p22_b, "5=0; 4=0.25; 2=0.75; 1=1; 3=0.5; -9=0.5; else=NA", as.numeric=T)
 #checks
 table(ces19phone$immigration_soc, ces19phone$p22_b, useNA = "ifany" )
+
+#recode Postgrad (q61)
+look_for(ces19phone, "education")
+ces19phone$postgrad<-Recode(ces19phone$q61, "10:11=1; 1:9=0; else=NA")
+#checks
+table(ces19phone$postgrad)

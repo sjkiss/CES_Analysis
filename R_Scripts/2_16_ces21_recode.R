@@ -520,3 +520,9 @@ table(ces21$satdem, ces21$cps21_demsat, useNA = "ifany" )
 # Add mip as missing variable. 
 ces21$mip<-rep(NA, nrow(ces21))
 ces21$sector<-rep(NA, nrow(ces21))
+
+#recode Postgrad (cps21_education)
+look_for(ces21, "education")
+ces21$postgrad<-Recode(ces21$cps21_education, "10:11=1; 1:9=0; else=NA")
+#checks
+table(ces21$postgrad)

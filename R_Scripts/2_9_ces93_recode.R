@@ -621,3 +621,22 @@ ces93$welfare<-Recode(ces93$CPSL7B, "1=1; 3=0.5; 8=0.5; 5=0; else=NA")
 #checks
 table(ces93$welfare)
 table(ces93$welfare, ces93$CPSL7B)
+
+#recode Education (CPSO3)
+look_for(ces93, "education")
+ces93 %>% 
+  mutate(postgrad=case_when(
+    RTYPE4==1 & (CPSO3==9 | REFN2==9)~ 0,
+    RTYPE4==1 & (CPSO3==10 | REFN2==10)~ 1,
+    RTYPE4==1 & (CPSO3==11 | REFN2==11)~ 1,
+    RTYPE4==1 & (CPSO3==1 | REFN2==1)~ 0,
+    RTYPE4==1 & (CPSO3==2 | REFN2==2)~ 0,
+    RTYPE4==1 & (CPSO3==3 | REFN2==3)~ 0,
+    RTYPE4==1 & (CPSO3==4 | REFN2==4)~ 0,
+    RTYPE4==1 & (CPSO3==5 | REFN2==5)~ 0,
+    RTYPE4==1 & (CPSO3==6 | REFN2==6)~ 0,
+    RTYPE4==1 & (CPSO3==7 | REFN2==7)~ 0,
+    RTYPE4==1 & (CPSO3==8 | REFN2==8)~ 0,
+  ))->ces93
+#checks
+table(ces93$postgrad)

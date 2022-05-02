@@ -325,6 +325,8 @@ ces04 %>%
   rename(mip=mip04)->ces04
 ces04 %>% 
   rename(satdem=satdem04)->ces04
+ces04 %>% 
+  rename(postgrad=postgrad04)->ces04
 
 table(ces04$survey, ces04$non_charter_language)
 
@@ -421,6 +423,8 @@ ces06 %>%
   rename(mip=mip06)->ces06
 ces06 %>% 
   rename(satdem=satdem06)->ces06
+ces06 %>% 
+  rename(postgrad=postgrad06)->ces06
 
 table(ces06$survey, ces06$non_charter_language)
 
@@ -519,6 +523,8 @@ ces08 %>%
   rename(mip=mip08)->ces08
 ces08 %>% 
   rename(satdem=satdem08)->ces08
+ces08 %>% 
+  rename(postgrad=postgrad08)->ces08
 
 table(ces08$survey, ces08$non_charter_language)
 
@@ -617,6 +623,8 @@ ces11 %>%
   rename(mip=mip11)->ces11
 ces11 %>% 
   rename(satdem=satdem11)->ces11
+ces11 %>% 
+  rename(postgrad=postgrad11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -655,7 +663,7 @@ common_vars<-c('male',
                'traditionalism',
                'traditionalism2', 
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 
-               'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id')
+               'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id', 'postgrad')
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
@@ -845,3 +853,4 @@ theme_set(theme_bw())
 ces$satdem
 table(ces$election, ces$satdem)
 table(ces$election, ces$turnout)
+table(ces$election, ces$postgrad)
