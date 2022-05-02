@@ -16,6 +16,7 @@ ols_block_models %>%
   ggplot(., aes(x=election, y=estimate, col=Measure, group=Measure))+geom_point()+geom_line()+
   labs(x="Election", y="Estimate")
 ggsave(here("Plots", "block_degree_income.png"))
+
 #### Decompose By Party
 #### Basic Party vote models 1965-2021 ####
 ces %>%
@@ -67,3 +68,47 @@ ndp_models_complete1 %>%
   geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
 ggsave(here("Plots", "ols_degree_party_income.png"))
 
+# Income as factor 1965-2021
+ces %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(ndp~region2+male+age+as.factor(income)+degree+as.factor(religion2), data=x)),
+         tidied=map(model, tidy),
+         vote=rep('NDP', nrow(.)))->ndp_models_complete2
+
+ces %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(conservative~region2+male+age+as.factor(income)+degree+as.factor(religion2), data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Conservative', nrow(.))
+  )->conservative_models_complete2
+
+ces %>%
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(liberal~region2+male+age+as.factor(income)+degree+as.factor(religion2), data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Liberal', nrow(.))
+  )->liberal_models_complete2
+
+stargazer(ndp_models_complete2$model, 
+          type="html", 
+          out=here("Tables", "NDP_Models_1965_2021.html"),
+          column.labels=c("1965", "1968", "1972", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
+          star.cutoffs=c(0.05), 
+          title="NDP Models 1965-2021", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(liberal_models_complete2$model, 
+          type="html", 
+          out=here("Tables", "liberal_Models_1965_2021.html"),
+          column.labels=c("1965", "1968", "1972", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
+          star.cutoffs=c(0.05), 
+          title="Liberal Models 1965-2021", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(conservative_models_complete2$model, 
+          type="html", 
+          out=here("Tables", "conservative_Models_1965_2021.html"),
+          column.labels=c("1965", "1968", "1972", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019", "2021"), 
+          star.cutoffs=c(0.05), 
+          title="Conservative Models 1965-2021", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
