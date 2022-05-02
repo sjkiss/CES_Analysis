@@ -770,6 +770,12 @@ ces$upper_class<-Recode(ces$occupation, "1:2=1; 3:5=0; else=NA")
 table(ces$upper_class)
 ces$upper_class2<-Recode(ces$occupation3, "1:2=1; 3:6=0; else=NA")
 table(ces$upper_class2)
+
+# Create Income Dummy
+
+ces$rich<-Recode(ces$income, "4:5=1; else=0")
+ces$poor<-Recode(ces$income, "1:2=1; else=0")
+# Create Time Dummies
 ces$`1965`<-Recode(ces$election, "1965=1; else=0")
 ces$`1968`<-Recode(ces$election, "1968=1; else=0")
 ces$`1972`<-Recode(ces$election, "1972=1; else=0")
@@ -818,7 +824,8 @@ val_labels(ces$working_class4)<-c(`Other`=0, `Working  Class`=1)
 val_labels(ces$Period)<-c(`Pre 2004`=0, `Post 2000`=1)
 val_labels(ces$right)<-c(Right=1, Other=0)
 val_labels(ces$left)<-c(Left=1, Other=0)
-
+val_labels(ces$rich)<-c(Rich=1, `Not Rich`=0)
+val_labels(ces$poor)<-c(Poor=1, `Not Poor`=0)
 #### Set Theme ####
 theme_set(theme_bw())
 
