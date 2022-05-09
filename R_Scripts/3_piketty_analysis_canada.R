@@ -264,6 +264,6 @@ cmp %>%
 canada$economic_dimension<-((log(canada$per401+.5))+(log(canada$per402+0.5))+(log(canada$per407+0.5))+(log(canada$per410+0.5))+(log(canada$per414+0.5))+(log(canada$per505+0.5))+(log(canada$per507+0.5))+(log(canada$per702+0.5)))-((log(canada$per403+0.5))+(log(canada$per404+0.5))+(log(canada$per405+0.5))+(log(canada$per406+0.5))+(log(canada$per409+0.5))+(log(canada$per412+0.5))+(log(canada$per413+0.5))+(log(canada$per415+0.5))+(log(canada$per503+0.5))+(log(canada$per504+0.5))+(log(canada$per506+0.5))+(log(canada$per701+0.5)))
 canada$social_dimension<-((log(canada$per305+0.5))+(log(canada$per601+0.5))+(log(canada$per603+0.5))+(log(canada$per605+0.5))+(log(canada$per606+0.5))+(log(canada$per608+0.5)))-((log(canada$per201+0.5))+(log(canada$per202+0.5))+(log(canada$per416+0.5))+(log(canada$per501+0.5))+(log(canada$per502+0.5))+(log(canada$per602+0.5))+(log(canada$per604+0.5))+(log(canada$per607+0.5))+(log(canada$per705+0.5))+(log(canada$per706+0.5)))
 canada %>% 
-  filter(date>"1989-01-01") %>% 
+  filter(date>"1989-01-01" & partyname="New Democratic Party" & partyname="Liberal Party of Canada" & partyname="Conservative Party of Canada" & partyname="Progressive Conservative Party") %>% 
   pivot_longer(cols=ends_with('_dimension'), names_to=c("Dimension"), values_to=c("Score")) %>% 
   ggplot(., aes(x=date, y=Score, col=partyabbrev))+geom_point()+geom_line()+facet_wrap(~Dimension)

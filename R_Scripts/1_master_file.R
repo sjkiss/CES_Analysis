@@ -849,6 +849,28 @@ ces %>%
   mutate(economic=mean(c_across(cols=c(market1, market2, redistribution_reversed))), na.rm=T) ->ces
 ces %>% ungroup()->ces
 
+### Socio-cultural Views ###
+
+#Start with data frame
+ces %>% 
+  #Do work on it rowwise
+  rowwise() %>% 
+  #Create new variable called social 
+  #It is defined as the average (mean) of trad1, trad2 and immigration; missing values ignored
+  mutate(social=mean(c_across(cols=c(trad1, trad2, immigration_rates))), na.rm=T)  %>%
+  #Select those variables 
+  select(trad1, trad2, election, immigration, social) %>% 
+  #Filter post 2004 to examine.
+  filter(election>2000)
+
+ces %>% 
+  #Do work on it rowwise
+  rowwise() %>% 
+  #Create new variable called social 
+  #It is defined as the average (mean) of trad1, trad2 and immigration; missing values ignored
+  mutate(social=mean(c_across(cols=c(trad1, trad2, immigration_rates))), na.rm=T) ->ces
+ces %>% ungroup()->ces
+
 ### Value labels often go missing in the creation of the ces data frame
 ### assign value label
 val_labels(ces$sector)<-c(Private=0, Public=1)
