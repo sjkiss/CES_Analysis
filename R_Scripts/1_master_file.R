@@ -327,10 +327,14 @@ ces04 %>%
   rename(satdem=satdem04)->ces04
 ces04 %>% 
   rename(postgrad=postgrad04)->ces04
-
+ces04 %>% 
+  rename(market1=market041)->ces04
+ces04 %>% 
+  rename(market2=market042)->ces04
 table(ces04$survey, ces04$non_charter_language)
 
 #### Rename CES06 ####
+
 ces06 %>% 
   rename(union_both=union_both06)->ces06
 ces06 %>% 
@@ -399,8 +403,8 @@ ces06 %>%
   rename(ndp_leader=ndp_leader06)->ces06
 ces06 %>% 
   rename(bloc_leader=bloc_leader06)->ces06
-ces06 %>% 
-  rename(green_leader=green_leader06)->ces06
+#ces06 %>% 
+  #rename(green_leader=green_leader06)->ces06
 ces06 %>% 
   rename(liberal_rating=liberal_rating06)->ces06
 ces06 %>% 
@@ -426,6 +430,10 @@ ces06 %>%
 ces06 %>% 
   rename(postgrad=postgrad06)->ces06
 
+ces06 %>% 
+  rename(market1=market061)->ces06
+ces06 %>% 
+  rename(market2=market062)->ces06
 table(ces06$survey, ces06$non_charter_language)
 
 #### Rename CES08 ####
@@ -525,7 +533,10 @@ ces08 %>%
   rename(satdem=satdem08)->ces08
 ces08 %>% 
   rename(postgrad=postgrad08)->ces08
-
+ces08 %>% 
+  rename(market1=market081)->ces08
+ces08 %>% 
+  rename(market2=market082)->ces08
 table(ces08$survey, ces08$non_charter_language)
 
 #### Rename CES11 ####
@@ -625,7 +636,10 @@ ces11 %>%
   rename(satdem=satdem11)->ces11
 ces11 %>% 
   rename(postgrad=postgrad11)->ces11
-
+ces11 %>% 
+  rename(market1=market111)->ces11
+ces11 %>% 
+  rename(market2=market112)->ces11
 #### Rejoin the Files To Make CES ####
 
 #For some years there are no variables (e.g. 1965 does not have a union variable)
@@ -662,6 +676,7 @@ common_vars<-c('male',
                'immigration_rates', 
                'traditionalism',
                'traditionalism2', 
+               'market1','market2',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 
                'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id', 'postgrad')
 #Start with the data frame
@@ -810,6 +825,29 @@ ces %>%
     election<2004~0
   ))->ces
 
+### Economic Views ###
+#Flip redistribution
+ces$redistribution_reversed<-1-ces$redistribution
+#Start with data frame
+ces %>% 
+  #Do work on it rowwise
+  rowwise() %>% 
+  #Create new variable called economic 
+  #It is defined as the average (mean) of market1, market2 and redistribution_reviersed; missing values ignored
+  mutate(economic=mean(c_across(cols=c(market1, market2, redistribution_reversed))), na.rm=T) %>% 
+  #Select those variables 
+  select(market1, market2, election, redistribution_reversed,economic) %>% 
+  #Filter post 2004 to examine.
+  filter(election>2000)
+
+#Repeat and store
+ces %>% 
+  #Do work on it rowwise
+  rowwise() %>% 
+  #Create new variable called economic 
+  #It is defined as the average (mean) of market1, market2 and redistribution_reviersed; missing values ignored
+  mutate(economic=mean(c_across(cols=c(market1, market2, redistribution_reversed))), na.rm=T) ->ces
+ces %>% ungroup()->ces
 
 ### Value labels often go missing in the creation of the ces data frame
 ### assign value label
@@ -854,3 +892,5 @@ ces$satdem
 table(ces$election, ces$satdem)
 table(ces$election, ces$turnout)
 table(ces$election, ces$postgrad)
+table(ces$election, ces$left)
+
