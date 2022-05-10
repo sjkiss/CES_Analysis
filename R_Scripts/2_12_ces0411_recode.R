@@ -388,7 +388,7 @@ ces0411$crime04<-Recode(ces0411$ces04_MBS_G5, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; 
 table(ces0411$crime04)
 
 #### #recode Gay Rights (ces04_PES_G12@3) #### 
-#***note needs `...` to recognize the variable***
+# ***note needs `...` to recognize the variable***
 look_for(ces0411, "gays")
 ces0411$gay_rights04<-Recode(ces0411$`ces04_PES_G12@3`, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA")
 #checks

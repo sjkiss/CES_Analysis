@@ -94,6 +94,7 @@ stargazer(conservative_models_complete1$model,
 
 
 #### Show Effetc of Income with Dichotomous Variables ####
+ces %>% 
   nest(variables=-election) %>%
   mutate(model=map(variables, function(x) lm(ndp~region2+male+age+as_factor(rich)+degree+as.factor(religion2), data=x)),
          tidied=map(model, tidy),
@@ -238,32 +239,54 @@ stargazer(conservative_models_complete3$model,
           title="Conservative Models 1965-2021")
 #### Add In Redistribution ####
 
-ces %>% 
-  nest(variables=-canada$period) %>% 
-  mutate(ndp=map(variables, function(x) lm(ndp~degree+income+male+age+region+traditionalism+redistribution+degree:redistribution, data=x)),
-                 liberal=map(variables, function(x) lm(liberal~degree+income+male+age+region+traditionalism+redistribution+degree:redistribution, data=x)),
-                             conservative=map(variables, function(x) lm(conservative~degree+income+male+age+region+traditionalism+redistribution+degree:redistribution, data=x)))->redistribution_models
+# ces %>% 
+#   nest(variables=-canada$period) %>% 
+#   mutate(ndp=map(variables, function(x) lm(ndp~degree+income+male+age+region+traditionalism+redistribution+degree:redistribution, data=x)),
+#                  liberal=map(variables, function(x) lm(liberal~degree+income+male+age+region+traditionalism+redistribution+degree:redistribution, data=x)),
+#                              conservative=map(variables, function(x) lm(conservative~degree+income+male+age+region+traditionalism+redistribution+degree:redistribution, data=x)))->redistribution_models
 #### CMP ####
 
 ces %>% 
-  group_by(election, vote) %>% 
-  filter(election>1992) %>% 
-  summarize(average=mean(economic, na.rm=T)) %>% 
+  pivot_longer(cols=c(economic, social), names_to=c("Dimension"), values_to=c("Score")) %>% 
+  group_by(election, Dimension,vote) %>% 
+  filter(election>1992 & election<2019) %>% 
+  summarize(Average=mean(Score, na.rm=T)) %>% 
   filter(vote>0 & vote<5) %>% 
-  ggplot(., aes(x=election, y=average, col=as_factor(vote), group=as_factor(vote)))+
-  geom_line()+geom_point()+scale_color_manual(values=c('darkred', "darkblue", "orange", "cyan"))
-
+  mutate(Dimension=str_to_title(Dimension)) %>% 
+  rename(Election=election) %>% 
+  ggplot(., aes(x=Election, y=Average, col=as_factor(vote), group=as_factor(vote)))+
+  geom_line()+geom_point()+scale_color_manual(values=c('darkred', "darkblue", "orange", "cyan"), name='Vote')+facet_wrap(~Dimension)
+ggsave(filename="Plots/canada_voter_policy_position_1993_2015.png", width=8, height=4)
 
 #Download the data
 cmp<-read.csv(file="https://manifesto-project.wzb.eu/down/data/2021a/datasets/MPDataset_MPDS2021a.csv")
 #Get Canada
+
 cmp %>% 
   filter(countryname=="Canada")->canada
 #Define Dimension issues
 
 canada$economic_dimension<-((log(canada$per401+.5))+(log(canada$per402+0.5))+(log(canada$per407+0.5))+(log(canada$per410+0.5))+(log(canada$per414+0.5))+(log(canada$per505+0.5))+(log(canada$per507+0.5))+(log(canada$per702+0.5)))-((log(canada$per403+0.5))+(log(canada$per404+0.5))+(log(canada$per405+0.5))+(log(canada$per406+0.5))+(log(canada$per409+0.5))+(log(canada$per412+0.5))+(log(canada$per413+0.5))+(log(canada$per415+0.5))+(log(canada$per503+0.5))+(log(canada$per504+0.5))+(log(canada$per506+0.5))+(log(canada$per701+0.5)))
 canada$social_dimension<-((log(canada$per305+0.5))+(log(canada$per601+0.5))+(log(canada$per603+0.5))+(log(canada$per605+0.5))+(log(canada$per606+0.5))+(log(canada$per608+0.5)))-((log(canada$per201+0.5))+(log(canada$per202+0.5))+(log(canada$per416+0.5))+(log(canada$per501+0.5))+(log(canada$per502+0.5))+(log(canada$per602+0.5))+(log(canada$per604+0.5))+(log(canada$per607+0.5))+(log(canada$per705+0.5))+(log(canada$per706+0.5)))
+
+library(lubridate)
+
 canada %>% 
-  filter(date>"1989-01-01" & partyname="New Democratic Party" & partyname="Liberal Party of Canada" & partyname="Conservative Party of Canada" & partyname="Progressive Conservative Party") %>% 
+  filter(date>"1989-01-01"&
+          (partyname=="New Democratic Party" |
+           partyname=="Liberal Party of Canada" |
+           partyname=="Conservative Party of Canada" |
+           partyname=="Progressive Conservative Party"|
+             partyname=="Canadian Reform Conservative Alliance"|
+           partyname=="Reform Party of Canada")) %>% 
   pivot_longer(cols=ends_with('_dimension'), names_to=c("Dimension"), values_to=c("Score")) %>% 
-  ggplot(., aes(x=date, y=Score, col=partyabbrev))+geom_point()+geom_line()+facet_wrap(~Dimension)
+  mutate(Party=Recode(partyname, "'New Democratic Party'='NDP' ; 'Liberal Party of Canada'='Liberal' ; 
+  'Conservative Party of Canada'='Conservative' ; 
+                      'Progressive Conservative Party of Canada'='PC';
+                      'Reform Party of Canada'='Reform' ; 'Canadian Reform Conservative Alliance'='Conservative'"),
+         Dimension=Recode(Dimension, "'economic_dimension'='Economic' ; 'social_dimension'='Social'")) %>% 
+  ggplot(., aes(x=date, y=Score, col=Party))+geom_point()+geom_line()+
+  facet_wrap(~Dimension)+
+  scale_color_manual(values=c('darkblue', 'darkred', 'orange', 'lightblue', 'darkgreen'), name="Party")
+ggsave(filename="Plots/canada_party_positions_1993_2015.png", width=8, height=4)
+

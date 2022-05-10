@@ -331,8 +331,11 @@ ces04 %>%
   rename(market1=market041)->ces04
 ces04 %>% 
   rename(market2=market042)->ces04
+ces04 %>% 
+  rename(trad1=trad041, trad2=trad042)->ces04
 table(ces04$survey, ces04$non_charter_language)
-
+ces06 %>% 
+  rename(trad1=trad061, trad2=trad062)->ces06
 #### Rename CES06 ####
 
 ces06 %>% 
@@ -438,6 +441,8 @@ table(ces06$survey, ces06$non_charter_language)
 
 #### Rename CES08 ####
 ces08 %>% 
+  rename(trad1=trad081, trad2=trad082)->ces08
+ces08 %>% 
   rename(union_both=union_both08)->ces08
 ces08 %>% 
   rename(union=union08)->ces08
@@ -540,6 +545,9 @@ ces08 %>%
 table(ces08$survey, ces08$non_charter_language)
 
 #### Rename CES11 ####
+
+ces11 %>% 
+  rename(trad1=trad111, trad2=trad112)->ces11
 ces11 %>% 
   rename(union_both=union_both11)->ces11
 ces11 %>% 
@@ -676,6 +684,7 @@ common_vars<-c('male',
                'immigration_rates', 
                'traditionalism',
                'traditionalism2', 
+               'trad1', 'trad2', 'immigration_rates',
                'market1','market2',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 
                'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id', 'postgrad')
@@ -859,7 +868,7 @@ ces %>%
   #It is defined as the average (mean) of trad1, trad2 and immigration; missing values ignored
   mutate(social=mean(c_across(cols=c(trad1, trad2, immigration_rates))), na.rm=T)  %>%
   #Select those variables 
-  select(trad1, trad2, election, immigration, social) %>% 
+  select(trad1, trad2, election, immigration_rates, social) %>% 
   #Filter post 2004 to examine.
   filter(election>2000)
 
