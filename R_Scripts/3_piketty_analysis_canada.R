@@ -250,12 +250,14 @@ ces %>%
   pivot_longer(cols=c(economic, social), names_to=c("Dimension"), values_to=c("Score")) %>% 
   group_by(election, Dimension,vote) %>% 
   filter(election>1992 & election<2019) %>% 
-  summarize(Average=mean(Score, na.rm=T)) %>% 
+  summarize(Average=mean(Score, na.rm=T), n=n(), sd=sd(Score, na.rm=T), se=sd/sqrt(n)) %>% 
   filter(vote>0 & vote<5) %>% 
   mutate(Dimension=str_to_title(Dimension)) %>% 
   rename(Election=election) %>% 
   ggplot(., aes(x=Election, y=Average, col=as_factor(vote), group=as_factor(vote)))+
-  geom_line()+geom_point()+scale_color_manual(values=c('darkred', "darkblue", "orange", "cyan"), name='Vote')+facet_wrap(~Dimension)
+  geom_line()+geom_point()+geom_errorbar(width=0, aes(ymin=Average-(1.96*se), ymax=Average+(1.96*se))) +
+  scale_color_manual(values=c('darkred', "darkblue", "orange", "cyan"), name='Vote')+facet_wrap(~Dimension)+
+  theme(legend.position = "bottom")
 ggsave(filename="Plots/canada_voter_policy_position_1993_2015.png", width=8, height=4)
 
 #Download the data
@@ -278,15 +280,20 @@ canada %>%
            partyname=="Conservative Party of Canada" |
            partyname=="Progressive Conservative Party"|
              partyname=="Canadian Reform Conservative Alliance"|
-           partyname=="Reform Party of Canada")) %>% 
+           partyname=="Reform Party of Canada"|
+             partyname=="Quebec Bloc")) %>% 
   pivot_longer(cols=ends_with('_dimension'), names_to=c("Dimension"), values_to=c("Score")) %>% 
-  mutate(Party=Recode(partyname, "'New Democratic Party'='NDP' ; 'Liberal Party of Canada'='Liberal' ; 
+  mutate(Party=Recode(partyname, as.factor=T ,"'New Democratic Party'='NDP' ; 
+  'Quebec Bloc'='BQ' ; 
+  'Liberal Party of Canada'='Liberal' ; 
   'Conservative Party of Canada'='Conservative' ; 
-                      'Progressive Conservative Party of Canada'='PC';
-                      'Reform Party of Canada'='Reform' ; 'Canadian Reform Conservative Alliance'='Conservative'"),
-         Dimension=Recode(Dimension, "'economic_dimension'='Economic' ; 'social_dimension'='Social'")) %>% 
-  ggplot(., aes(x=date, y=Score, col=Party))+geom_point()+geom_line()+
+                      'Progressive Conservative Party'='PC';
+                      'Reform Party of Canada'='Reform' ; 'Canadian Reform Conservative Alliance'='Conservative'", 
+                      levels=c("Liberal", "Conservative", "NDP", "BQ","PC", "Reform")),
+ Dimension=Recode(Dimension, "'economic_dimension'='Economic' ; 'social_dimension'='Social'")) %>% 
+  rename(Date=date) %>% 
+  ggplot(., aes(x=Date, y=Score, col=Party))+geom_point()+geom_line()+
   facet_wrap(~Dimension)+
-  scale_color_manual(values=c('darkblue', 'darkred', 'orange', 'lightblue', 'darkgreen'), name="Party")
+  scale_color_manual(values=c( 'darkred', 'darkblue', 'orange','cyan', 'lightblue', 'darkgreen'), name="Party")+theme(legend.position="bottom")
 ggsave(filename="Plots/canada_party_positions_1993_2015.png", width=8, height=4)
 
