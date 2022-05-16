@@ -238,7 +238,43 @@ stargazer(conservative_models_complete3$model,
           star.cutoffs=c(0.05), 
           title="Conservative Models 1965-2021")
 #### Add In Redistribution ####
+ces$ROC<-(ces$quebec-1)*-1
+val_labels(ces$ROC)<-c(Quebec=0, ROC=1)
 
+ces %>% 
+  filter(election>1988) %>% 
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) 
+    glm(ndp~male+degree+income+as_factor(ROC)+traditionalism+redistribution+redistribution*degree, data=x, family="binomial"))) %>% 
+  mutate(tidied=map(model, tidy))->ndp_redistribution_interaction_models
+
+library(marginaleffects)
+
+ces %>% 
+  filter(election>1988) %>% 
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) 
+    lm(ndp~male+degree+income+as_factor(ROC)+traditionalism+redistribution+traditionalism*degree, data=x))) %>% 
+  mutate(tidied=map(model, tidy))->ndp_traditionalism_interaction_models
+
+#Plot the coefficients
+ndp_traditionalism_models$model %>% 
+  map(., marginaleffects, )
+library(marginaleffects)
+ndp_interaction_models$model %>% 
+  map(., marginaleffects, 
+      variables=c("redistribution"), 
+      newdata=datagrid(degree=c(0,1), quebec=c(0,1))) %>% 
+  bind_rows() %>% 
+  mutate(Degree=Recode(degree, "0='No Degree' ; 1='Degree'"),
+         Quebec=Recode(quebec,"0='Rest of Canada' ; 1='Quebec'")) %>% 
+  mutate(Election=rep(ndp_interaction_models$election, each=4)) %>% 
+    filter(Quebec=="Rest of Canada") %>%
+  ggplot(., aes(x=Election, y=dydx, col=Degree, group=Degree))+
+  geom_line()+
+  geom_point()
+  labs(y="AME",
+       title="Avearge Marginal Effect of Redistribution on P of voting NDP by Degree Status")
 # ces %>% 
 #   nest(variables=-canada$period) %>% 
 #   mutate(ndp=map(variables, function(x) lm(ndp~degree+income+male+age+region+traditionalism+redistribution+degree:redistribution, data=x)),
