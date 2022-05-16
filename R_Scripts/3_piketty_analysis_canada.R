@@ -241,46 +241,98 @@ stargazer(conservative_models_complete3$model,
 ces$ROC<-(ces$quebec-1)*-1
 val_labels(ces$ROC)<-c(Quebec=0, ROC=1)
 
+library(nnet)
 ces %>% 
+  filter(vote2!="Green") %>%
   filter(election>1988) %>% 
-  nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) 
-    glm(ndp~male+degree+income+as_factor(ROC)+traditionalism+redistribution+redistribution*degree, data=x, family="binomial"))) %>% 
-  mutate(tidied=map(model, tidy))->ndp_redistribution_interaction_models
-
-library(marginaleffects)
+  filter(ROC==1) %>% 
+  nest(-election) %>% 
+mutate(model=map(data, function(x) multinom(vote2~degree+male+age+income+redistribution+traditionalism+degree*redistribution, data=x)),
+       tidied=map(model, tidy, conf.int=T))->redistribution_models
+redistribution_models %>% 
+  unnest(tidied) %>% 
+  filter(term=="degree:redistribution") %>% 
+  ggplot(., aes(x=election, y=estimate, col=y.level))+
+  geom_point()+
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.high), width=0)+
+  scale_color_manual(values=c('darkred', 'orange'))+geom_hline(yintercept=0, linetype=2)
 
 ces %>% 
+  as_factor() %>% 
+  filter(vote2!="Green") %>%
   filter(election>1988) %>% 
-  nest(variables=-election) %>% 
-  mutate(model=map(variables, function(x) 
-    lm(ndp~male+degree+income+as_factor(ROC)+traditionalism+redistribution+traditionalism*degree, data=x))) %>% 
-  mutate(tidied=map(model, tidy))->ndp_traditionalism_interaction_models
-
-#Plot the coefficients
-ndp_traditionalism_models$model %>% 
-  map(., marginaleffects, )
-library(marginaleffects)
-ndp_interaction_models$model %>% 
-  map(., marginaleffects, 
-      variables=c("redistribution"), 
-      newdata=datagrid(degree=c(0,1), quebec=c(0,1))) %>% 
-  bind_rows() %>% 
-  mutate(Degree=Recode(degree, "0='No Degree' ; 1='Degree'"),
-         Quebec=Recode(quebec,"0='Rest of Canada' ; 1='Quebec'")) %>% 
-  mutate(Election=rep(ndp_interaction_models$election, each=4)) %>% 
-    filter(Quebec=="Rest of Canada") %>%
-  ggplot(., aes(x=Election, y=dydx, col=Degree, group=Degree))+
-  geom_line()+
-  geom_point()
-  labs(y="AME",
-       title="Avearge Marginal Effect of Redistribution on P of voting NDP by Degree Status")
-# ces %>% 
-#   nest(variables=-canada$period) %>% 
-#   mutate(ndp=map(variables, function(x) lm(ndp~degree+income+male+age+region+traditionalism+redistribution+degree:redistribution, data=x)),
-#                  liberal=map(variables, function(x) lm(liberal~degree+income+male+age+region+traditionalism+redistribution+degree:redistribution, data=x)),
-#                              conservative=map(variables, function(x) lm(conservative~degree+income+male+age+region+traditionalism+redistribution+degree:redistribution, data=x)))->redistribution_models
-#### CMP ####
+  filter(ROC=="ROC") %>% 
+  nest(-election) %>% 
+  mutate(model=map(data, function(x) multinom(vote2~degree+male+age+income+redistribution+traditionalism+degree*traditionalism, data=x)),
+         tidied=map(model, tidy, conf.int=T))->traditionalism_models
+traditionalism_models %>% 
+  unnest(tidied) %>% 
+  filter(str_detect(term, "degree")) %>% 
+  filter(term=="degreeDegree:traditionalism") %>% 
+  ggplot(., aes(x=election, y=estimate, col=y.level))+
+  geom_point()+
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.high), width=0)+
+  scale_color_manual(values=c('darkred', 'orange'))+geom_hline(yintercept=0, linetype=2)
+  #labs(caption="This shows multinomial logistic regression coefficients from a model with vote as the dependent variable, age, male, income, degree and traditionalism as covariates. The points are the interaction between degree and traditionalism for each party compared to the Conservatives.Social liberalism has a bigger effect on differentiating the vote for NDP degree holders than for Liberal degree holders.")
+ggsave(filename="Plots/Multinomial_coefficients_traditionalism_degree.png")
+#### Find a way to show effects plot 
+# 
+#### Average Scores For Degree Versus Average ####
+  
+  ces %>% 
+    select(election, degree, redistribution_reversed, immigration_rates, market_liberalism, traditionalism2) %>%
+    rename(Redistribution=redistribution_reversed, `Immigration Rates`=immigration_rates, `Market Liberalism`=market_liberalism, `Moral Traditionalism`=traditionalism2) %>% 
+    #  mutate(Redistribution=skpersonal::revScale(Redistribution, reverse=T)) %>% 
+    pivot_longer(cols=3:6) %>% 
+    pivot_longer(cols=2, names_to="Variable", values_to="Group") %>% 
+    filter(election>1988) %>% 
+    group_by(election, Variable, Group, name) %>% 
+    summarize(average=mean(value, na.rm=T), n=n(), sd=sd(value, na.rm=T), se=sd/sqrt(n)) %>% 
+    arrange(election, Variable, name, Group) %>%
+    filter(!is.na(Group)) %>% 
+    group_by(election, name) %>% 
+    mutate(Variable=recode_factor(Variable, "degree"="Degree")) %>% 
+    mutate(Group=case_when(
+      Variable=="Degree" & Group==0 ~ "No Degree",
+      Variable=="Degree" & Group==1 ~ "Degree",
+    )) %>%
+    #  filter(Group=="No Degree") %>% 
+    
+    ggplot(., aes(y=election, x=average, group=Variable, col=`Group`))+geom_point()+
+    facet_wrap(~fct_relevel(name, "Immigration Rates","Moral Traditionalism", "Market Liberalism", "Redistribution"), nrow=2)+
+    theme(axis.text.x=element_text(angle=90))+scale_y_discrete(limits=rev)+
+    scale_color_manual(values=rep(c('grey', 'black'),2))+
+    geom_vline(xintercept=0.5, linetype=2)+labs(y="Election", x="Average")+labs(col="Degree Status")+
+    geom_errorbar(width=0,aes(xmin=average-(1.96*se), xmax=average+(1.96*se)))
+  ggsave(filename=here("Plots", "mean_attitudinal_preferences_income.png"), width=8, height=8)
+  
+  #### Average Scores For Income ####
+  
+  ces %>% 
+    select(election, income, redistribution_reversed, immigration_rates, market_liberalism, traditionalism2) %>%
+    rename(Redistribution=redistribution_reversed, `Immigration Rates`=immigration_rates, `Market Liberalism`=market_liberalism, `Moral Traditionalism`=traditionalism2) %>% 
+    #  mutate(Redistribution=skpersonal::revScale(Redistribution, reverse=T)) %>% 
+    pivot_longer(cols=3:6) %>% 
+    pivot_longer(cols=2, names_to="Variable", values_to="Group") %>% 
+    filter(election>1988) %>% 
+    group_by(election, Variable, Group, name) %>% 
+    summarize(average=mean(value, na.rm=T), n=n(), sd=sd(value, na.rm=T), se=sd/sqrt(n)) %>% 
+    arrange(election, Variable, name, Group) %>%
+    filter(!is.na(Group)) %>% 
+    group_by(election, name) %>% 
+    rename(Income=Group) %>% 
+    # mutate(Group=case_when(
+    #   Variable=="Income" & Group==1 ~ "Low Income",
+    #   Variable=="Income" & Group==5 ~ "High Income",
+    # )) %>%
+    #filter(Variable=="Income") %>%
+        filter(Income==1|Income==5) %>% 
+    ggplot(., aes(y=election, x=average,  col=as_factor(Income)))+geom_point()+
+      facet_wrap(~fct_relevel(name, "Immigration Rates","Moral Traditionalism", "Market Liberalism", "Redistribution"), nrow=2)+theme(axis.text.x=element_text(angle=90))+scale_y_discrete(limits=rev)+scale_color_manual(values=rep(c('grey', 'black'),2))+
+    geom_vline(xintercept=0.5, linetype=2)+labs(y="Election", x="Average")+
+    geom_errorbar(width=0,aes(xmin=average-(1.96*se), xmax=average+(1.96*se)))+labs(col="Income Quintile")
+  ggsave(filename=here("Plots", "mean_attitudinal_preferences_income.png"), width=6, height=6)
+  #### CMP ####
 
 ces %>% 
   pivot_longer(cols=c(economic, social), names_to=c("Dimension"), values_to=c("Score")) %>% 
