@@ -381,6 +381,52 @@ ggsave(filename="Plots/predicted_probabilities_traditionalism_poor.png",dpi=150,
 
 #ggsave(filename="Plots/Multinomial_coefficients_traditionalism_poor.png")
 
+#Immigration 
+ces %>% 
+  as_factor() %>% 
+  filter(vote2!="Green") %>%
+  filter(election>1988) %>% 
+  filter(ROC=="ROC") %>% 
+  nest(-election) %>% 
+  mutate(model=map(data, function(x) multinom(vote2~degree+male+age+income+redistribution+immigration_rates+degree*immigration_rates, data=x)),
+         tidied=map(model, tidy, conf.int=T))->degree_immigration_models
+
+degree_immigration_models$model %>% 
+  map(., ggeffect, 
+      terms=c('immigration_rates [0.33,0.66]','degree')) %>% 
+  bind_rows(., .id="Election") %>% 
+  data.frame() %>% 
+  # filter(Election==10) %>% 
+  mutate(Election=Recode(Election, "1=1993; 2=1997; 3=2000; 4=2004; 5=2006; 6=2008;7=2011; 8=2015; 9=2019;10=2021 ")) %>% 
+  ggplot(., aes(x=x, y=predicted, col=group))+
+  geom_line()+
+  facet_grid(response.level~Election)+
+  ylim(c(0,1))+labs(title="Predicted Probabilities of Vote Choice Degree (No Degree))\nBased on Immigration (ROC)")
+
+ggsave(filename="Plots/predicted_probabilities_immigration_degree.png",dpi=150,width=8, height=3)
+
+#Immgration
+ces %>% 
+  as_factor() %>% 
+  filter(vote2!="Green") %>%
+  filter(election>1988) %>% 
+  filter(ROC=="ROC") %>% 
+  nest(-election) %>% 
+  mutate(model=map(data, function(x) multinom(vote2~degree+male+age+poor+redistribution+immigration_rates+poor*immigration_rates, data=x)),
+         tidied=map(model, tidy, conf.int=T))->poor_immigration_models
+
+poor_immigration_models$model %>% 
+  map(., ggeffect, 
+      terms=c('immigration_rates [0.33,0.66]','poor')) %>% 
+  bind_rows(., .id="Election") %>% 
+  data.frame() %>% 
+  # filter(Election==10) %>% 
+  mutate(Election=Recode(Election, "1=1993; 2=1997; 3=2000; 4=2004; 5=2006; 6=2008;7=2011; 8=2015; 9=2019;10=2021 ")) %>% 
+  ggplot(., aes(x=x, y=predicted, col=group))+
+  geom_line()+
+  facet_grid(response.level~Election)+
+  ylim(c(0,1))+labs(title="Predicted Probabilities of Vote Choice Poor (Not Poor)\nBased on Immigration (ROC)")
+ggsave(filename="Plots/predicted_probabilities_immigration_poor.png",dpi=150,width=8, height=3)
 
 #### Find a way to show effects plot 
 # 
