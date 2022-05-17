@@ -246,17 +246,72 @@ ces %>%
   filter(vote2!="Green") %>%
   filter(election>1988) %>% 
   filter(ROC==1) %>% 
+ # select(vote2, degree, male, age, income) %>% 
+  as_factor() %>% 
   nest(-election) %>% 
 mutate(model=map(data, function(x) multinom(vote2~degree+male+age+income+redistribution+traditionalism+degree*redistribution, data=x)),
-       tidied=map(model, tidy, conf.int=T))->redistribution_models
-redistribution_models %>% 
-  unnest(tidied) %>% 
-  filter(term=="degree:redistribution") %>% 
-  ggplot(., aes(x=election, y=estimate, col=y.level))+
-  geom_point()+
-  geom_errorbar(aes(ymin=conf.low, ymax=conf.high), width=0)+
-  scale_color_manual(values=c('darkred', 'orange'))+geom_hline(yintercept=0, linetype=2)
+       tidied=map(model, tidy, conf.int=T))->degree_redistribution_models
+degree_redistribution_models
+library(ggeffects)
+degree_redistribution_models$model %>% 
+  map(., ggeffect, terms=c('redistribution [0.33,0.66]','degree')) %>% 
+  bind_rows(., .id="Election") %>% 
+  data.frame() %>% 
+ # filter(Election==10) %>% 
+  mutate(Election=Recode(Election, "1=1993; 2=1997; 3=2000; 4=2004; 5=2006; 6=2008;7=2011; 8=2015; 9=2019;10=2021 ")) %>% 
+  ggplot(., aes(x=x, y=predicted, col=group))+
+  geom_line()+
+  facet_grid(response.level~Election)+ylim(c(0,1))+labs(title="Predicted Probabilities of Vote Choice Degree (Not Degree)\nBased on Redistribution (ROC)")
+ggsave(filename="Plots/predicted_probabilities_redistribution_degree.png",dpi=150,width=8, height=3)
+# degree_redistribution_models %>% 
+#   unnest(tidied) %>% 
+#   filter(term=="degree:redistribution") %>% 
+#   ggplot(., aes(x=election, y=estimate, col=y.level))+
+#   geom_point()+
+#   geom_errorbar(aes(ymin=conf.low, ymax=conf.high), width=0)+
+#   scale_color_manual(values=c('darkred', 'orange'))+geom_hline(yintercept=0, linetype=2)+
+#   labs(title="Multinomial coefficients of Degree and Redistribution Interaction\nRight Vote Reference Category")
+# ggsave(filename="Plots/multinomial_coefficients_degree_redistribution.png")
 
+ces %>% 
+  filter(vote2!="Green") %>%
+  filter(election>1988) %>% 
+  filter(ROC==1) %>% 
+  as_factor() %>% 
+  nest(-election) %>% 
+  mutate(model=map(data, function(x) 
+    multinom(vote2~degree+male+age+poor+redistribution+traditionalism+poor*redistribution, 
+             data=x)),
+         tidied=map(model, tidy, conf.int=T))->poor_redistribution_models
+
+poor_redistribution_models$model %>% 
+  map(., ggeffect, 
+      terms=c('redistribution [0.33,0.66]','poor')) %>% 
+  bind_rows(., .id="Election") %>% 
+  data.frame() %>% 
+  # filter(Election==10) %>% 
+  mutate(Election=Recode(Election, "1=1993; 2=1997; 3=2000; 4=2004; 5=2006; 6=2008;7=2011; 8=2015; 9=2019;10=2021 ")) %>% 
+  ggplot(., aes(x=x, y=predicted, col=group))+
+  geom_line()+
+  facet_grid(response.level~Election)+
+  ylim(c(0,1))+labs(title="Predicted Probabilities of Vote Choice Poor (Not Poor)\nBased on Redistribution (ROC)")
+ggsave(filename="Plots/predicted_probabilities_redistribution_poor.png",dpi=150,width=8, height=3)
+
+
+
+# poor_redistribution_models %>% 
+#   unnest(tidied) %>% 
+#   filter(term=="poor:redistribution") %>% 
+#   ggplot(., aes(x=election, y=estimate, col=y.level))+
+#   geom_point()+
+#   geom_errorbar(aes(ymin=conf.low, ymax=conf.high), width=0)+
+#   scale_color_manual(values=c('darkred', 'orange'))+geom_hline(yintercept=0, linetype=2)+
+# labs(title="Multinomial coefficients of Lowest Quintile and Redistribution Interaction\nRight Vote Reference Category")
+
+#ggsave(filename="Plots/multinomial_coefficients_poor_redistribution.png")
+
+
+#Traditionalism 
 ces %>% 
   as_factor() %>% 
   filter(vote2!="Green") %>%
@@ -264,17 +319,69 @@ ces %>%
   filter(ROC=="ROC") %>% 
   nest(-election) %>% 
   mutate(model=map(data, function(x) multinom(vote2~degree+male+age+income+redistribution+traditionalism+degree*traditionalism, data=x)),
-         tidied=map(model, tidy, conf.int=T))->traditionalism_models
-traditionalism_models %>% 
-  unnest(tidied) %>% 
-  filter(str_detect(term, "degree")) %>% 
-  filter(term=="degreeDegree:traditionalism") %>% 
-  ggplot(., aes(x=election, y=estimate, col=y.level))+
-  geom_point()+
-  geom_errorbar(aes(ymin=conf.low, ymax=conf.high), width=0)+
-  scale_color_manual(values=c('darkred', 'orange'))+geom_hline(yintercept=0, linetype=2)
-  #labs(caption="This shows multinomial logistic regression coefficients from a model with vote as the dependent variable, age, male, income, degree and traditionalism as covariates. The points are the interaction between degree and traditionalism for each party compared to the Conservatives.Social liberalism has a bigger effect on differentiating the vote for NDP degree holders than for Liberal degree holders.")
-ggsave(filename="Plots/Multinomial_coefficients_traditionalism_degree.png")
+         tidied=map(model, tidy, conf.int=T))->degree_traditionalism_models
+
+degree_traditionalism_models$model %>% 
+  map(., ggeffect, 
+      terms=c('traditionalism [0.33,0.66]','degree')) %>% 
+  bind_rows(., .id="Election") %>% 
+  data.frame() %>% 
+  # filter(Election==10) %>% 
+  mutate(Election=Recode(Election, "1=1993; 2=1997; 3=2000; 4=2004; 5=2006; 6=2008;7=2011; 8=2015; 9=2019;10=2021 ")) %>% 
+  ggplot(., aes(x=x, y=predicted, col=group))+
+  geom_line()+
+  facet_grid(response.level~Election)+
+  ylim(c(0,1))+labs(title="Predicted Probabilities of Vote Choice Degree (No Degree))\nBased on Moral Traditionalism (ROC)")
+
+ggsave(filename="Plots/predicted_probabilities_traditionalism_degree.png",dpi=150,width=8, height=3)
+
+# degree_traditionalism_models %>% 
+#   unnest(tidied) %>% 
+#   filter(str_detect(term, "degree")) %>% 
+#   filter(term=="degreeDegree:traditionalism") %>% 
+#   ggplot(., aes(x=election, y=estimate, col=y.level))+
+#   geom_point()+
+#   geom_errorbar(aes(ymin=conf.low, ymax=conf.high), width=0)+
+#   scale_color_manual(values=c('darkred', 'orange'))+geom_hline(yintercept=0, linetype=2)+
+#   labs(title="Multinomial coefficients of Degree and traditionalism Interaction\nRight Vote Reference Category")
+# 
+# ggsave(filename="Plots/Multinomial_coefficients_traditionalism_degree.png")
+
+#Traditionalism 
+ces %>% 
+  as_factor() %>% 
+  filter(vote2!="Green") %>%
+  filter(election>1988) %>% 
+  filter(ROC=="ROC") %>% 
+  nest(-election) %>% 
+  mutate(model=map(data, function(x) multinom(vote2~degree+male+age+poor+redistribution+traditionalism+poor*traditionalism, data=x)),
+         tidied=map(model, tidy, conf.int=T))->poor_traditionalism_models
+
+# poor_traditionalism_models %>% 
+#   unnest(tidied) %>% 
+#   filter(str_detect(term, "poor")) %>% 
+#   filter(term=="poorPoor:traditionalism") %>% 
+#   ggplot(., aes(x=election, y=estimate, col=y.level))+
+#   geom_point()+
+#   geom_errorbar(aes(ymin=conf.low, ymax=conf.high), width=0)
+#   scale_color_manual(values=c('darkred', 'orange'))+geom_hline(yintercept=0, linetype=2)+
+# labs(title="Multinomial coefficients of Lowest Quintile and Traditionalism Interaction\nRight Vote Reference Category")
+poor_traditionalism_models$model %>% 
+  map(., ggeffect, 
+      terms=c('traditionalism [0.33,0.66]','poor')) %>% 
+  bind_rows(., .id="Election") %>% 
+  data.frame() %>% 
+  # filter(Election==10) %>% 
+  mutate(Election=Recode(Election, "1=1993; 2=1997; 3=2000; 4=2004; 5=2006; 6=2008;7=2011; 8=2015; 9=2019;10=2021 ")) %>% 
+  ggplot(., aes(x=x, y=predicted, col=group))+
+  geom_line()+
+  facet_grid(response.level~Election)+
+  ylim(c(0,1))+labs(title="Predicted Probabilities of Vote Choice Poor (Not Poor)\nBased on Moral Traditionalism (ROC)")
+ggsave(filename="Plots/predicted_probabilities_traditionalism_poor.png",dpi=150,width=8, height=3)
+
+#ggsave(filename="Plots/Multinomial_coefficients_traditionalism_poor.png")
+
+
 #### Find a way to show effects plot 
 # 
 #### Average Scores For Degree Versus Average ####
@@ -301,10 +408,10 @@ ggsave(filename="Plots/Multinomial_coefficients_traditionalism_degree.png")
     ggplot(., aes(y=election, x=average, group=Variable, col=`Group`))+geom_point()+
     facet_wrap(~fct_relevel(name, "Immigration Rates","Moral Traditionalism", "Market Liberalism", "Redistribution"), nrow=2)+
     theme(axis.text.x=element_text(angle=90))+scale_y_discrete(limits=rev)+
-    scale_color_manual(values=rep(c('grey', 'black'),2))+
+    scale_color_manual(values=rep(c('black', 'grey'),2))+
     geom_vline(xintercept=0.5, linetype=2)+labs(y="Election", x="Average")+labs(col="Degree Status")+
     geom_errorbar(width=0,aes(xmin=average-(1.96*se), xmax=average+(1.96*se)))
-  ggsave(filename=here("Plots", "mean_attitudinal_preferences_income.png"), width=8, height=8)
+  ggsave(filename=here("Plots", "mean_attitudinal_preferences_education.png"), width=8, height=8)
   
   #### Average Scores For Income ####
   
@@ -332,7 +439,11 @@ ggsave(filename="Plots/Multinomial_coefficients_traditionalism_degree.png")
     geom_vline(xintercept=0.5, linetype=2)+labs(y="Election", x="Average")+
     geom_errorbar(width=0,aes(xmin=average-(1.96*se), xmax=average+(1.96*se)))+labs(col="Income Quintile")
   ggsave(filename=here("Plots", "mean_attitudinal_preferences_income.png"), width=6, height=6)
-  #### CMP ####
+ 
+#### Variance of Opinion inside each party ####
+  
+  
+#### CMP ####
 
 ces %>% 
   pivot_longer(cols=c(economic, social), names_to=c("Dimension"), values_to=c("Score")) %>% 
