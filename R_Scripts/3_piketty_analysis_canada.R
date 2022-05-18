@@ -542,3 +542,52 @@ canada %>%
   scale_color_manual(values=c( 'darkred', 'darkblue', 'orange','cyan', 'lightblue', 'darkgreen'), name="Party")+theme(legend.position="bottom")
 ggsave(filename="Plots/canada_party_positions_1993_2015.png", width=8, height=4)
 
+#### Pooled OLS Models by decade ####
+#What we need is by decade, minus the BQ and the Greens
+ces %>% 
+  filter(election<1999 & election> 1989 & vote2!="BQ" & vote2!="Green")->ces.1
+ces %>% 
+  filter(election<2009 & election> 1999 & vote2!="BQ" & vote2!="Green")->ces.2
+ces %>% 
+  filter(election<2020 & election> 2009 & vote2!="BQ" & vote2!="Green")->ces.3
+
+# NDP Models
+m1<-lm(ndp~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.1)
+m2<-lm(ndp~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.2)
+m3<-lm(ndp~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.3)
+m10<-lm(ndp~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.1)
+m11<-lm(ndp~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.2)
+m12<-lm(ndp~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.3)
+
+# Liberal models
+m4<-lm(liberal~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.1)
+m5<-lm(liberal~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.2)
+m6<-lm(liberal~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.3)
+m13<-lm(liberal~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.1)
+m14<-lm(liberal~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.2)
+m15<-lm(liberal~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.3)
+
+#Conservative Models
+m7<-lm(conservative~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.1)
+m8<-lm(conservative~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.2)
+m9<-lm(conservative~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates, data=ces.3)
+m16<-lm(conservative~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.1)
+m17<-lm(conservative~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.2)
+m18<-lm(conservative~region2+age+male+degree+income+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+degree:redistribution, data=ces.3)
+
+#### Degree x Redistribution interaction ####
+
+interaction.models<-list(m10, m11, m12, m13, m14, m15, m16, m17, m18)
+#get length of coefficients
+interaction.models %>% 
+  map(., function(x) length(x$coefficients))
+
+#names(interaction.models)<-c(rep("NDP", 2), rep("Liberals", 2), rep("Conservative", 2))
+interaction.models %>% 
+  map_dfr(., tidy, .id='model') %>% 
+  mutate(term=recode_factor(term, "degree:redistribution"="Degree:Redistribution")) %>% 
+  mutate(Party=c(rep("NDP", 48), rep("Liberal", 48), rep("Conservative", 48)),
+         Period=c(rep("1990s", 16 ), rep("2000s", 16), rep("2010s", 16 ), rep("1990s", 16),
+                  rep("2000s", 16 ), rep("2010s", 16), rep("1990s", 16 ), rep("2000s", 16), rep("2010s", 16))) %>% filter(str_detect(term, ":")) %>% 
+  ggplot(., aes(x=Period, y=estimate, col=Period))+geom_point()+facet_grid(term~fct_relevel(Party, "NDP", "Liberal"), scales="free")+scale_color_grey(start=0.8, end=0.2) +geom_errorbar(width=0, aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+   geom_hline(yintercept=0,  linetype=2)+theme(strip.text.y.right = element_text(angle = 0))+labs(y="Coefficient")
+ggsave(filename=here("Plots", "degree_redistribution_interaction_terms.png"), width=8, height=4)
