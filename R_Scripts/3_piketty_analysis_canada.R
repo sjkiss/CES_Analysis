@@ -62,7 +62,7 @@ ndp_models_complete1 %>%
   #scale_fill_manual(values=c("navy blue", "red", "orange"))+
   labs(title="OLS Coefficients of Degree holders and Income on Party Vote 1965-2021", alpha="Variable", color="Vote", x="Election", y="Estimate")+
   #geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
-  ylim(c(-0.2,0.2))+
+  ylim(c(-0.15,0.15))+
   #Turn to greyscale for printing in the journal; also we don't actually need the legend because the labels are on the side
   #scale_color_grey(guide="none")+
   geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
@@ -136,13 +136,13 @@ ndp_models_complete2 %>%
   scale_size_manual(values=c(1,3))+
   geom_smooth(method="loess", size=0.5, alpha=0.2) +
   #scale_fill_manual(values=c("navy blue", "red", "orange"))+
-  labs(title="OLS Coefficients of Degree holders and being Rich on Party Vote 1965-2021", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  labs(title="OLS Coefficients of Degree and Rich Status on Party Vote 1965-2021", alpha="Variable", color="Vote", x="Election", y="Estimate")+
   #geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
-  ylim(c(-0.2,0.2))+
+  ylim(c(-0.18,0.18))+
   #Turn to greyscale for printing in the journal; also we don't actually need the legend because the labels are on the side
   #scale_color_grey(guide="none")+
   geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
-ggsave(here("Plots", "ols_degree_rich_ party.png"))
+ggsave(here("Plots", "ols_degree_rich_party.png"))
 
 #### Print out regression models ####
 stargazer(ndp_models_complete2$model, 
