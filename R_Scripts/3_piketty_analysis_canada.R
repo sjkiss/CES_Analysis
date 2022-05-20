@@ -518,30 +518,65 @@ canada$economic_dimension<-((log(canada$per401+.5))+(log(canada$per402+0.5))+(lo
 canada$social_dimension<-((log(canada$per305+0.5))+(log(canada$per601+0.5))+(log(canada$per603+0.5))+(log(canada$per605+0.5))+(log(canada$per606+0.5))+(log(canada$per608+0.5)))-((log(canada$per201+0.5))+(log(canada$per202+0.5))+(log(canada$per416+0.5))+(log(canada$per501+0.5))+(log(canada$per502+0.5))+(log(canada$per602+0.5))+(log(canada$per604+0.5))+(log(canada$per607+0.5))+(log(canada$per705+0.5))+(log(canada$per706+0.5)))
 
 library(lubridate)
-
+canada$Date<-ym(canada$date)
 canada %>% 
-  filter(date>"1989-01-01"&
+  filter(Date>"1989-01-01"& 
           (partyname=="New Democratic Party" |
            partyname=="Liberal Party of Canada" |
            partyname=="Conservative Party of Canada" |
            partyname=="Progressive Conservative Party"|
              partyname=="Canadian Reform Conservative Alliance"|
-           partyname=="Reform Party of Canada"|
+          # partyname=="Reform Party of Canada"|
              partyname=="Quebec Bloc")) %>% 
   pivot_longer(cols=ends_with('_dimension'), names_to=c("Dimension"), values_to=c("Score")) %>% 
   mutate(Party=Recode(partyname, as.factor=T ,"'New Democratic Party'='NDP' ; 
   'Quebec Bloc'='BQ' ; 
   'Liberal Party of Canada'='Liberal' ; 
   'Conservative Party of Canada'='Conservative' ; 
-                      'Progressive Conservative Party'='PC';
+                      'Progressive Conservative Party'='Conservative';
                       'Reform Party of Canada'='Reform' ; 'Canadian Reform Conservative Alliance'='Conservative'", 
-                      levels=c("Liberal", "Conservative", "NDP", "BQ","PC", "Reform")),
+                      levels=c("Liberal", "Conservative", "NDP", "BQ","PC")),
  Dimension=Recode(Dimension, "'economic_dimension'='Economic' ; 'social_dimension'='Social'")) %>% 
-  rename(Date=date) %>% 
   ggplot(., aes(x=Date, y=Score, col=Party))+geom_point()+geom_line()+
   facet_wrap(~Dimension)+
   scale_color_manual(values=c( 'darkred', 'darkblue', 'orange','cyan', 'lightblue', 'darkgreen'), name="Party")+theme(legend.position="bottom")
 ggsave(filename="Plots/canada_party_positions_1993_2015.png", width=8, height=4)
+#Define Dimension issues
+canada %>% 
+  rowwise() %>% 
+  mutate(second_dimension=sum(c_across(c(per101:per110, per201:per204, per301:per305,
+                                         per501:per503, per601:per608,per705:per706
+  ))),
+  first_dimension=sum(c_across(c(per401:per416, per504:per507, per701:per704,))))->canada
+
+library(lubridate)
+canada %>% 
+  # select(edate,partyname, second_dimension, first_dimension) %>% 
+  #modify party names for categorization
+  mutate(Party=case_when(
+    str_detect(partyname, "Cooperative Commonwealth Federation")~'CCF-NDP',
+    str_detect(partyname, "Democratic")~'CCF-NDP',
+    str_detect(partyname, "Progressive Conservative")~'Conservative',
+    str_detect(partyname, "Reform Party of Canada")~'Conservative',
+    str_detect(partyname, "Canadian Reform Canadian Alliance")~'Conservative',
+    str_detect(partyname, "Conservative")~'Conservative',
+    str_detect(partyname, "Liberal")~'Liberal',
+    str_detect(partyname, "Social Credit")~'Social Credit',
+    str_detect(partyname, "Bloc")~'Bloc',
+    str_detect(partyname, "Green")~'Green',
+  ), 
+  #modify date
+  Date=dmy(edate), 
+  #Create ratio
+  ratio=first_dimension/second_dimension)->canada
+
+canada %>% 
+  #pivot_longer(., cols=c("first_dimension", "second_dimension")) %>% 
+  ggplot(., aes(x=Date, y=ratio, col=Party))+geom_line()+
+  theme_minimal()+geom_hline(yintercept=1, linetype=2)+
+  scale_color_manual(values=c("cyan", "orange", "blue", "darkgreen", "darkred", "black"))
+  ggsave(filename="Plots/first_second_dimension.png")
+
 
 #### Pooled OLS Models by decade ####
 #What we need is by decade, minus the BQ and the Greens
