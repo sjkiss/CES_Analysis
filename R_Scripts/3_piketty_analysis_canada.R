@@ -12,6 +12,7 @@ ces %>%
 ols_block_models %>% 
   unnest(tidied) %>% 
   filter(term=="degree"|term=="income") %>% 
+  filter(election<2020) %>% 
   mutate(Measure=Recode(term, "'degreeDegree'='Degree' ; 'income'='Income'")) %>% 
   ggplot(., aes(x=election, y=estimate, col=Measure, group=Measure))+geom_point()+geom_line()+
   labs(x="Election", y="Estimate")
@@ -128,6 +129,7 @@ ndp_models_complete2 %>%
   bind_rows(., conservative_models_complete2) %>%
   unnest(tidied) %>% 
   filter(str_detect(term, "degree|rich")) %>% 
+  filter(election<2020) %>% 
   mutate(term=Recode(term, "'degree'='Degree'; 'as_factor(rich)Rich'='Rich'")) %>%
   ggplot(., aes(x=election, y=estimate, col=vote, size=term, group=term))+
   geom_point()+facet_grid(~vote, switch="y")+
