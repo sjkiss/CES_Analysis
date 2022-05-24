@@ -12,10 +12,12 @@ ces %>%
 ols_block_models %>% 
   unnest(tidied) %>% 
   filter(term=="degree"|term=="income") %>% 
-  filter(election<2020) %>% 
-  mutate(Measure=Recode(term, "'degreeDegree'='Degree' ; 'income'='Income'")) %>% 
+  filter(election<2020)  %>% 
+  mutate(Measure=Recode(term, "'degree'='Degree' ; 'income'='Income'")) %>% 
   ggplot(., aes(x=election, y=estimate, col=Measure, group=Measure))+geom_point()+geom_line()+
-  labs(x="Election", y="Estimate")
+  labs(x="Election", y="Estimate")+
+  scale_color_grey()+
+  geom_hline(yintercept=0, linetype=2)
 ggsave(here("Plots", "block_degree_income.png"))
 
 #### Decompose By Party
@@ -56,18 +58,19 @@ ndp_models_complete1 %>%
   mutate(term=Recode(term, "'degree'='Degree'; 'income'='Income'")) %>%
   ggplot(., aes(x=election, y=estimate, col=vote, size=term, group=term))+
   geom_point()+facet_grid(~vote, switch="y")+
-  scale_color_manual(values=c("navy blue", "red", "orange"))+
+  scale_color_manual(values=c("navy blue", "red", "orange"), name="Vote")+
   #scale_alpha_manual(values=c(0.4, .8))+  
-  scale_size_manual(values=c(1,3))+
+  scale_size_manual(values=c(1,3), name="Coefficient")+
   geom_smooth(method="loess", size=0.5, alpha=0.2) +
   #scale_fill_manual(values=c("navy blue", "red", "orange"))+
-  labs(title="OLS Coefficients of Degree holders and Income on Party Vote 1965-2021", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+ # labs(title="OLS Coefficients of Degree holders and Income on Party Vote 1965-2021", alpha="Variable", color="Vote", x="Election", y="Estimate")+
   #geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
   ylim(c(-0.15,0.15))+
   #Turn to greyscale for printing in the journal; also we don't actually need the legend because the labels are on the side
   #scale_color_grey(guide="none")+
-  geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
-ggsave(here("Plots", "ols_degree_party_income.png"))
+  geom_hline(yintercept=0, alpha=0.5, linetype=2)+
+  theme(axis.text.x=element_text(angle=90))
+ggsave(here("Plots", "ols_degree_party_income.png"), width=8, height=4)
 
 
 #### Print out regression models ####
@@ -495,16 +498,27 @@ ggsave(filename="Plots/predicted_probabilities_immigration_poor.png",dpi=150,wid
 ces %>% 
   pivot_longer(cols=c(economic, social), names_to=c("Dimension"), values_to=c("Score")) %>% 
   group_by(election, Dimension,vote) %>% 
-  filter(election>1992 & election<2019) %>% 
+  filter(election>1992 & election<2021) %>% 
   summarize(Average=mean(Score, na.rm=T), n=n(), sd=sd(Score, na.rm=T), se=sd/sqrt(n)) %>% 
   filter(vote>0 & vote<5) %>% 
   mutate(Dimension=str_to_title(Dimension)) %>% 
-  rename(Election=election) %>% 
-  ggplot(., aes(x=Election, y=Average, col=as_factor(vote), group=as_factor(vote)))+
-  geom_line()+geom_point()+geom_errorbar(width=0, aes(ymin=Average-(1.96*se), ymax=Average+(1.96*se))) +
-  scale_color_manual(values=c('darkred', "darkblue", "orange", "cyan"), name='Vote')+facet_wrap(~Dimension)+
-  theme(legend.position = "bottom")
-ggsave(filename="Plots/canada_voter_policy_position_1993_2015.png", width=8, height=4)
+  mutate(Election=as.Date(election, format="%Y")) %>% 
+  ggplot(., aes(x=Election, 
+                y=Average, 
+                col=as_factor(vote),
+                # linetype=as_factor(vote),
+                # shape=as_factor(vote), 
+                 group=as_factor(vote)))+
+  geom_line()+facet_wrap(~Dimension)+
+    geom_point()+
+    geom_errorbar(width=0, aes(ymin=Average-(1.96*se), ymax=Average+(1.96*se)))+ 
+  scale_color_manual(values=c('darkred', "darkblue", "orange", "cyan"), name='Vote')+
+    #scale_shape_discrete(name="Vote")+
+    #scale_linetype_discrete(name="Vote")+
+   # scale_color_grey(name="Vote")+
+  theme(legend.position = "bottom")->canada_voter_policy_position_1993_2015
+canada_voter_policy_position_1993_2015
+ggsave(canada_voter_policy_position_1993_2015,filename="Plots/canada_voter_policy_position_1993_2015.png", width=8, height=4)
 
 #Download the data
 cmp<-read.csv(file="https://manifesto-project.wzb.eu/down/data/2021a/datasets/MPDataset_MPDS2021a.csv")
@@ -528,7 +542,9 @@ canada %>%
              partyname=="Canadian Reform Conservative Alliance"|
           # partyname=="Reform Party of Canada"|
              partyname=="Quebec Bloc")) %>% 
-  pivot_longer(cols=ends_with('_dimension'), names_to=c("Dimension"), values_to=c("Score")) %>% 
+  pivot_longer(cols=ends_with('_dimension'), 
+               names_to=c("Dimension"), 
+               values_to=c("Score")) %>% 
   mutate(Party=Recode(partyname, as.factor=T ,"'New Democratic Party'='NDP' ; 
   'Quebec Bloc'='BQ' ; 
   'Liberal Party of Canada'='Liberal' ; 
@@ -539,8 +555,18 @@ canada %>%
  Dimension=Recode(Dimension, "'economic_dimension'='Economic' ; 'social_dimension'='Social'")) %>% 
   ggplot(., aes(x=Date, y=Score, col=Party))+geom_point()+geom_line()+
   facet_wrap(~Dimension)+
-  scale_color_manual(values=c( 'darkred', 'darkblue', 'orange','cyan', 'lightblue', 'darkgreen'), name="Party")+theme(legend.position="bottom")
-ggsave(filename="Plots/canada_party_positions_1993_2015.png", width=8, height=4)
+  scale_color_manual(values=c( 'darkred', 'darkblue', 'orange','cyan', 'lightblue', 'darkgreen'), name="Party")+
+  #scale_linetype_discrete()+
+  #scale_color_grey()+scale_shape_discrete()+
+  theme(legend.position="none")->canada_party_positions_1993_2015
+canada_party_positions_1993_2015
+ggsave(canada_party_positions_1993_2015,filename="Plots/canada_party_positions_1993_2015.png", width=8, height=4)
+#install.packages('cowplot')
+library(cowplot)
+plot_grid(canada_party_positions_1993_2015,
+          canada_voter_policy_position_1993_2015, 
+           ncol=1)
+ggsave(filename=here("Plots", "combined_canada_voter_policy_preferences_1993_2015.png"), width=8, height=8)
 #Define Dimension issues
 canada %>% 
   rowwise() %>% 
