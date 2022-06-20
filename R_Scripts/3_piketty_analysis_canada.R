@@ -453,7 +453,7 @@ ggsave(filename="Plots/predicted_probabilities_immigration_poor.png",dpi=150,wid
     filter(election>1988&election<2020) %>% 
     group_by(election, Variable, Group, name) %>% 
     summarize(average=mean(value, na.rm=T), n=n(), sd=sd(value, na.rm=T), se=sd/sqrt(n)) %>% 
-    arrange(election, Variable, name, Group) %>%
+    arrange(election, Variable, name, Group) %>% 
     filter(!is.na(Group)) %>% 
     group_by(election, name) %>% 
     mutate(Variable=recode_factor(Variable, "degree"="Degree")) %>% 
@@ -496,8 +496,49 @@ ggsave(filename="Plots/predicted_probabilities_immigration_poor.png",dpi=150,wid
     geom_vline(xintercept=0.5, linetype=2)+labs(y="Election", x="Average")+
     geom_errorbar(width=0,aes(xmin=average-(1.96*se), xmax=average+(1.96*se)))+
     labs(col="Income Quintile")
-  ggsave(filename=here("Plots", "mean_attitudinal_preferences_income.png"), width=6, height=6)
+  ggsave(filename=here("Plots", "mean_attitudinal_preferences_income.png"), width=8, height=4)
  
+  
+ces %>% 
+  select(degree, redistribution, vote2, election) %>% 
+  filter(election>1988) %>% 
+  as_factor() %>% 
+  #mutate(Income=fct_relevel(income2, "Lowest", "Middle", "Highest")) %>% 
+  rename(Degree=degree, Vote=vote2, Redistribution=redistribution, Election=election) %>% 
+  #pivot_longer(., cols=c("Degree", "Income"), names_to=c("Variable"), values_to=c("Value")) %>% 
+  group_by(Election, Vote, Degree) %>% 
+  filter(!is.na(Vote)&Vote!="Green"& Vote!="BQ") %>% 
+  #filter(!is.na(Value)) %>% 
+  filter(!is.na(Degree)) %>% 
+  summarize(avg=mean(Redistribution, na.rm=T), n=n(), sd=sd(Redistribution, na.rm=T), se=sd/sqrt(n)) %>% 
+  arrange(Election, Degree, Vote) %>% 
+  ggplot(. ,aes(x=avg, y=fct_reorder(Election, desc(Election)), col=Degree))+geom_point()+facet_grid(~Vote)+
+  scale_color_grey(start=0.8, end=0.2)+
+  geom_errorbar(aes(xmin=avg-(1.96*se), xmax=avg+(1.96*se), width=0))+geom_vline(xintercept=0.5, linetype=2)+
+  labs(y="Year") 
+ggsave(filename=here("Plots", "means_degree_redistribution_party.png"), width=8, height=8)
+
+ces %>% 
+  select(income2, redistribution, vote2, election) %>% 
+  filter(election>1988) %>% 
+  as_factor() %>% 
+  rename(Income=income2, Vote=vote2, Redistribution=redistribution, Election=election) %>% 
+  #pivot_longer(., cols=c("Degree", "Income"), names_to=c("Variable"), values_to=c("Value")) %>% 
+  group_by(Election, Vote,Income) %>% 
+  filter(!is.na(Vote)&Vote!="Green"& Vote!="BQ") %>% 
+  #filter(!is.na(Value)) %>% 
+  filter(!is.na(Income)) %>% 
+  summarize(avg=mean(Redistribution, na.rm=T), n=n(), sd=sd(Redistribution, na.rm=T), se=sd/sqrt(n)) %>% 
+  ggplot(. ,aes(x=avg, y=fct_reorder(Election, desc(Election)), col=Income))+geom_point()+facet_grid(~Vote)+
+  scale_color_grey(start=0.8, end=0.2)+
+  geom_errorbar(aes(xmin=avg-(1.96*se), xmax=avg+(1.96*se), width=0))+geom_vline(xintercept=0.5, linetype=2)+
+  labs(y="Year")
+ggsave(filename=here("Plots", "means_redistribution_income_party.png"), width=8, height=4)
+
+
+
+  
+  
 #### Variance of Opinion inside each party ####
   
   

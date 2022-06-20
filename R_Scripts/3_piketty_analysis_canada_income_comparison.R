@@ -198,14 +198,14 @@ ndp_models_complete3 %>%
   scale_size_manual(values=c(1,3), name="Coefficient")+
   geom_smooth(method="loess", size=0.5, alpha=0.2, se=F) +
   #scale_fill_manual(values=c("navy blue", "red", "orange"))+
-  labs( alpha="Variable", color="Vote", x="Election", y="Estimate", title="Income2, 1, 2:4, 5")+
+  labs( alpha="Variable", color="Vote", x="Election", y="Estimate", title="Income3, 1:2, 3, 4:5")+
   #geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
   ylim(c(-0.12,0.12))+
   #Turn to greyscale for printing in the journal; also we don't actually need the legend because the labels are on the side
   #scale_color_grey(guide="none")+
   geom_hline(yintercept=0, alpha=0.5, linetype=2)+
   theme(axis.text.x=element_text(angle=90))
-ggsave(here("Plots", "ols_degree_party_income2.png"), width=8, height=4)
+ggsave(here("Plots", "ols_degree_party_income3.png"), width=8, height=4)
 
 
 
