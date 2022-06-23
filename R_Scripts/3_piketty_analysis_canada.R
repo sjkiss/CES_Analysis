@@ -52,6 +52,7 @@ ndp_models_complete1 %>%
   bind_rows(., liberal_models_complete1) %>%
   bind_rows(., conservative_models_complete1) %>%
   unnest(tidied) %>% 
+  filter(election<2020) %>% 
   filter(term=="degree"|term=="income") %>%
   mutate(term=Recode(term, "'degree'='Degree'; 'income'='Income'")) %>%
   ggplot(., aes(x=election, y=estimate, col=vote, size=term, group=term))+
