@@ -123,7 +123,7 @@ table(ces80$vote, ces80$vote80)
 ##We just need to turn the variables that end with 80 into regularly named variables.
 
 ces80 %>% 
-  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size, ideology, turnout, redistribution, market_liberalism, immigration_rates, traditionalism2, mip=mip80)->ces80names(ces80)
+  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size, ideology, turnout, redistribution, market_liberalism, immigration_rates, traditionalism2, mip=mip80)->ces80
 
 ### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
   ces93[!is.na(ces93$RTYPE4), ] -> ces93
@@ -224,7 +224,7 @@ table(ces04$union_both04, useNA = "ifany")
 table(ces04$ces04_CPS_S6A, useNA = "ifany")
 table(ces04$union04, ces04$union_both04, useNA = "ifany")
 #After consulting the ODESI merged file, there should be 802 yes and 1251 no to the respondent question in the merged file
-table(ces0411$ces04_CPS_S6A)
+
 #but after we kept only the respondents who took part in the PES04
 table(ces04$ces04_CPS_S6A) # we lose more than half. So that can't be good. 
 table(ces04$union04, ces04$ces04_CPS_S6A, useNA = "ifany")
@@ -809,6 +809,15 @@ table(ces$upper_class2)
 
 ces$rich<-Recode(ces$income, "4:5=1; else=0")
 ces$poor<-Recode(ces$income, "1:2=1; else=0")
+
+
+#Create tertles
+table(ces$income)
+ces$income2<-Recode(ces$income, "1=1; 2:4=2; 5=3")
+ces$income3<-Recode(ces$income, "1:2=1; 3=2; 4:5=3")
+val_labels(ces$inome2)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
+val_labels(ces$inome3)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
+
 # Create Time Dummies
 ces$`1965`<-Recode(ces$election, "1965=1; else=0")
 ces$`1968`<-Recode(ces$election, "1968=1; else=0")
