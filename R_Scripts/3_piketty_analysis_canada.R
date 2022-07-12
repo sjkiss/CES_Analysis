@@ -2,22 +2,38 @@
 library(broom)
 library(stargazer)
 library(tidyverse)
+#### Voting Shares
+ces %>% 
+  select(election, working_class, vote2) %>% 
+  group_by(election, working_class, vote2) %>% 
+  summarize(n=n()) %>% 
+  filter(!is.na(vote2)) %>% 
+  mutate(pct=n/sum(n))
+
+ces %>% 
+  select(election, working_class, vote2) %>% 
+  group_by(election,  vote2, working_class) %>% 
+  summarize(n=n()) %>% 
+  filter(!is.na(vote2)) %>% 
+  mutate(pct=n/sum(n))
+
 #### First cut Degree and Income gap for left-right block ####
 
 ces %>% 
   nest(variables=-election) %>%
-  mutate(model=map(variables, function(x) lm(left~region2+male+age+income+degree+as.factor(religion2), data=x)),
+  mutate(model=map(variables, function(x) lm(left~region2+male+age+income2+degree+as.factor(religion2), data=x)),
          tidied=map(model, tidy))->ols_block_models
 
 ols_block_models %>% 
   unnest(tidied) %>% 
-  filter(term=="degree"|term=="income") %>% 
+  filter(term=="degree"|term=="income2") %>% 
   filter(election<2020)  %>% 
-  mutate(Measure=Recode(term, "'degree'='Degree' ; 'income'='Income'")) %>% 
+  mutate(Measure=Recode(term, "'degree'='Degree' ; 'income2'='Income'")) %>% 
   ggplot(., aes(x=election, y=estimate, col=Measure, group=Measure))+
   geom_point()+
   geom_line()+
-  #geom_smooth(se=F)+
+  #geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error), width=0))+
+  #geom_smooth(se=F, method="lm")+
   labs(x="Election", y="Estimate")+
   scale_color_grey()+
   geom_hline(yintercept=0, linetype=2)
@@ -28,20 +44,20 @@ ggsave(here("Plots", "block_degree_income.png"), width=8, height=6)
 #### Basic Party vote models 1965-2021 ####
 ces %>%
   nest(variables=-election) %>%
-  mutate(model=map(variables, function(x) lm(ndp~region2+male+age+income+degree+as.factor(religion2), data=x)),
+  mutate(model=map(variables, function(x) lm(ndp~region2+male+age+income2+degree+as.factor(religion2), data=x)),
          tidied=map(model, tidy),
          vote=rep('NDP', nrow(.)))->ndp_models_complete1
 
 ces %>%
   nest(variables=-election) %>%
-  mutate(model=map(variables, function(x) lm(conservative~region2+male+age+income+degree+as.factor(religion2), data=x)),
+  mutate(model=map(variables, function(x) lm(conservative~region2+male+age+income2+degree+as.factor(religion2), data=x)),
          tidied=map(model, tidy),
          vote=rep('Conservative', nrow(.))
   )->conservative_models_complete1
 
 ces %>%
   nest(variables=-election) %>%
-  mutate(model=map(variables, function(x) lm(liberal~region2+male+age+income+degree+as.factor(religion2), data=x)),
+  mutate(model=map(variables, function(x) lm(liberal~region2+male+age+income2+degree+as.factor(religion2), data=x)),
          tidied=map(model, tidy),
          vote=rep('Liberal', nrow(.))
   )->liberal_models_complete1
@@ -49,7 +65,7 @@ ces %>%
 ces %>%
   filter(election>2003) %>%
   nest(variables=-election) %>%
-  mutate(model=map(variables, function(x) lm(green~region2+male+age+income+degree+as.factor(religion2), data=x)),
+  mutate(model=map(variables, function(x) lm(green~region2+male+age+income2+degree+as.factor(religion2), data=x)),
          tidied=map(model, tidy),
          vote=rep('Green', nrow(.))
   )->green_models_complete1
@@ -58,9 +74,9 @@ ndp_models_complete1 %>%
   bind_rows(., liberal_models_complete1) %>%
   bind_rows(., conservative_models_complete1) %>%
   unnest(tidied) %>% 
-  filter(term=="degree"|term=="income") %>%
+  filter(term=="degree"|term=="income2") %>%
   filter(election<2021) %>% 
-  mutate(term=Recode(term, "'degree'='Degree'; 'income'='Income'")) %>%
+  mutate(term=Recode(term, "'degree'='Degree'; 'income2'='Income'")) %>%
   ggplot(., aes(x=election, y=estimate, col=vote, size=term, group=term))+
   geom_point()+facet_grid(~vote, switch="y")+
   scale_color_manual(values=c("navy blue", "red", "orange"), name="Vote")+
@@ -510,17 +526,18 @@ ces %>%
   filter(!is.na(Vote)&Vote!="Green"& Vote!="BQ") %>% 
   #filter(!is.na(Value)) %>% 
   filter(!is.na(Degree)) %>% 
+  filter(Election<2021) %>% 
   summarize(avg=mean(Redistribution, na.rm=T), n=n(), sd=sd(Redistribution, na.rm=T), se=sd/sqrt(n)) %>% 
   arrange(Election, Degree, Vote) %>% 
   ggplot(. ,aes(x=avg, y=fct_reorder(Election, desc(Election)), col=Degree))+geom_point()+facet_grid(~Vote)+
   scale_color_grey(start=0.8, end=0.2)+
   geom_errorbar(aes(xmin=avg-(1.96*se), xmax=avg+(1.96*se), width=0))+geom_vline(xintercept=0.5, linetype=2)+
   labs(y="Year") 
-ggsave(filename=here("Plots", "means_degree_redistribution_party.png"), width=8, height=8)
+ggsave(filename=here("Plots", "means_degree_redistribution_party.png"), width=8, height=4)
 
 ces %>% 
   select(income2, redistribution, vote2, election) %>% 
-  filter(election>1988) %>% 
+  filter(election>1988&election<2021) %>% 
   as_factor() %>% 
   rename(Income=income2, Vote=vote2, Redistribution=redistribution, Election=election) %>% 
   #pivot_longer(., cols=c("Degree", "Income"), names_to=c("Variable"), values_to=c("Value")) %>% 
@@ -535,10 +552,6 @@ ces %>%
   labs(y="Year")
 ggsave(filename=here("Plots", "means_redistribution_income_party.png"), width=8, height=4)
 
-
-
-  
-  
 #### Variance of Opinion inside each party ####
   
   
