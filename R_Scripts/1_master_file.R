@@ -686,7 +686,7 @@ common_vars<-c('male',
                'traditionalism2', 
                'trad1', 'trad2', 'immigration_rates',
                'market1','market2',
-               'turnout', 'mip', 'occupation', 'occupation3', 'education', 
+               'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 
                'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id', 'postgrad')
 #Start with the data frame
 ces.list %>% 
