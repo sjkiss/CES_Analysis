@@ -51,3 +51,11 @@ census86 %>%
   summarise(avg=mean(HHTOTINC, na.rm=T), n=n())  %>% 
   mutate(year=rep('1986', nrow(.)))-> quintile_average_1986
 
+
+tertiles_1986<-quantile(census86$HHTOTINC, probs=c(seq(0,1,1/3)), na.rm=T)
+census86 %>% 
+  mutate(tertile=quantcut(HHTOTINC, q=3, labels=c(seq(1,3,1)))) %>% 
+  group_by(tertile) %>% 
+  summarise(avg=mean(HHTOTINC, na.rm=T), n=n())  %>% 
+  mutate(year=rep('1986', nrow(.)))-> tertile_average_1986
+tertiles_1986

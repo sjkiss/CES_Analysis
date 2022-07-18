@@ -49,3 +49,13 @@ census81 %>%
   group_by(quintile) %>% 
   summarise(avg=mean(HHINC, na.rm=T), n=n())  %>% 
   mutate(year=rep('1981', nrow(.)))-> quintile_average_1981
+quintile_average_1981
+
+tertiles_1981<-quantile(census81$HHINC, probs=c(seq(0,1,1/3)), na.rm=T)
+census81 %>% 
+  mutate(tertile=quantcut(HHINC, q=3, labels=c(seq(1,3,1)))) %>% 
+  group_by(tertile) %>% 
+  summarise(avg=mean(HHINC, na.rm=T), n=n())  %>% 
+  mutate(year=rep('1981', nrow(.)))-> tertile_average_1981
+tertile_average_1981
+tertiles_1981

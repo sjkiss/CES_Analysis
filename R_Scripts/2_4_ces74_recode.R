@@ -139,10 +139,21 @@ table(ces74$occupation)
 #recode Income (V479)
 look_for(ces74, "income")
 ces74$income<-Recode(ces74$V479, "1:2=1; 3:4=2; 5=3; 6=4; 7:8=5; else=NA")
-val_labels(ces74$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces74$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 #checks
-val_labels(ces74$income)
-table(ces74$income)
+#Simon's Version
+
+ces74$income2<-Recode(ces74$V479, "1:2=1; 3=2; 4=3; 5=4; 7:8=5; else=NA")
+val_labels(ces74$income2)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+
+
+#recode Income (V479)
+look_for(ces74, "income")
+ces74$income_tertile<-Recode(ces74$V479, "1:2=1; 3:4=2; 5:8=3;  else=NA")
+val_labels(ces74$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
+#checks
+val_labels(ces74$income_tertile)
+table(ces74$income_tertile)
 
 #recode Community Size (V9)
 look_for(ces74, "community")

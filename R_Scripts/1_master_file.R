@@ -43,7 +43,7 @@ look_for(ces74, "respondent")
 look_for(ces7980, "respondent")
 look_for(ces74, "respondent")
 look_for(ces7980, "filter")
-
+names(ces7980)
 #Get a summary of V9 sector and V4020
 ces7980 %>% 
   select(V9, sector, V4020) %>% 
@@ -123,7 +123,7 @@ table(ces80$vote, ces80$vote80)
 ##We just need to turn the variables that end with 80 into regularly named variables.
 
 ces80 %>% 
-  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size, ideology, turnout, redistribution, market_liberalism, immigration_rates, traditionalism2, mip=mip80)->ces80
+  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income,income_tertile, income2, occupation, occupation3, religion, non_charter_language, size, ideology, turnout, redistribution, market_liberalism, immigration_rates, traditionalism2, mip=mip80)->ces80
 
 ### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
   ces93[!is.na(ces93$RTYPE4), ] -> ces93
@@ -212,7 +212,7 @@ nrow(ces08)
 nrow(ces11)
 
 #Remove ces0411 for data saving
-rm(ces0411)
+#rm(ces0411)
 #### STEP 3 RENAMING VARIABLES
 
 ### This is how we will rename the variables in each data frame.. removing the years. 
@@ -235,6 +235,8 @@ table(as_factor(ces04$ces04_CPS_S6A), as_factor(ces04$ces04_CPS_S6B), useNA = "i
 #### Rename CES 04####
 ces04 %>% 
   rename(union_both=union_both04)->ces04
+ces04 %>% 
+  rename(income2=income042)->ces04
 ces04 %>% 
   rename(union=union04)->ces04
 ces04 %>% 
@@ -334,10 +336,15 @@ ces04 %>%
 ces04 %>% 
   rename(trad1=trad041, trad2=trad042)->ces04
 table(ces04$survey, ces04$non_charter_language)
+ces04 %>% 
+  rename(income_tertile=income_tertile04)->ces04
+#### Rename CES06 ####
+ces06 %>% 
+  rename(income2=income062)->ces06
+ces06 %>% 
+  rename(income_tertile=income_tertile06)->ces06
 ces06 %>% 
   rename(trad1=trad061, trad2=trad062)->ces06
-#### Rename CES06 ####
-
 ces06 %>% 
   rename(union_both=union_both06)->ces06
 ces06 %>% 
@@ -440,6 +447,10 @@ ces06 %>%
 table(ces06$survey, ces06$non_charter_language)
 
 #### Rename CES08 ####
+ces08 %>% 
+  rename(income2=income082)->ces08
+ces08 %>% 
+  rename(income_tertile=income_tertile08)->ces08
 ces08 %>% 
   rename(trad1=trad081, trad2=trad082)->ces08
 ces08 %>% 
@@ -545,7 +556,8 @@ ces08 %>%
 table(ces08$survey, ces08$non_charter_language)
 
 #### Rename CES11 ####
-
+ces11 %>% 
+  rename(income2=income112)->ces11
 ces11 %>% 
   rename(trad1=trad111, trad2=trad112)->ces11
 ces11 %>% 
@@ -648,6 +660,8 @@ ces11 %>%
   rename(market1=market111)->ces11
 ces11 %>% 
   rename(market2=market112)->ces11
+ces11 %>% 
+  rename(income_tertile=income_tertile11)->ces11
 #### Rejoin the Files To Make CES ####
 
 #For some years there are no variables (e.g. 1965 does not have a union variable)
@@ -672,7 +686,7 @@ common_vars<-c('male',
                'occupation',
                'employment', 
                'union_both',
-               'region', 
+               'region', 'union',
                'degree', 
                'quebec', 
                'age', 
@@ -687,7 +701,7 @@ common_vars<-c('male',
                'trad1', 'trad2', 'immigration_rates',
                'market1','market2',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 
-               'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id', 'postgrad')
+               'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2')
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
@@ -706,7 +720,7 @@ ces.list %>%
 
 #Remove ces.list
 # We don't need it here
-rm(ces.list)
+#rm(ces.list)
 
 #### Recodes #### 
 ### Region
@@ -811,12 +825,6 @@ ces$rich<-Recode(ces$income, "4:5=1; else=0")
 ces$poor<-Recode(ces$income, "1:2=1; else=0")
 
 
-#Create tertles
-table(ces$income)
-ces$income2<-Recode(ces$income, "1=1; 2:4=2; 5=3")
-ces$income3<-Recode(ces$income, "1:2=1; 3=2; 4:5=3")
-val_labels(ces$inome2)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
-val_labels(ces$inome3)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 
 # Create Time Dummies
 ces$`1965`<-Recode(ces$election, "1965=1; else=0")
@@ -849,11 +857,9 @@ ces %>%
 ces$redistribution_reversed<-1-ces$redistribution
 #Start with data frame
 ces %>% 
-  #Do work on it rowwise
-  rowwise() %>% 
   #Create new variable called economic 
   #It is defined as the average (mean) of market1, market2 and redistribution_reviersed; missing values ignored
-  mutate(economic=mean(c_across(cols=c(market1, market2, redistribution_reversed))), na.rm=T) %>% 
+  mutate(economic=rowMeans(select(., c("market1", "market2", "redistribution_reversed"))), na.rm=T) %>% 
   #Select those variables 
   select(market1, market2, election, redistribution_reversed,economic) %>% 
   #Filter post 2004 to examine.
@@ -861,34 +867,27 @@ ces %>%
 
 #Repeat and store
 ces %>% 
-  #Do work on it rowwise
-  rowwise() %>% 
   #Create new variable called economic 
   #It is defined as the average (mean) of market1, market2 and redistribution_reviersed; missing values ignored
-  mutate(economic=mean(c_across(cols=c(market1, market2, redistribution_reversed))), na.rm=T) ->ces
-ces %>% ungroup()->ces
+  mutate(economic=rowMeans(select(., c("market1", "market2", "redistribution_reversed"))), na.rm=T) ->ces
+
 
 ### Socio-cultural Views ###
 
 #Start with data frame
 ces %>% 
-  #Do work on it rowwise
-  rowwise() %>% 
   #Create new variable called social 
   #It is defined as the average (mean) of trad1, trad2 and immigration; missing values ignored
-  mutate(social=mean(c_across(cols=c(trad1, trad2, immigration_rates))), na.rm=T)  %>%
+  mutate(social=rowMeans(select(., c("trad1", "trad2", "immigration_rates")), na.rm=T))  %>% 
   #Select those variables 
   select(trad1, trad2, election, immigration_rates, social) %>% 
   #Filter post 2004 to examine.
   filter(election>2000)
 
 ces %>% 
-  #Do work on it rowwise
-  rowwise() %>% 
   #Create new variable called social 
   #It is defined as the average (mean) of trad1, trad2 and immigration; missing values ignored
-  mutate(social=mean(c_across(cols=c(trad1, trad2, immigration_rates))), na.rm=T) ->ces
-ces %>% ungroup()->ces
+  mutate(social=rowMeans(select(., c("trad1", "trad2", "immigration_rates")), na.rm=T))  ->ces
 
 ### Value labels often go missing in the creation of the ces data frame
 ### assign value label
@@ -935,5 +934,27 @@ ces$satdem
 table(ces$election, ces$satdem)
 table(ces$election, ces$turnout)
 table(ces$election, ces$postgrad)
-table(ces$election, ces$left)
+table(ces$election, ces$union)
 
+table(ces$income, ces$income_tertile)
+table(ces$income2, ces$income_tertile)
+ces %>% 
+  filter(income2==3&income_tertile==3) %>% 
+select(election) #Note there are some suspicious values here
+# There are 489 people who are in the third simon quintile and the top tertile
+#I checked and they are *all* in 2004 and 2006 and they are just boundary edge cases. I used the 2004 SLID to etimate terciles for 2004, but I'm waiting on terciles
+# for the 20006 census data; this may change. But if you look at the proportions, they overwhelming majority of 3 quintiles are in the second tercile.
+
+ces %>% 
+  filter(income2==3&income_tertile==3) %>% 
+  select(election)
+#Create tertles
+table(ces$income)
+table(ces$income2, ces$election)
+table(ces$income_tertile, ces$election)
+# ces$income2<-Recode(ces$income, "1=1; 2:4=2; 5=3")
+# ces$income3<-Recode(ces$income, "1:2=1; 3=2; 4:5=3")
+# val_labels(ces$income2)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
+# val_labels(ces$income3)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
+val_labels(ces$income_tertile)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
+prop.table(table(ces$income_tertile, ces$election), 2)

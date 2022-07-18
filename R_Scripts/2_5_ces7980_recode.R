@@ -174,6 +174,20 @@ val_labels(ces7980$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4
 val_labels(ces7980$income)
 table(ces7980$income)
 
+look_for(ces7980, "income")
+ces7980$income2<-Recode(ces7980$V1516, "1:2=1; 3=2; 4:5=3; 6:7=4; 8=5; else=NA")
+val_labels(ces7980$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+
+
+#recode Income_tertile (V1516)
+look_for(ces7980, "income")
+ces7980$V478
+ces7980$income_tertile<-Recode(ces7980$V1516, "1:3=1; 4:7=2; 8=3; else=NA")
+val_labels(ces7980$income_tertile)<-c(Lowest=1, Middle=2,Highest=3)
+#checks
+val_labels(ces7980$income_tertile)
+table(ces7980$income_tertile)
+
 #recode Religiosity (V1507)
 look_for(ces7980, "church")
 ces7980$religiosity<-Recode(ces7980$V1507, "5:9=1; 4=2; 3=3; 2=4; 1=5; else=NA")

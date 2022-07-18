@@ -260,20 +260,7 @@ table(ces21$market1, ces21$pes21_privjobs , useNA = "ifany" )
 table(ces21$market2, ces21$pes21_blame , useNA = "ifany" )
 ces21$market1
 ces21 %>% 
-  rowwise() %>% 
-  mutate(market_liberalism=mean(c_across(market1:market2), na.rm=T ))->out
-out %>% 
-  ungroup() %>% 
-  select(c(market1, market2, market_liberalism)) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<2)
-#Scale Averaging 
-ces21 %>% 
-  rowwise() %>% 
-  mutate(market_liberalism=mean(
-    c_across(market1:market2), na.rm=T  
-  )) %>% 
-  ungroup()->ces21
+  mutate(market_liberalism=rowMeans(select(., num_range("market", 1:2)), na.rm=T))->ces21
 
 ces21 %>% 
   select(starts_with("market")) %>% 
@@ -373,28 +360,8 @@ ces21$trad3<-ces21$abortion
 table(ces21$trad1)
 table(ces21$trad2)
 table(ces21$trad3)
-
 ces21 %>% 
-  rowwise() %>% 
-  mutate(traditionalism=mean(
-    c_across(trad1:trad3)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c(trad1, trad2, trad3, traditionalism)) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na<5)
-
-#Scale Averaging 
-ces21 %>% 
-  rowwise() %>% 
-  mutate(traditionalism=mean(c(trad1, trad2, trad3), na.rm=T  
-  )) %>% 
-  ungroup()->ces21
-
-ces21 %>% 
-  select(starts_with("trad")) %>% 
-  summary()
+  mutate(traditionalism=rowMeans(select(., num_range("trad", 1:3)), na.rm=T))->ces21
 #Check distribution of traditionalism
 qplot(ces21$traditionalism, geom="histogram")
 table(ces21$traditionalism, useNA="ifany")
@@ -410,24 +377,8 @@ ces21 %>%
 
 #recode Moral Traditionalism 2 (women & gay rights) (Left-Right)
 ces21 %>% 
-  rowwise() %>% 
-  mutate(traditionalism2=mean(c(trad1, trad2), na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c(trad1, trad2, traditionalism2)) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na<5)
+  mutate(traditionalism2=rowMeans(select(., num_range("trad", 1:2)), na.rm=T))->ces21
 
-#Scale Averaging 
-ces21 %>% 
-  rowwise() %>% 
-  mutate(traditionalism2=mean(c(trad1, trad2), na.rm=T   )) %>% 
-  ungroup()->ces21
-
-ces21 %>% 
-  select(starts_with("trad")) %>% 
-  summary()
-tail(names(ces21))
 
 #Check distribution of traditionalism2
 qplot(ces21$traditionalism2, geom="histogram")
@@ -453,22 +404,8 @@ table(ces21$author3)
 table(ces21$author4)
 
 ces21 %>% 
-  rowwise() %>% 
-  mutate(authoritarianism=mean(
-    c_across(author1:author4)
-    , na.rm=T )) -> out
-tail(names(out))
-out %>% 
-  ungroup() %>% 
-  select(c(author1, author2, author3, author4, authoritarianism)) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<6)
-names(out)
-#Scale Averaging 
-ces21 %>% 
-  rowwise() %>% 
-  mutate(authoritarianism=mean(c_across(author1:author4), na.rm=T  )) %>% 
-  ungroup()->ces21
+  mutate(authoritarianism=rowMeans(select(. ,num_range("author", 1:4)), na.rm=T))->ces21
+
 
 ces21 %>% 
   select(starts_with("author")) %>% 

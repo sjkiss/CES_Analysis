@@ -152,7 +152,7 @@ table(ces97$occupation3)
 #### recode Income (cpsm16 and cpsm16a)#### 
 
 look_for(ces97, "income")
-ces97 %>% 
+ces97 %>%
   mutate(income=case_when(
     cpsm16a==1 | cpsm16> 0 & cpsm16 < 20 ~ 1,
     cpsm16a==2 | cpsm16> 19 & cpsm16 < 30 ~ 2,
@@ -168,9 +168,41 @@ ces97 %>%
 
 val_labels(ces97$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 #checks
-val_labels(ces97$income)
-table(ces97$income)
 
+#Simon's Version
+ces97 %>% 
+  mutate(income2=case_when(
+    #First Quintile
+    cpsm16a==1 | cpsm16> 0 & cpsm16 < 18 ~ 1,
+    #Second Quintile
+    cpsm16a==2 | cpsm16> 17 & cpsm16 < 33 ~ 2,
+    cpsm16a==3 | cpsm16> 32 & cpsm16 < 50 ~ 3,
+    cpsm16a==4 | cpsm16> 32 & cpsm16 < 50 ~ 3,
+    cpsm16a==5 | cpsm16> 49 & cpsm16 < 72 ~ 4,
+    cpsm16a==6 | cpsm16> 49 & cpsm16 < 72 ~ 4,
+    cpsm16a==7 | cpsm16> 71 & cpsm16 < 998 ~ 5,
+    cpsm16a==8 | cpsm16> 71 & cpsm16 < 998 ~ 5,
+    cpsm16a==9 | cpsm16> 71 & cpsm16 < 998 ~ 5,
+    cpsm16a==10 | cpsm16> 71 & cpsm16 < 998 ~ 5,
+  ))->ces97
+
+val_labels(ces97$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+
+look_for(ces97, "income")
+ces97 %>% 
+  mutate(income_tertile=case_when(
+    #first tertile
+    as.numeric(cpsm16a)<2 | as.numeric(cpsm16)> 0 & as.numeric(cpsm16) < 27 ~ 1,
+    #Second tertile
+    as.numeric(cpsm16a)>2&as.numeric(cpsm16a)<5 | as.numeric(cpsm16)> 26 & as.numeric(cpsm16) < 56 ~ 2,
+    #Third Tertile
+    as.numeric(cpsm16a)>4&as.numeric(cpsm16a)<98 | as.numeric(cpsm16)> 55 & as.numeric(cpsm16) < 998~ 3
+  ))->ces97
+
+val_labels(ces97$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
+#checks
+val_labels(ces97$income_tertile)
+table(ces97$income_tertile)
 ####recode Religiosity (pesm10b)####
 look_for(ces97, "relig")
 ces97$religiosity<-Recode(ces97$pesm10b, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
@@ -203,25 +235,22 @@ ces97$market2<-Recode(ces97$pese19, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", 
 #checks
 table(ces97$market1)
 table(ces97$market2)
-
-ces97 %>% 
-  rowwise() %>% 
-  mutate(market_liberalism=mean(
-    c_across(market1:market2)
- , na.rm=T )) ->out
-
-out %>% 
-  ungroup() %>% 
-  select(c('market1', 'market2', 'market_liberalism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
+# 
+# ces97 %>% 
+#   rowwise() %>% 
+#   mutate(market_liberalism=mean(
+#     c_across(market1:market2)
+#  , na.rm=T )) ->out
+# 
+# out %>% 
+#   ungroup() %>% 
+#   select(c('market1', 'market2', 'market_liberalism')) %>% 
+#   mutate(na=rowSums(is.na(.))) %>% 
+#   filter(na>0, na<3)
 #Scale Averaging 
 ces97 %>% 
-  rowwise() %>% 
-  mutate(market_liberalism=mean(
-    c_across(c('market1', 'market2')), na.rm=T  
-  )) %>% 
-  ungroup()->ces97
+  mutate(market_liberalism=rowMeans(select(., num_range("market", 1:2)), na.rm=T))->ces97
+
 
 ces97 %>% 
   select(starts_with("market")) %>% 
@@ -350,22 +379,10 @@ table(ces97$trad5)
 table(ces97$trad6)
 table(ces97$trad7)
 
-ces97 %>% 
-  rowwise() %>% 
-  mutate(traditionalism=mean(c_across(c(trad1, trad2, trad3, trad4, trad5, trad6, trad7)) , na.rm=T )) -> out
-
-out %>% 
-  ungroup() %>% 
-  select(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'trad7', 'traditionalism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
 #Scale Averaging 
 ces97 %>% 
-  rowwise() %>% 
-  mutate(traditionalism=mean(
-    c_across(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'trad7')), na.rm=T 
-  )) %>% 
-  ungroup()->ces97
+  mutate(traditionalism=rowMeans(select(., num_range("trad", 1:7)), na.rm=T))->ces97
+
 
 ces97 %>% 
   select(starts_with("trad")) %>% 
@@ -387,24 +404,11 @@ ces97 %>%
 
 
 #recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)
-ces97 %>% 
-  rowwise() %>% 
-  mutate(traditionalism2=mean(
-    c_across(trad1:trad2)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('trad1', 'trad2', 'traditionalism2')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
+
 #Scale Averaging 
 ces97 %>% 
-  rowwise() %>% 
-  mutate(traditionalism2=mean(
-    c_across(c('trad1', 'trad2')), na.rm=T  
-  )) %>% 
-  ungroup()->ces97
-
+  mutate(traditionalism2=rowMeans(select(., c('trad1', 'trad2')), na.rm=T))->ces97
+ 
 ces97 %>% 
   select(starts_with("trad")) %>% 
   summary()
@@ -442,28 +446,10 @@ table(ces97$author4)
 #Remove value labels
 ces97 %>% 
   mutate(across(num_range('author', 1:4), remove_val_labels))->ces97
+ces97 %>% 
+  mutate(authoritarianism=rowMeans(select(., num_range("author", 1:4)), na.rm=T))->ces97
 
-ces97 %>% 
-  rowwise() %>% 
-  mutate(authoritarianism=mean(
-    c_across(author1:author4)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('author1', 'author2', 'author3', 'author4', 'authoritarianism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
-#Scale Averaging 
-ces97 %>% 
-  rowwise() %>% 
-  mutate(authoritarianism=mean(
-    c_across(c('author1', 'author2', 'author3', 'author4')), na.rm=T  
-  )) %>% 
-  ungroup()->ces97
 
-ces97 %>% 
-  select(starts_with("author")) %>% 
-  summary()
 #Check distribution of traditionalism
 qplot(ces97$authoritarianism, geom="histogram")
 table(ces97$authoritarianism, useNA="ifany")

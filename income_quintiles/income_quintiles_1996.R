@@ -50,3 +50,12 @@ group_by(quintile) %>%
   summarise(avg=mean(TOTINCH, na.rm=T), n=n())  %>% 
   mutate(year=rep('1996', nrow(.)))-> quintile_average_1996
 
+#Create Tertiles
+tertiles_1996<-quantile(census96$TOTINCH, probs=c(seq(0,1,1/3)), na.rm=T)
+census96 %>% 
+  mutate(tertile=quantcut(TOTINCH, q=3, labels=c(seq(1,3,1)))) %>% 
+  group_by(tertile) %>% 
+  summarise(avg=mean(TOTINCH, na.rm=T), n=n())  %>% 
+  mutate(year=rep('1996', nrow(.)))-> tertile_average_1996
+tertiles_1996
+

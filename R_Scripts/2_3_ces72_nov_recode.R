@@ -118,7 +118,22 @@ table(ces72_nov$occupation)
 #recode Income (qxii)
 look_for(ces72_nov, "income")
 ces72_nov$income<-Recode(ces72_nov$qxii, "1:2=1; 3:4=2; 5=3; 6=4; 7:8=5; else=NA")
-val_labels(ces72_nov$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces72_nov$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces72_nov$income)
+table(ces72_nov$income)
+#Simon's Version is identical
+look_for(ces72_nov, "income")
+ces72_nov$qxii
+ces72_nov$income2<-Recode(ces72_nov$qxii, "1:2=1; 3:4=2; 5=3; 6=4; 7:8=5; else=NA")
+val_labels(ces72_nov$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces72_nov$income)
+table(ces72_nov$income)
+#tertiles
+look_for(ces72_nov, "income")
+ces72_nov$income_tertile<-Recode(ces72_nov$qxii, "1:3=1; 4:5=2; 6:8=3; else=NA")
+val_labels(ces72_nov$income_tertile)<-c(Lowest=1, Middle=2,Highest=3)
 #checks
 val_labels(ces72_nov$income)
 table(ces72_nov$income)

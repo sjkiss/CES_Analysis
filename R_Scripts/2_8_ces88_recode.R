@@ -1,6 +1,11 @@
 #File to Recode 1988 CES Data 
 
 #load data
+library(tidyverse)
+library(car)
+library(cesdata)
+library(labelled)
+library(here)
 data("ces88")
 
 #recode Gender (rsex)
@@ -145,7 +150,21 @@ val_labels(ces88$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, 
 #checks
 val_labels(ces88$income)
 table(ces88$income)
+#Simon's Version
+look_for(ces88, "income")
+ces88$income2<-Recode(ces88$n19, "1=1; 2=2; 3:4=3; 5=4; 6:9=5; else=NA")
+val_labels(ces88$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces88$income)
+table(ces88$income)
 
+#recode Income (n19)
+look_for(ces88, "income")
+ces88$income_tertile<-Recode(ces88$n19, "1:2=1; 3:5=2; 6:9=3; else=NA")
+val_labels(ces88$income_tertile)<-c(Lowest=1,Middle=2, Highest=3)
+#checks
+val_labels(ces88$income_tertile)
+table(ces88$income_tertile)
 #recode Religiosity (n12)
 look_for(ces88, "worship")
 ces88$religiosity<-Recode(ces88$n12, "0=1; 1:3=2; 4=3; 5:6=4; 7:8=5; else=NA")
@@ -161,28 +180,28 @@ ces88$qc13
 ces88$qc2
 ces88$market1<-Recode(ces88$qc13, "1=1; 2=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
 ces88$market2<-Recode(ces88$qc2, "1=1; 2=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
+
+
 #checks
 table(ces88$market1)
 table(ces88$market2)
 
-ces88 %>% 
-  rowwise() %>% 
-  mutate(market_liberalism=mean(
-    c_across(market1:market2)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('market1', 'market2', 'market_liberalism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
+# ces88 %>% 
+#   rowwise() %>% 
+#   mutate(market_liberalism=mean(
+#     c_across(market1:market2)
+#     , na.rm=T )) -> out
+# out %>% 
+#   ungroup() %>% 
+#   select(c('market1', 'market2', 'market_liberalism')) %>% 
+#   mutate(na=rowSums(is.na(.))) %>% 
+#   filter(na>0, na<3)
 #Scale Averaging 
 ces88 %>% 
-  rowwise() %>% 
-  mutate(market_liberalism=mean(
-    c_across(c('market1', 'market2')), na.rm=T  
-  )) %>% 
-  ungroup()->ces88
+  mutate(market_liberalism=rowMeans(select(., matches('market[0-9]')), na.rm=T))->ces88
 
+
+cor(ces88$market_liberalism, ces88$market_liberalism2, use="complete.obs")
 ces88 %>% 
   select(starts_with("market")) %>% 
   summary()
@@ -191,14 +210,14 @@ qplot(ces88$market_liberalism, geom="histogram")
 table(ces88$market_liberalism, useNA="ifany")
 
 #Calculate Cronbach's alpha
-library(psych)
-ces88 %>% 
-  select(market1, market2) %>% 
-  psych::alpha(.)
-#Check correlation
-ces88 %>% 
-  select(market1, market2) %>% 
-  cor(., use="complete.obs")
+# library(psych)
+# ces88 %>% 
+#   select(market1, market2) %>% 
+#   psych::alpha(.)
+# #Check correlation
+# ces88 %>% 
+#   select(market1, market2) %>% 
+#   cor(., use="complete.obs")
 
 #recode Redistribution (xk2 and qc16) (Right-Left)
 look_for(ces88, "wealth")
@@ -209,43 +228,43 @@ table(ces88$qc16, useNA="ifany")
 val_labels(ces88$xk2)
 ces88$redistro1<-Recode(ces88$xk2, "1=1; 3=0.5; 5=0; 8=0.5; else=NA", as.numeric=T)
 ces88$redistro2<-Recode(ces88$qc16, "1=1; 2=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
+
 #checks
 table(ces88$redistro1, ces88$xk2)
 table(ces88$redistro2, ces88$qc16)
-
-ces88 %>% 
-  rowwise() %>% 
-  mutate(redistribution=mean(
-    c_across(redistro1:redistro2)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('redistro1', 'redistro2', 'redistribution')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
+# 
+# ces88 %>% 
+#   rowwise() %>% 
+#   mutate(redistribution=mean(
+#     c_across(redistro1:redistro2)
+#     , na.rm=T )) -> out
+# out %>% 
+#   ungroup() %>% 
+#   select(c('redistro1', 'redistro2', 'redistribution')) %>% 
+#   mutate(na=rowSums(is.na(.))) %>% 
+#   filter(na>0, na<3)
 #Scale Averaging 
 ces88 %>% 
-  rowwise() %>% 
-  mutate(redistribution=mean(
-    c_across(c('redistro1', 'redistro2')), na.rm=T  
-  )) %>% 
-  ungroup()->ces88
+  select(starts_with("redistro"))
+ces88 %>% 
+  mutate(redistribution=rowMeans(select(., starts_with("redistro")), na.rm=T))->ces88
+
 
 ces88 %>% 
-  select(starts_with("redistro")) %>% 
+  select(starts_with("redistr")) %>% 
   summary()
 #Check distribution of market_liberalism
 qplot(ces88$redistribution, geom="histogram")
 table(ces88$redistribution, useNA="ifany")
 
-#Calculate Cronbach's alpha
-ces88 %>% 
-  select(redistro1, redistro2) %>% 
-  psych::alpha(.)
-#Check correlation
-ces88 %>% 
-  select(redistro1, redistro2) %>% 
-  cor(., use="complete.obs")
+# #Calculate Cronbach's alpha
+# ces88 %>% 
+#   select(redistro1, redistro2) %>% 
+#   psych::alpha(.)
+# #Check correlation
+# ces88 %>% 
+#   select(redistro1, redistro2) %>% 
+#   cor(., use="complete.obs")
 
 #recode Pro-Redistribution
 ces88$pro_redistribution<-Recode(ces88$redistribution, "0.75=1; 1=1; 0:0.5=0; else=NA", as.numeric=T)
@@ -264,40 +283,37 @@ ces88$immigration_encourage<-Recode(ces88$qf10, "1=0; 2=1; 8=0.5; else=NA", as.n
 table(ces88$immigration_rates, ces88$l5 , useNA = "ifany" )
 table(ces88$immigration_better, ces88$qf2 , useNA = "ifany" )
 table(ces88$immigration_encourage, ces88$qf10 , useNA = "ifany" )
-
-ces88 %>% 
-  rowwise() %>% 
-  mutate(immigration=mean(
-    c_across(immigration_rates:immigration_encourage)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('immigration_rates', 'immigration_better', 'immigration_encourage', 'immigration')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
+# 
+# ces88 %>% 
+#   rowwise() %>% 
+#   mutate(immigration=mean(
+#     c_across(immigration_rates:immigration_encourage)
+#     , na.rm=T )) -> out
+# out %>% 
+#   ungroup() %>% 
+#   select(c('immigration_rates', 'immigration_better', 'immigration_encourage', 'immigration')) %>% 
+#   mutate(na=rowSums(is.na(.))) %>% 
+#   filter(na>0, na<3)
 #Scale Averaging 
 ces88 %>% 
-  rowwise() %>% 
-  mutate(immigration=mean(
-    c_across(c('immigration_rates', 'immigration_better', 'immigration_encourage')), na.rm=T  
-  )) %>% 
-  ungroup()->ces88
+  mutate(immigration=rowMeans(select(., c('immigration_rates', 'immigration_better', 'immigration_encourage')), na.rm=T))->ces88
 
-ces88 %>% 
-  select(starts_with("immigration")) %>% 
-  summary()
+
+# ces88 %>% 
+#   select(starts_with("immigration")) %>% 
+#   summary()
 #Check distribution of immigration
-qplot(ces88$immigration, geom="histogram")
-table(ces88$immigration, useNA="ifany")
+# qplot(ces88$immigration, geom="histogram")
+# table(ces88$immigration, useNA="ifany")
 
 #Calculate Cronbach's alpha
-ces88 %>% 
-  select(immigration_rates, immigration_better, immigration_encourage) %>% 
-  psych::alpha(.)
-#Check correlation
-ces88 %>% 
-  select(immigration_rates, immigration_better, immigration_encourage) %>% 
-  cor(., use="complete.obs")
+# ces88 %>% 
+#   select(immigration_rates, immigration_better, immigration_encourage) %>% 
+#   psych::alpha(.)
+# #Check correlation
+# ces88 %>% 
+#   select(immigration_rates, immigration_better, immigration_encourage) %>% 
+#   cor(., use="complete.obs")
 
 #recode Environment (qf9) (Left-Right)
 look_for(ces88, "env")
@@ -324,11 +340,7 @@ summary(ces88$crime)
 table(ces88$crime, ces88$qh11 , useNA = "ifany" )
 summary(ces88$qh11)
 #ces88$crime<-Recode(ces88$qh11, "1=1; 2=0.9; 3=0.8; 4=0.7; 5=0.6; 6=0.5; 7=0.4; 8=0.3; 9=0.2; 10=0.1; 11:12=0; else=NA")
-ces88$qh11
 
-ces88$qh11
-
-var_label(ces88$qh11)
 #checks
 table(ces88$crime)
 
@@ -366,59 +378,43 @@ table(ces88$trad1)
 table(ces88$trad2)
 table(ces88$trad3)
 
-ces88 %>% 
-  rowwise() %>% 
-  mutate(traditionalism=mean(
-    c_across(trad1:trad3)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('trad1', 'trad2', 'trad3', 'traditionalism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
 #Scale Averaging 
-ces88 %>% 
-  rowwise() %>% 
-  mutate(traditionalism=mean(
-    c_across(c('trad1', 'trad2', 'trad3')), na.rm=T  
-  )) %>% 
-  ungroup()->ces88
 
 ces88 %>% 
-  select(starts_with("trad")) %>% 
-  summary()
+  mutate(traditionalism=rowMeans(select(., c('trad1', 'trad2', 'trad3')), na.rm=T))->ces88
+
+# ces88 %>% 
+#   select(starts_with("trad")) %>% 
+#   summary()
 #Check distribution of traditionalism
-qplot(ces88$traditionalism, geom="histogram")
-table(ces88$traditionalism, useNA="ifany")
+# qplot(ces88$traditionalism, geom="histogram")
+# table(ces88$traditionalism, useNA="ifany")
 
-#Calculate Cronbach's alpha
-ces88 %>% 
-  select(trad1, trad2, trad3) %>% 
-  psych::alpha(.)
-#Check correlation
-ces88 %>% 
-  select(trad1, trad2, trad3) %>% 
-  cor(., use="complete.obs")
+# #Calculate Cronbach's alpha
+# ces88 %>% 
+#   select(trad1, trad2, trad3) %>% 
+#   psych::alpha(.)
+# #Check correlation
+# ces88 %>% 
+#   select(trad1, trad2, trad3) %>% 
+#   cor(., use="complete.obs")
 
 
-#recode Moral Traditionalism 2 (abortion & gay rights) (Left-Right)
-ces88 %>% 
-  rowwise() %>% 
-  mutate(traditionalism2=mean(
-    c_across(trad1:trad2)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('trad1', 'trad2', 'traditionalism2')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
+# #recode Moral Traditionalism 2 (abortion & gay rights) (Left-Right)
+# ces88 %>% 
+#   rowwise() %>% 
+#   mutate(traditionalism2=mean(
+#     c_across(trad1:trad2)
+#     , na.rm=T )) -> out
+# out %>% 
+#   ungroup() %>% 
+#   select(c('trad1', 'trad2', 'traditionalism2')) %>% 
+#   mutate(na=rowSums(is.na(.))) %>% 
+#   filter(na>0, na<3)
 #Scale Averaging 
 ces88 %>% 
-  rowwise() %>% 
-  mutate(traditionalism2=mean(
-    c_across(c('trad1', 'trad2')), na.rm=T  
-  )) %>% 
-  ungroup()->ces88
+ # rowwise() %>% 
+  mutate(traditionalism2=rowMeans(select(., c('trad1', 'trad2')), na.rm=T)) ->ces88
 
 ces88 %>% 
   select(starts_with("trad")) %>% 
@@ -427,15 +423,15 @@ ces88 %>%
 qplot(ces88$traditionalism2, geom="histogram")
 table(ces88$traditionalism2, useNA="ifany")
 
-#Calculate Cronbach's alpha
-ces88 %>% 
-  select(trad1, trad2) %>% 
-  psych::alpha(.)
-
-#Check correlation
-ces88 %>% 
-  select(trad1, trad2) %>% 
-  cor(., use="complete.obs")
+# #Calculate Cronbach's alpha
+# ces88 %>% 
+#   select(trad1, trad2) %>% 
+#   psych::alpha(.)
+# 
+# #Check correlation
+# ces88 %>% 
+#   select(trad1, trad2) %>% 
+#   cor(., use="complete.obs")
 
 #recode 2nd Dimension (censorship, immigration, gay rights, crime)
 ces88$author1<-ces88$censorship
@@ -447,23 +443,19 @@ table(ces88$author2)
 table(ces88$author3)
 table(ces88$author4)
 
-ces88 %>% 
-  rowwise() %>% 
-  mutate(authoritarianism=mean(
-    c_across(author1:author4)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('author1', 'author2', 'author3', 'author4', 'authoritarianism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
+# ces88 %>% 
+#   rowwise() %>% 
+#   mutate(authoritarianism=mean(
+#     c_across(author1:author4)
+#     , na.rm=T )) -> out
+# out %>% 
+#   ungroup() %>% 
+#   select(c('author1', 'author2', 'author3', 'author4', 'authoritarianism')) %>% 
+#   mutate(na=rowSums(is.na(.))) %>% 
+#   filter(na>0, na<3)
 #Scale Averaging 
 ces88 %>% 
-  rowwise() %>% 
-  mutate(authoritarianism=mean(
-    c_across(c('author1', 'author2', 'author3', 'author4')), na.rm=T  
-  )) %>% 
-  ungroup()->ces88
+  mutate(authoritarianism=rowMeans(select(., c('author1', 'author2', 'author3', 'author4')), na.rm=T))->ces88
 
 ces88 %>% 
   select(starts_with("author")) %>% 
@@ -472,15 +464,15 @@ ces88 %>%
 qplot(ces88$authoritarianism, geom="histogram")
 table(ces88$authoritarianism, useNA="ifany")
 
-#Calculate Cronbach's alpha
-ces88 %>% 
-  select(author1, author2, author3, author4) %>% 
-  psych::alpha(.)
-
-#Check correlation
-ces88 %>% 
-  select(author1, author2, author3, author4) %>% 
-  cor(., use="complete.obs")
+# #Calculate Cronbach's alpha
+# ces88 %>% 
+#   select(author1, author2, author3, author4) %>% 
+#   psych::alpha(.)
+# 
+# #Check correlation
+# ces88 %>% 
+#   select(author1, author2, author3, author4) %>% 
+#   cor(., use="complete.obs")
 
 #recode Quebec Accommodation (qa9) (Left=more accom)
 look_for(ces88, "quebec")
@@ -577,3 +569,4 @@ look_for(ces88, "education")
 ces88$postgrad<-Recode(ces88$n3, "10:11=1; 1:9=0; else=NA")
 #checks
 table(ces88$postgrad)
+ces88$authoritarianism

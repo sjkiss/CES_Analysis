@@ -43,10 +43,22 @@ summary(census71$HHLDINC)
 library(gtools)
 
 quintiles_1971<-quantile(census71$HHLDINC, probs=c(0.2,0.4,0.6,0.8), na.rm=T)
+#Create Design
 
+quintiles_1971
 census71 %>% 
   mutate(quintile=quantcut(HHLDINC, q=5,  labels=c(seq(1,5,1)))) %>% 
 group_by(quintile) %>% 
   summarise(avg=mean(HHLDINC, na.rm=T), n=n())  %>% 
   mutate(year=rep('1971', nrow(.)))-> quintile_average_1971
+
+quintile_average_1971
+tertiles_1971<-quantile(census71$HHLDINC, probs = seq(0, 1, 1/3), na.rm=T)
+
+census71 %>% 
+  mutate(tertile=quantcut(HHLDINC, q=3,  labels=c(seq(1,3,1)))) %>% 
+  group_by(tertile) %>% 
+  summarise(avg=mean(HHLDINC, na.rm=T), n=n())  %>% 
+  mutate(year=rep('1971', nrow(.)))-> tertile_average_1971
+tertiles_1971
 

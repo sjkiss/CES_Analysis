@@ -163,6 +163,7 @@ val_labels(ces84$occupation3)
 table(ces84$occupation3)
 
 #recode Income (VAR442 and VAR443)
+#recode Income (VAR442 and VAR443)
 look_for(ces84, "income")
 ces84 %>% 
   mutate(income=case_when(
@@ -179,11 +180,50 @@ ces84 %>%
     VAR442==11 | VAR443==11 ~ 5,
   ))->ces84
 
-val_labels(ces84$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces84$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+
+#Simon's Version
+look_for(ces84, "income")
+ces84 %>% 
+  mutate(income2=case_when(
+    VAR442==1 | VAR443==1 ~ 1,
+    VAR442==2 | VAR443==2 ~ 1,
+    VAR442==3 | VAR443==3 ~ 1,
+    VAR442==4 | VAR443==4 ~ 1,
+    VAR442==5 | VAR443==5 ~ 2,
+    VAR442==6 | VAR443==6 ~ 2,
+    VAR442==7 | VAR443==7 ~ 3,
+    VAR442==8 | VAR443==8 ~ 3,
+    VAR442==9 | VAR443==9 ~ 4,
+    VAR442==10 | VAR443==10 ~ 5,
+    VAR442==11 | VAR443==11 ~ 5,
+  ))->ces84
+
+val_labels(ces84$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 #checks
 val_labels(ces84$income)
 table(ces84$income)
 
+look_for(ces84, "income")
+ces84 %>% 
+  mutate(income_tertile=case_when(
+    VAR442==1 | VAR443==1 ~ 1,
+    VAR442==2 | VAR443==2 ~ 1,
+    VAR442==3 | VAR443==3 ~ 1,
+    VAR442==4 | VAR443==4 ~ 1,
+    VAR442==5 | VAR443==5 ~ 1,
+    VAR442==6 | VAR443==6 ~ 2,
+    VAR442==7 | VAR443==7 ~ 2,
+    VAR442==8 | VAR443==8 ~ 2,
+    VAR442==9 | VAR443==9 ~ 3,
+    VAR442==10 | VAR443==10 ~ 3,
+    VAR442==11 | VAR443==11 ~ 3,
+  ))->ces84
+
+val_labels(ces84$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
+#checks
+val_labels(ces84$income_tertile)
+table(ces84$income_tertile)
 #recode Community Size (VAR464)
 look_for(ces84, "community")
 look_for(ces84, "city")

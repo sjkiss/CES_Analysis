@@ -167,7 +167,9 @@ table(ces93$occupation3)
 ####income #### 
 #recode Income (CPSO18 and CPSO18A)
 look_for(ces93, "income")
-ces93 %>% 
+
+
+ces93 %>%
   mutate(income=case_when(
     CPSO18A==1 | CPSO18> 0 & CPSO18 < 20 ~ 1,
     CPSO18A==2 | CPSO18> 19 & CPSO18 < 30 ~ 2,
@@ -181,11 +183,51 @@ ces93 %>%
     CPSO18A==10 | CPSO18> 69 & CPSO18 < 998 ~ 5,
   ))->ces93
 
-val_labels(ces93$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces93$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+
+
 #checks
 val_labels(ces93$income)
 table(ces93$income)
 
+#Simon's Version
+ces93 %>% 
+  mutate(income2=case_when(
+    CPSO18A==1 | CPSO18> 0 & CPSO18 < 18 ~ 1,
+    CPSO18A==2 | CPSO18> 19 & CPSO18 < 33 ~ 2,
+    CPSO18A==3 | CPSO18> 32 & CPSO18 < 50 ~ 3,
+    CPSO18A==4 | CPSO18> 32 & CPSO18 < 50 ~ 3,
+    CPSO18A==5 | CPSO18> 49 & CPSO18 < 72 ~ 4,
+    CPSO18A==6 | CPSO18> 49 & CPSO18 < 72 ~ 4,
+    CPSO18A==7 | CPSO18> 71 & CPSO18 < 998 ~ 5,
+    CPSO18A==8 | CPSO18> 71 & CPSO18 < 998 ~ 5,
+    CPSO18A==9 | CPSO18> 71 & CPSO18 < 998 ~ 5,
+    CPSO18A==10 | CPSO18> 71 & CPSO18 < 998 ~ 5,
+  ))->ces93
+
+val_labels(ces93$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+### Tertiles
+look_for(ces93, "income")
+table(ces93$CPSO18A, ces93$CPSO18)
+val_labels(ces93$CPSO18)
+ces93 %>% 
+  mutate(income_tertile=case_when(
+    as.numeric(CPSO18A)<3 |(as.numeric(CPSO18)> 0 & as.numeric(CPSO18) < 27) ~ 1,
+    #CPSO18A==2 | CPSO18> 26 & CPSO18 < 52 ~ 2,
+    (as.numeric(CPSO18A)>2 &as.numeric(CPSO18A) <4 )| as.numeric(CPSO18)> 26 & as.numeric(CPSO18) < 53 ~ 2,
+    (as.numeric(CPSO18A)>5 & as.numeric(CPSO18A)<98) | as.numeric(CPSO18)> 52 & as.numeric(CPSO18) <997 ~ 3
+  ))->ces93
+
+
+val_labels(ces93$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
+table(ces93$income_tertile, ces93$CPSO18)
+table(ces93$income_tertile, ces93$CPSO18A)
+
+table(ces93$income, ces93$CPSO18A)
+table(ces93$income, ces93$CPSO18)
+#checks
+val_labels(ces93$income)
+table(ces93$income)
 #####recode Religiosity (CPSO10 & REFN10)####
 look_for(ces93, "god")
 ces93 %>% 
@@ -235,24 +277,21 @@ table(ces93$market2, ces93$MBSA2 , useNA = "ifany" )
 val_labels(ces93$market1)<-NULL
 val_labels(ces93$market2)<-NULL
 #This does not work for some reason!
-ces93 %>% 
-  rowwise() %>% 
-  mutate(market_liberalism=mean(
-  c_across(market1:market2))) -> out
-
-
-out %>% 
-  ungroup() %>% 
-  select(c('market1', 'market2', 'market_liberalism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
+# ces93 %>% 
+#   rowwise() %>% 
+#   mutate(market_liberalism=mean(
+#   c_across(market1:market2))) -> out
+# 
+# 
+# out %>% 
+#   ungroup() %>% 
+#   select(c('market1', 'market2', 'market_liberalism')) %>% 
+#   mutate(na=rowSums(is.na(.))) %>% 
+#   filter(na>0, na<3)
+# cor(out$market_liberalism, ces93$market_liberalism, use="complete.obs")
 #Scale Averaging 
 ces93 %>% 
-  rowwise() %>% 
-  mutate(market_liberalism=mean(
-    c_across(c('market1', 'market2')), na.rm=T  
-  )) %>% 
-  ungroup()->ces93
+  mutate(market_liberalism=rowMeans(select(., c("market1", "market2")), na.rm=T))->ces93
 
 ces93 %>% 
   select(starts_with("market")) %>% 
@@ -382,24 +421,20 @@ ces93 %>%
   #Then resaving the data frame back as ces93
   mutate(across(num_range('trad', 1:6), remove_val_labels))->ces93
 
-ces93 %>% 
-  rowwise() %>% 
-  mutate(traditionalism=mean(
-    c_across(trad1:trad6)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'traditionalism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
+# ces93 %>% 
+#   rowwise() %>% 
+#   mutate(traditionalism=mean(
+#     c_across(trad1:trad6)
+#     , na.rm=T )) -> out
+# out %>% 
+#   ungroup() %>% 
+#   select(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'traditionalism')) %>% 
+#   mutate(na=rowSums(is.na(.))) %>% 
+#   filter(na>0, na<3)
 #Scale Averaging 
 ces93 %>% 
-  rowwise() %>% 
-  mutate(traditionalism=mean(
-    c_across(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6')), na.rm=T 
-  )) %>% 
-  ungroup()->ces93
-
+  mutate(traditionalism=rowMeans(select(., num_range("trad", range=1:6)), na.rm=T))->ces93
+  
 ces93 %>% 
   select(starts_with("trad")) %>% 
   summary()
@@ -418,27 +453,10 @@ ces93 %>%
   cor(., use="complete.obs")
 
 #recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)
-ces93 %>% 
-  rowwise() %>% 
-  mutate(traditionalism2=mean(
-    c_across(trad1:trad2)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('trad1', 'trad2', 'traditionalism2')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
-#Scale Averaging 
-ces93 %>% 
-  rowwise() %>% 
-  mutate(traditionalism2=mean(
-    c_across(c('trad1', 'trad2')), na.rm=T  
-  )) %>% 
-  ungroup()->ces93
 
 ces93 %>% 
-  select(starts_with("trad")) %>% 
-  summary()
+  mutate(traditionalism2=rowMeans(select(., trad1:trad2)), na.rm=T)->ces93
+ 
 #Check distribution of traditionalism
 qplot(ces93$traditionalism2, geom="histogram")
 table(ces93$traditionalism2, useNA="ifany")
@@ -467,23 +485,20 @@ table(ces93$author4)
 ces93 %>% 
   mutate(across(num_range('author', 1:4), remove_val_labels))->ces93
 
-ces93 %>% 
-  rowwise() %>% 
-  mutate(authoritarianism=mean(
-    c_across(author1:author4)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('author1', 'author2', 'author3', 'author4', 'authoritarianism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
+# ces93 %>% 
+#   rowwise() %>% 
+#   mutate(authoritarianism=mean(
+#     c_across(author1:author4)
+#     , na.rm=T )) -> out
+# out %>% 
+#   ungroup() %>% 
+#   select(c('author1', 'author2', 'author3', 'author4', 'authoritarianism')) %>% 
+#   mutate(na=rowSums(is.na(.))) %>% 
+#   filter(na>0, na<3)
 #Scale Averaging 
 ces93 %>% 
-  rowwise() %>% 
-  mutate(authoritarianism=mean(
-    c_across(c('author1', 'author2', 'author3', 'author4')), na.rm=T  
-  )) %>% 
-  ungroup()->ces93
+  mutate(authoritarianism=rowMeans(select(., num_range("author", 1:4)), na.rm=T))->ces93
+  
 
 ces93 %>% 
   select(starts_with("author")) %>% 

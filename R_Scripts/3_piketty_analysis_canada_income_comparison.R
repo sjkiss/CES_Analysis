@@ -3,8 +3,13 @@ library(broom)
 library(stargazer)
 library(tidyverse)
 #### First cut Degree and Income gap for left-right block ####
-
 ces %>% 
+  filter(election<1993)
+  select(election, left, region, male, age, income, degree, religion2) %>% 
+  group_by(election) %>% 
+  summary()
+ces %>% 
+  filter(election>1979) %>% 
   nest(variables=-election) %>%
   mutate(model=map(variables, function(x) lm(left~region2+male+age+income+degree+as.factor(religion2), data=x)),
          tidied=map(model, tidy))->ols_block_models
@@ -17,7 +22,10 @@ ces %>%
   nest(variables=-election) %>%
   mutate(model=map(variables, function(x) lm(left~region2+male+age+income3+degree+as.factor(religion2), data=x)),
          tidied=map(model, tidy))->ols_block_models3
-
+ces %>% 
+  nest(variables=-election) %>%
+  mutate(model=map(variables, function(x) lm(left~region2+male+age+income_tertile+degree+as.factor(religion2), data=x)),
+         tidied=map(model, tidy))->ols_block_models4
 ols_block_models2 %>% 
   unnest(tidied) %>% 
   filter(term=="degree"|term=="income2") %>% 

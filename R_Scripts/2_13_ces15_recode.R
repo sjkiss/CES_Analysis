@@ -204,11 +204,54 @@ val_labels(ces15phone$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middl
 #checks
 val_labels(ces15phone$income)
 table(ces15phone$income)
+#Simon's Version
+ces15phone$CPS15_93
+ces15phone %>% 
+  mutate(income2=case_when(
+    CPS15_93==1 | CPS15_92> -1 & CPS15_92 < 33 ~ 1,
+    CPS15_93==2 | CPS15_92> 32 & CPS15_92 < 57 ~ 2,
+    CPS15_93==3 | CPS15_92> 56 & CPS15_92 < 87 ~ 3,
+    CPS15_93==4 | CPS15_92> 86 & CPS15_92 < 131 ~ 4,
+    CPS15_93==5 | CPS15_92> 130 & CPS15_92 < 998 ~ 5,
+  ))->ces15phone
 
+table(ces15phone$income, ces15phone$income2)
+
+ces15phone %>% 
+  filter(income==5&income2==4) %>% 
+  select(income, income2, CPS15_93, CPS15_92)
+
+#Which variable has more
+table(ces15phone$CPS15_93, ces15phone$CPS15_92)
+ces15phone$CPS15_92
+ces15phone$CPS15_93
+
+ces15phone$income_number_missing<-Recode(as.numeric(ces15phone$CPS15_92), "0:900='valid' ; 998:999='missing'")
+ces15phone$income_cat_missing<-Recode(as.numeric(ces15phone$CPS15_93), "1:5='valid' ; 8:9='missing'")
+table(ces15phone$income_number_missing)
+table(ces15phone$income_cat_missing) #People are much more likely to report with the numberl
+
+
+#Income Tertile
+ces15phone %>% 
+  mutate(income_tertile=case_when(
+    #First Tertile
+    CPS15_92<54~1,
+    #Second Tertile
+    CPS15_92>53 &CPS15_92<110~2,
+    #Third Tertile
+    CPS15_92>109 &CPS15_92<997 ~3,
+    #First Tertile
+    CPS15_93<3 ~ 1,
+    #Second Tertile
+    CPS15_93>2 &CPS15_93<5 ~2,
+    CPS15_93 ==5 ~3
+  ))->ces15phone
+val_labels(ces15phone$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
 #recode Religiosity (CPS15_82)
 look_for(ces15phone, "relig")
 ces15phone$religiosity<-Recode(ces15phone$CPS15_82, "7=1; 5=2; 98=3; 3=4; 1=5; else=NA")
-val_labels(ces15phone$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces15phone$religiosity)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 #checks
 val_labels(ces15phone$religiosity)
 table(ces15phone$religiosity)
@@ -245,8 +288,7 @@ table(ces15phone$immigration_rate)
 ces15phone$immigration_feel
 
 ces15phone %>% 
-  rowwise() %>% 
-  mutate(immigration=mean(c(immigration_jobs, immigration_rate, immigration_feel), na.rm=T))->ces15phone
+  mutate(immigration=rowMeans(select(., c("immigration_jobs", "immigration_rate", "immigration_feel")), na.rm=T))->ces15phone
 
 #Check distribution of immigration
 qplot(ces15phone$immigration, geom="histogram")
@@ -268,8 +310,7 @@ table(ces15phone$minorities_help, useNA = "ifany" )
 
 #Combine the 2 racial minority variables and divide by 2
 ces15phone %>% 
-  rowwise() %>% 
-  mutate(minorities=mean(c_across(c(minorities_help, minorities_feel)), na.rm=T))->ces15phone
+mutate(minorities=rowMeans(select(., c("minorities_help", "minorities_feel")), na.rm=T))->ces15phone
 
 #Check distribution of immigration
 qplot(ces15phone$minorities, geom="histogram")
@@ -289,7 +330,8 @@ ces15phone %>%
   mutate(across(.cols=starts_with('immigration_|minorities_'), remove_val_labels) )->ces15phone
 
 ces15phone %>% 
-  mutate(immigration2=mean(c(immigration_jobs, immigration_feel, immigration_rate, minorities_feel, minorities_help), na.rm=T))->ces15phone
+  mutate(immigration2=rowMeans(select(., c("immigration_jobs", "immigration_feel", "immigration_rate", "minorities_feel", "minorities_help")), na.rm=T))
+
 qplot(ces15phone$immigration2, geom="histogram")
 
 #Calculate Cronbach's alpha
@@ -453,22 +495,8 @@ table(ces15phone$market1, useNA="ifany")
 table(ces15phone$market2, useNA="ifany")
 
 ces15phone %>% 
-  rowwise() %>% 
-  mutate(market_liberalism=mean(
-    c(market1, market2), na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c(market1, market2, market_liberalism)) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
-#Scale Averaging 
-ces15phone %>% 
-  rowwise() %>% 
-  mutate(market_liberalism=mean(c(market1, market2), na.rm=T  )) %>% 
-  ungroup()->ces15phone
-ces15phone %>% 
-  select(starts_with("market")) %>% 
-  summary()
+  mutate(market_liberalism=rowMeans(select(., num_range("market", 1:2)), na.rm=T))->ces15phone
+ 
 #Check distribution of market_liberalism
 qplot(ces15phone$market_liberalism, geom="histogram")
 table(ces15phone$market_liberalism, useNA="ifany")
@@ -499,13 +527,8 @@ ces15phone %>%
 #Scale Averaging 
 
 ces15phone %>% 
-  rowwise() %>% 
-  mutate(moral_traditionalism=mean(c(moral_1, moral_2, moral_3), na.rm=T  
-  )) %>% 
-  ungroup()->ces15phone
-ces15phone %>% 
-  select(starts_with("moral_")) %>% 
-  summary()
+  mutate(moral_traditionalism=rowMeans(select(., num_range("moral_", 1:3)), na.rm=T))->ces15phone
+ 
 #Check distribution of moral_traditionalism
 qplot(ces15phone$moral_traditionalism, geom="histogram")
 table(ces15phone$moral_traditionalism, useNA="ifany")
@@ -748,25 +771,8 @@ table(ces15phone$trad6 , useNA = "ifany" )
 table(ces15phone$trad7 , useNA = "ifany" )
 
 ces15phone %>% 
-  rowwise() %>% 
-  mutate(traditionalism=mean(
-    c_across(trad1:trad7)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'trad7', 'traditionalism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na<8)
-  
-#Scale Averaging 
-ces15phone %>% 
-  rowwise() %>% 
-  mutate(traditionalism=mean(
-    c_across(num_range('trad', 1:7)), na.rm=T  
-  )) %>% 
-  ungroup()->ces15phone
-
-ces15phone %>% 
+  mutate(traditionalism=rowMeans(select(., num_range("trad", 1:7)), na.rm=T))->ces15phone
+ ces15phone %>% 
   select(starts_with("trad")) %>% 
   summary()
 #Check distribution of traditionalism
@@ -784,23 +790,8 @@ ces15phone %>%
 
 #recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)
 ces15phone %>% 
-  rowwise() %>% 
-  mutate(traditionalism2=mean(
-    c_across(trad1:trad2)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('trad1', 'trad2', 'traditionalism2')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na<5)
-
-#Scale Averaging 
-ces15phone %>% 
-  rowwise() %>% 
-  mutate(traditionalism2=mean(
-    c_across(c('trad1', 'trad2')), na.rm=T  
-  )) %>% 
-  ungroup()->ces15phone
+mutate(traditionalism2=rowMeans(select(., c("trad1", "trad2")), na.rm=T))->ces15phone
+ 
 
 ces15phone %>% 
   select(starts_with("trad")) %>% 
@@ -828,23 +819,11 @@ table(ces15phone$author2)
 table(ces15phone$author3)
 table(ces15phone$author4)
 
-ces15phone %>% 
-  rowwise() %>% 
-  mutate(authoritarianism=mean(
-    c_across(author1:author4)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('author1', 'author2', 'author3', 'author4', 'authoritarianism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<6)
+
 #Scale Averaging 
 ces15phone %>% 
-  rowwise() %>% 
-  mutate(authoritarianism=mean(
-    c_across(num_range('author', 4)), na.rm=T  
-  )) %>% 
-  ungroup()->ces15phone
+  mutate(authoritarianism=rowMeans(select(. ,num_range("author", 1:4)), na.rm=T))->ces15phone
+ 
 
 ces15phone %>% 
   select(starts_with("author")) %>% 

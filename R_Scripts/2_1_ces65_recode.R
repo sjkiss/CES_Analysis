@@ -114,13 +114,25 @@ val_labels(ces65$occupation)
 table(ces65$occupation)
 
 #recode Income (v336)
+
 look_for(ces65, "income")
 ces65$income<-Recode(ces65$v336, "1:3=1; 4:5=2; 6=3; 7:8=4; 9:11=5; else=NA")
-val_labels(ces65$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces65$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+#Simon's Version
+val_labels(ces65$income)
+table(ces65$income)
+look_for(ces65, "income")
+ces65$v336
+ces65$income2<-Recode(ces65$v336, "1:4=1; 5:7=2; 8:9=3; 10=4; 11=5; else=NA")
+val_labels(ces65$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+
 #checks
 val_labels(ces65$income)
 table(ces65$income)
 
+ces65$income_tertile<-Recode(ces65$v336, "1:6=1; 7:9=2;10:11=3; 97=NA")
+table(ces65$income_tertile)
+val_labels(ces65$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
 #recode Religiosity (v310)
 look_for(ces65, "church")
 ces65$religiosity<-Recode(ces65$v310, "5=1; 4=2; 3=3; 2=4; 1=5; else=NA")

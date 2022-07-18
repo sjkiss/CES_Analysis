@@ -9,42 +9,63 @@ here("Data")
 #LIst files in the data folder to see that it is there.
 list.files(here("Data"))
 #read in the file.
-census16<-read_sav(file=here("Data", "2016_individual_pumf.sav"))
-#load tidyverse library of useful commands
-library(tidyverse)
-#The glimpse command give us a look at the data
-glimpse(census16)
-#This library helps search for keywords in variable labels
+income_2015<-read_sav(file=here("Data", "2015_income_individual.sav"))
 library(labelled)
-#look for income
-look_for(census16, "income")
-census16$HHInc
-#the variable is HHInc, use summary command to check
-summary(census16$HHInc)
-table(census16$HHInc)
-#Check the histogram
-census16 %>% 
-  ggplot(., aes(x=HHInc))+geom_histogram()
-#find cases with negative income
-census16 %>% 
-  #this filters the data set to rows with income less than zero
-  filter(HHInc<0) %>% 
-  #then select the variable and print it
-  select(HHInc)
-#so it looks like there are about 243 cases of people with negative income;
-#I guess in theory it is possible for a business owner to have lost income; so let's gamble and keep it. I have not seen any referene in technical eocumentation to negative values
-#check summary again,
-summary(census16$HHInc)
-#The maximum value in the dataset is 200000. 
+lookfor(income_2015, "census family")
+lookfor(income_2015, "household")
+lookfor(income_2015, "size")
+income_2015$HHCOMP
+table(as_factor(income_2015$HHCOMP), as_factor(income_2015$CFCOMP))
+lookfor(income_2015, "income")
+income_2015$EFMJIE
+income_2015 %>% 
+  filter(EFMJIE==1) %>% 
+  select(CFTTINC, EFTTINC, CFCOMP, HHSIZE, EFMJIE) %>% 
+  group_by(CFCOMP, HHSIZE) %>% 
+  summarize(avg=mean(CFTTINC, na.rm=T), avg2=mean(EFTTINC)) %>%
+  as_factor() %>% 
+  View()
 
-#find the quintiles
-library(gtools)
-#This calculates the quintiles
-quintiles_2016<-quantile(census16$HHInc, probs=c(0.2,0.4,0.6,0.8), na.rm=T)
-#Ths calculates the average by quintile
-census16 %>% 
-  mutate(quintile=quantcut(HHInc, q=5,  labels=c(seq(1,5,1)))) %>% 
-group_by(quintile) %>% 
-  summarise(avg=mean(HHInc, na.rm=T), n=n())  %>% 
-  mutate(year=rep('2016', nrow(.)))-> quintile_average_2016
-quintile_average_2016
+
+income_2015%>% 
+  filter(EFMJIE=="1")->income_2015
+lookfor(income_2015, "weight")
+income_2015 %>% 
+  ggplot(., aes(x=CFTTINC))+geom_histogram()
+summary(income_2015$CFTTINC)
+library(survey)
+income_2015_des<-svydesign(ids=~0, data=income_2015, weights=~FWEIGHT)
+tertiles_2015<-svyquantile(~as.numeric(CFTTINC), design=income_2015_des, quantiles=seq(0,1,1/3))
+tertiles_2015
+
+
+#### Income 2018 for the 2019 election
+income_2018<-read_sav(file=here("Data", "2018_income_individual.sav"))
+library(labelled)
+lookfor(income_2018, "census family")
+lookfor(income_2018, "household")
+lookfor(income_2018, "size")
+income_2018$HHCOMP
+table(as_factor(income_2018$HHCOMP), as_factor(income_2018$CFCOMP))
+lookfor(income_2018, "income")
+income_2018$EFMJIE
+income_2018 %>% 
+  filter(EFMJIE=="1") %>% 
+  select(CFTTINC, EFTTINC, CFCOMP, HHSIZE, EFMJIE) %>% 
+  group_by(CFCOMP, HHSIZE) %>% 
+  summarize(avg=mean(CFTTINC, na.rm=T), avg2=mean(EFTTINC)) %>%
+  as_factor() %>% 
+  View()
+
+
+income_2018%>% 
+  filter(EFMJIE=="1")->income_2018
+lookfor(income_2018, "weight")
+income_2018 %>% 
+  ggplot(., aes(x=CFTTINC))+geom_histogram()
+summary(income_2018$CFTTINC)
+library(survey)
+income_2018_des<-svydesign(ids=~0, data=income_2018, weights=~FWEIGHT)
+tertiles_2018<-svyquantile(~as.numeric(CFTTINC), design=income_2018_des, quantiles=seq(0,1,1/3))
+tertiles_2018
+?svyquantile

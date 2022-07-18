@@ -1,13 +1,14 @@
 #census income quintiles master script
-source("income_quintiles_1971.R")
-source("income_quintiles_1981.R")
-source("income_quintiles_1986.R")
-source("income_quintiles_1991.R")
-source("income_quintiles_1996.R")
+source("income_quintiles/income_quintiles_1971.R")
+source("income_quintiles/income_quintiles_1981.R")
+source("income_quintiles/income_quintiles_1986.R")
+source("income_quintiles/income_quintiles_1991.R")
+source("income_quintiles/income_quintiles_1996.R")
 #This is a check
 quintile_average_1971 %>% 
   bind_rows(., quintile_average_1981) %>% 
-  bind_rows(., quintile_average_1986)
+  bind_rows(., quintile_average_1986) %>% 
+  bind_rows(., quintile_average_2001)
 
 #print out the boundaries
 df71<-data.frame(Year=rep(1971, 4),boundary= quintiles_1971, quintile=c(seq(1,4,1)))
@@ -40,4 +41,6 @@ bind_rows(., quintile_average_1981) %>%
   ggplot(., aes(x=year, y=avg, group=quintile))+geom_line(aes(linetype=quintile))+labs(title="Average Real Total Household Income By Quintile, Canada, 1971-2001", y="Average", x="Year")+theme_bw()->income_inequality
 income_inequality %>% 
   ggsave(., filename=here("Plots", "average_income_by_quintile.png"))
+
+#Read in from the Statistics Canada Quintile Boundary file 
 

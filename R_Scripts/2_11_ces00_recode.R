@@ -150,7 +150,7 @@ table(ces00$vote)
 #### income#### 
 #recode Income (cpsm16 and cpsm16a)
 look_for(ces00, "income")
-ces00 %>% 
+ces00 %>%
   mutate(income=case_when(
     cpsm16a==1 | cpsm16> -1 & cpsm16 < 20 ~ 1,
     cpsm16a==2 | cpsm16> 19 & cpsm16 < 40 ~ 2,
@@ -164,10 +164,56 @@ ces00 %>%
     cpsm16a==10 | cpsm16> 79 & cpsm16 < 998 ~ 5,
   ))->ces00
 
-val_labels(ces00$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+look_for(ces00, "income")
+ces00 %>% 
+  mutate(income2=case_when(
+    #First Quintile
+    cpsm16a==1 | cpsm16> -1 & cpsm16 < 21 ~ 1,
+    #second Quintile
+    cpsm16a==2 | cpsm16> 20 & cpsm16 < 38 ~ 2,
+    cpsm16a==3 | cpsm16> 20& cpsm16 < 38 ~ 2,
+    #Third Quintile
+    cpsm16a==4 | cpsm16> 37 & cpsm16 < 58 ~ 3,
+    cpsm16a==5 | cpsm16> 37 & cpsm16 < 58 ~ 3,
+    #Fourth Quintile
+    cpsm16a==6 | cpsm16> 57 & cpsm16 < 86 ~ 4,
+    cpsm16a==7 | cpsm16> 57 & cpsm16 < 86 ~ 4,
+    #Fifth Quintile
+    cpsm16a==8 | cpsm16> 85 & cpsm16 < 998 ~ 5,
+    cpsm16a==9 | cpsm16> 85 & cpsm16 < 998 ~ 5,
+    cpsm16a==10 | cpsm16> 85 & cpsm16 < 998 ~ 5,
+  ))->ces00
+val_labels(ces00$income2)<-c(Lowest=1, Lower_Middle=2, Midddle=3, Upper_Middle=4, Highest=5)
 #checks
 val_labels(ces00$income)
 table(ces00$income)
+table(ces00$income, ces00$cpsm16)
+table(ces00$income, ces00$cpsm16a)
+
+
+#income_tertiles
+
+look_for(ces00, "income")
+ces00$cpsm16a
+ces00$cpsm16
+ces00$cpsm16a
+ces00 %>% 
+  mutate(income_tertile=case_when(
+    #First tertile
+    cpsm16a<3 | cpsm16<32~1,
+    #Second Tertile
+    cpsm16a>2 &cpsm16a< 6 | cpsm16 >31 & cpsm16<65 ~2,
+    #third Tertile 
+    cpsm16a>5 &cpsm16a<11 |cpsm16 > 64 & cpsm16<998 ~ 3
+  ))->ces00
+val_labels(ces00$income_tertile)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
+table(ces00$income)
+table(ces00$income_tertile, ces00$cpsm16)
+table(ces00$income_tertile, ces00$cpsm16a)
+
+ces00 %>% 
+select(contains("income"), cpsm16a, cpsm16) %>% 
+  filter(cpsm16a==998&income_tertile==1)
 look_for(ces00, "noc")
 look_for(ces00, "employment")
 look_for(ces00, "career")
@@ -229,26 +275,11 @@ table(ces00$pesg15, ces00$market2, useNA = "ifany")
 #This must be from the Campaign Period Survey. 
 
 #this computes the average of market1 and market2 in a dataframe called out.
-#but note that this does not actually save anything back into ces00. Maybe that is intentiona.
-ces00 %>% 
-  rowwise() %>% 
-  mutate(market_liberalism=mean(
-    c_across(market1:market2)
-    , na.rm=T )) -> out
-#This checks to see how many missing values are in each,
-out %>% 
-  ungroup() %>% 
-  select(c('market1', 'market2', 'market_liberalism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
+
 
 #Scale Averaging 
 ces00 %>% 
-  rowwise() %>% 
-  mutate(market_liberalism=mean(
-    c_across(c('market1', 'market2')), na.rm=T  
-  )) %>% 
-  ungroup()->ces00
+  mutate(market_liberalism=rowMeans(select(., market1:market2)), na.rm=T)->ces00
 
 ces00 %>% 
   select(starts_with("market")) %>% 
@@ -366,21 +397,11 @@ ces00 %>%
   mutate(across(num_range('trad', 1:7), 
                 remove_val_labels))->ces00
 
-ces00 %>% 
-  mutate(traditionalism=mean(c_across(trad1:trad7), na.rm=T ))->out
 
-out %>% 
-  ungroup() %>% 
-  select(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'trad7', 'traditionalism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
 #Scale Averaging 
 ces00 %>% 
-  rowwise() %>% 
-  mutate(traditionalism=mean(
-    c_across(c('trad1', 'trad2', 'trad3', 'trad4', 'trad5', 'trad6', 'trad7')), na.rm=T 
-  )) %>% 
-  ungroup()->ces00
+  mutate(traditionalism=rowMeans(select(., num_range("trad", 1:7)), na.rm=T))->ces00
+ 
 
 ces00 %>% 
   select(starts_with("trad")) %>% 
@@ -400,22 +421,8 @@ ces00 %>%
 
 #recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)
 ces00 %>% 
-  rowwise() %>% 
-  mutate(traditionalism2=mean(
-    c_across(trad1:trad2)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('trad1', 'trad2', 'traditionalism2')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
-#Scale Averaging 
-ces00 %>% 
-  rowwise() %>% 
-  mutate(traditionalism2=mean(
-    c_across(c('trad1', 'trad2')), na.rm=T  
-  )) %>% 
-  ungroup()->ces00
+  mutate(traditionalism2=rowMeans(select(., trad1:trad2)), na.rm=T)->ces00
+ 
 
 ces00 %>% 
   select(starts_with("trad")) %>% 
@@ -449,22 +456,8 @@ ces00 %>%
   mutate(across(num_range('author', 1:4), remove_val_labels))->ces00
 
 ces00 %>% 
-  rowwise() %>% 
-  mutate(authoritarianism=mean(
-    c_across(author1:author4)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('author1', 'author2', 'author3', 'author4', 'authoritarianism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<3)
-#Scale Averaging 
-ces00 %>% 
-  rowwise() %>% 
-  mutate(authoritarianism=mean(
-    c_across(c('author1', 'author2', 'author3', 'author4')), na.rm=T  
-  )) %>% 
-  ungroup()->ces00
+  mutate(authoritarianism=rowMeans(select(., num_range("author", 1:4)), na.rm = T))->ces00
+ 
 
 ces00 %>% 
   select(starts_with("author")) %>% 

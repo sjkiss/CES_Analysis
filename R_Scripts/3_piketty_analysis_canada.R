@@ -829,11 +829,19 @@ m25<-lm(conservative~region2+age+male+degree+income2+religion2+redistribution+ma
 m26<-lm(conservative~region2+age+male+degree+income2+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+income2:redistribution+`2000`+`2004`+`2006`+`2008`, data=ces.2)
 m27<-lm(conservative~region2+age+male+degree+income2+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+income2:redistribution+`2011`+`2015`+`2019`, data=ces.3)
 
->>>>>>> origin/june_28_22
 ols.models<-list(m1, m2, m3, m4, m5, m6, m7, m8, m9)
 interaction.models<-list(m10, m11, m12, m13, m14, m15, m16, m17, m18)
 interaction.models2<-list(m19, m20, m21, m22, m23, m24, m25, m26, m27)
+#### Stargazer Interaction models
 
+stargazer(interaction.models, 
+          out=here("Tables", "interaction_models_degree_redistribution.html"),
+          ep.var.labels=c("NDP", "Liberal", "Conservative"),
+          omit=c(".[12][90]"), digits=2, column.labels=rep(c("1990s", "2000s", "2010s"), 3))
+stargazer(interaction.models2, 
+          out=here("Tables", "interaction_models_income_redistribution.html"),
+          ep.var.labels=c("NDP", "Liberal", "Conservative"),
+          omit=c(".[12][90]"), digits=2, column.labels=rep(c("1990s", "2000s", "2010s"), 3))
 #### Graph Degree & Income x Redistribution interactions ####
 
 names(interaction.models)<-c(rep("NDP", 3), rep("Liberal", 3), rep("Conservative", 3))
