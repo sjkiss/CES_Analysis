@@ -194,7 +194,7 @@ table(ces93$income)
 ces93 %>% 
   mutate(income2=case_when(
     CPSO18A==1 | CPSO18> 0 & CPSO18 < 18 ~ 1,
-    CPSO18A==2 | CPSO18> 19 & CPSO18 < 33 ~ 2,
+    CPSO18A==2 | CPSO18> 17 & CPSO18 < 33 ~ 2,
     CPSO18A==3 | CPSO18> 32 & CPSO18 < 50 ~ 3,
     CPSO18A==4 | CPSO18> 32 & CPSO18 < 50 ~ 3,
     CPSO18A==5 | CPSO18> 49 & CPSO18 < 72 ~ 4,
@@ -214,8 +214,8 @@ ces93 %>%
   mutate(income_tertile=case_when(
     as.numeric(CPSO18A)<3 |(as.numeric(CPSO18)> 0 & as.numeric(CPSO18) < 27) ~ 1,
     #CPSO18A==2 | CPSO18> 26 & CPSO18 < 52 ~ 2,
-    (as.numeric(CPSO18A)>2 &as.numeric(CPSO18A) <4 )| as.numeric(CPSO18)> 26 & as.numeric(CPSO18) < 53 ~ 2,
-    (as.numeric(CPSO18A)>5 & as.numeric(CPSO18A)<98) | as.numeric(CPSO18)> 52 & as.numeric(CPSO18) <997 ~ 3
+    (as.numeric(CPSO18A)>2 &as.numeric(CPSO18A) <5 )| as.numeric(CPSO18)> 26 & as.numeric(CPSO18) < 53 ~ 2,
+    (as.numeric(CPSO18A)>4 & as.numeric(CPSO18A)<98) | as.numeric(CPSO18)> 52 & as.numeric(CPSO18) <998 ~ 3
   ))->ces93
 
 

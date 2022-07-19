@@ -1105,7 +1105,7 @@ ces0411 %>%
         #Secon Tertiile_Panel
         ces04_CPS_S18>2 & ces04_CPS_S18 <6 & ces06_RECALL==1 ~ 2,
         #Third Tertile_Panel
-        ces04_CPS_S18>6 & ces04_CPS_S18 <98 & ces06_RECALL==1 ~ 3,
+        ces04_CPS_S18>5 & ces04_CPS_S18 <98 & ces06_RECALL==1 ~ 3,
       ))->ces0411
     
     val_labels(ces0411$income_tertile06)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
@@ -1860,53 +1860,57 @@ ces0411 %>%
   #PES actual income
   ces08_PES_S9A >-1 &ces08_PES_S9A <25 ~ 1,
   #CPS categories_ISR
-  ces08_CPS_S18B_ISR==1 ~1,
-  #CPS categories_Jolie
-  ces08_CPS_S18B_Joli==1 ~1, 
+  ces08_CPS_S18B==1 ~1,
+#  #CPS categories_Jolie
+#  ces08_CPS_S18B==1 ~1, 
   #PES categories
   ces08_PES_S9B==1 ~1,
+  
   #SECOND QUINTILE
   #CPS actual income
   ces08_CPS_S18A > 24 & ces08_CPS_S18A < 44 ~ 2,
   #PES actual income
   ces08_PES_S9A >24 &ces08_PES_S9A <44 ~ 2,
   #CPS categories ISR
-  ces08_CPS_S18B_ISR>1 &ces08_CPS_S18B_ISR<3 ~2,
-  #CPS categories Joli
-  ces08_CPS_S18B_Joli>1 &ces08_CPS_S18B_Joli<3 ~2,
+  ces08_CPS_S18B>1 &ces08_CPS_S18B<3 ~2,
+#  #CPS categories Joli
+#  ces08_CPS_S18B>1 &ces08_CPS_S18B<3 ~2,
   #PES categories
   ces08_PES_S9B >1 & ces08_PES_S9B<3 ~2,
+  
   #THIRD QUINTILE
   #CPS actual income
   ces08_CPS_S18A > 43 & ces08_CPS_S18A < 66 ~ 3,
   #PES actual income
   ces08_PES_S9A >43 &ces08_PES_S9A <66 ~ 3,
   #CPS categories ISR
-  ces08_CPS_S18B_ISR>3 &ces08_CPS_S18B_ISR<7 ~3,
-  #CPS categories Joli
-  ces08_CPS_S18B_Joli==3 ~4, 
+  ces08_CPS_S18B>2 &ces08_CPS_S18B<7 ~3,
+#  #CPS categories Joli
+#  ces08_CPS_S18B==3 ~4, 
   #PES categories ISR
-  ces08_PES_S9B >3 & ces08_PES_S9B<7 ~3,
+  ces08_PES_S9B >2 & ces08_PES_S9B<7 ~3,
+  
   #FOURTH QUINTILE
   #CPS actual income
   ces08_CPS_S18A > 65 & ces08_CPS_S18A < 99 ~ 4,
   #PES actual income
   ces08_PES_S9A >65 &ces08_PES_S9A <99 ~ 4,
   #CPS categories ISR
-  ces08_CPS_S18B_ISR>6 &ces08_CPS_S18B_ISR<10 ~4,
-  #CPS categories Joli
-  ces08_CPS_S18B_Joli>3 &ces08_CPS_S18B_Joli<6 ~4, 
+  ces08_CPS_S18B>6 &ces08_CPS_S18B<10 ~4,
+#  #CPS categories Joli
+#  ces08_CPS_S18B>3 &ces08_CPS_S18B<6 ~4, 
   #PES categories 
   ces08_PES_S9B >6 & ces08_PES_S9B<10 ~4,
+  
   #FIFTH QUINTILE
   #CPS actual income
   ces08_CPS_S18A > 98 & ces08_CPS_S18A < 996 ~ 5,
   #PES actual income
   ces08_PES_S9A >98 &ces08_PES_S9A <996 ~ 5,
   #CPS categories ISR
-  ces08_CPS_S18B_ISR>9 &ces08_CPS_S18B_ISR<13 ~5,
-  #CPS categories Joli
-  ces08_CPS_S18B_Joli>5 &ces08_CPS_S18B_Joli<8 ~5,
+  ces08_CPS_S18B>9 &ces08_CPS_S18B<13 ~5,
+#  #CPS categories Joli
+#  ces08_CPS_S18B>5 &ces08_CPS_S18B<8 ~5,
   #PES categories ISR
   ces08_PES_S9B>9 & ces08_PES_S9B<13 ~5))->ces0411
   
@@ -1918,7 +1922,7 @@ val_labels(ces0411$income08)
 summary(ces0411$ces08_CPS_S18A)
 ces0411 %>% 
   filter(!is.na(ces0411$ces08_PES_S9A)) %>% 
-  select(ces08_CPS_S18B_Joli, ces08_PES_S9A) 
+  select(ces08_CPS_S18B, ces08_PES_S9A) 
   
 table(ces0411$income08, ces0411$income082) #There are some high income quintiles in the original variable who have been put into the second and 3 quintile
 #This code prints respondents who have 4 on the original and 3 on the second
@@ -1930,18 +1934,18 @@ table(ces0411$income08, ces0411$income082) #There are some high income quintiles
 
 ces0411 %>% 
   filter(income08==4&income082==3) %>% 
-  select(income08, income082, ces08_CPS_S18A, ces08_CPS_S18B_ISR, ces08_CPS_S18B_Joli, ces08_PES_S9A, ces08_PES_S9B)
+  select(income08, income082, ces08_CPS_S18A, ces08_CPS_S18B, ces08_CPS_S18B, ces08_PES_S9A, ces08_PES_S9B)
 
 #This checks people with 5 on the original and a value of 3 on the new. I think this did catch an error in the original.
 #People who were respondeing 2ith 998 in the original were refusing to answer and they were then asked the category question and they answered, mostly with 6,
 #Which puts them in the third quintile
 ces0411 %>% 
   filter(income08==5&income082==3) %>% 
-  select(income08, income082, ces08_CPS_S18A, ces08_CPS_S18B_ISR, ces08_CPS_S18B_Joli, ces08_PES_S9A, ces08_PES_S9B)
+  select(income08, income082, ces08_CPS_S18A, ces08_CPS_S18B, ces08_CPS_S18B, ces08_PES_S9A, ces08_PES_S9B)
 #This checks people with 5 on the original d 4 on the new and this caught the same error
 ces0411 %>% 
   filter(income08==5&income082==4) %>% 
-  select(income08, income082, ces08_CPS_S18A, ces08_CPS_S18B_ISR, ces08_CPS_S18B_Joli, ces08_PES_S9A, ces08_PES_S9B)
+  select(income08, income082, ces08_CPS_S18A, ces08_CPS_S18B, ces08_CPS_S18B, ces08_PES_S9A, ces08_PES_S9B)
 
 #Income_tertile
 ces0411 %>% 
@@ -1956,17 +1960,30 @@ ces0411 %>%
     ces08_CPS_S18A > 68 & ces08_CPS_S18A <997~3,
     ces08_PES_S9A > 68 & ces08_PES_S9A <997~3,
        #First Tercile ISR
-    ces08_CPS_S18B_ISR <3 ~1,
+    ces08_CPS_S18B <3 ~1,
     #Second Tercile ISR
-    ces08_CPS_S18B_ISR >2 &ces08_CPS_S18B_ISR<7  ~2,
+    ces08_CPS_S18B >2 &ces08_CPS_S18B<7  ~2,
     #Third Tercile ISR
-    ces08_CPS_S18B_ISR >6 &ces08_CPS_S18B_ISR<13  ~3,
+    ces08_CPS_S18B >6 &ces08_CPS_S18B<13  ~3,
     #First Tercile Joli
-    ces08_CPS_S18B_Joli < 3 ~ 1, 
+    ces08_CPS_S18B < 3 ~ 1, 
     #Second Tercile Joli
-    ces08_CPS_S18B_Joli >2 & ces08_CPS_S18B_Joli<4 ~ 2,
+    ces08_CPS_S18B >2 & ces08_CPS_S18B<4 ~ 2,
     #Third Quintile Joli
-    ces08_CPS_S18B_Joli >3 & ces08_CPS_S18B_Joli<8 ~ 3
+    ces08_CPS_S18B >3 & ces08_CPS_S18B<8 ~ 3,
+    
+    #First Tercile ISR
+    ces08_PES_S9B <3 ~1,
+    #Second Tercile ISR
+    ces08_PES_S9B >2 & ces08_PES_S9B<7  ~2,
+    #Third Tercile ISR
+    ces08_PES_S9B >6 & ces08_PES_S9B<13  ~3,
+    #First Tercile Joli
+    ces08_PES_S9B < 3 ~ 1, 
+    #Second Tercile Joli
+    ces08_PES_S9B >2 & ces08_PES_S9B<4 ~ 2,
+    #Third Quintile Joli
+    ces08_PES_S9B >3 & ces08_PES_S9B<8 ~ 3
 
   ))->ces0411
 
@@ -2564,7 +2581,7 @@ ces0411 %>%
     #Third Quintile
     CPS11_93==3 | (CPS11_92> 49 & CPS11_92 < 76) ~ 3,
     #Fourth Quintile
-    CPS11_93==4 | (CPS11_92> 76 & CPS11_92 < 115) ~ 4,
+    CPS11_93==4 | (CPS11_92> 75 & CPS11_92 < 115) ~ 4,
     #Fifth Quintile
     CPS11_93==5 | (CPS11_92> 114 & CPS11_92 < 998) ~ 5,
   ))->ces0411

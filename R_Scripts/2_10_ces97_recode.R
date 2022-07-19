@@ -192,11 +192,11 @@ look_for(ces97, "income")
 ces97 %>% 
   mutate(income_tertile=case_when(
     #first tertile
-    as.numeric(cpsm16a)<2 | as.numeric(cpsm16)> 0 & as.numeric(cpsm16) < 27 ~ 1,
+    as.numeric(cpsm16a)<3 | as.numeric(cpsm16)> 0 & as.numeric(cpsm16) < 27 ~ 1,
     #Second tertile
-    as.numeric(cpsm16a)>2&as.numeric(cpsm16a)<5 | as.numeric(cpsm16)> 26 & as.numeric(cpsm16) < 56 ~ 2,
+    as.numeric(cpsm16a)>2 & as.numeric(cpsm16a)<5 | as.numeric(cpsm16)> 26 & as.numeric(cpsm16) < 56 ~ 2,
     #Third Tertile
-    as.numeric(cpsm16a)>4&as.numeric(cpsm16a)<98 | as.numeric(cpsm16)> 55 & as.numeric(cpsm16) < 998~ 3
+    as.numeric(cpsm16a)>4 & as.numeric(cpsm16a)<98 | as.numeric(cpsm16)> 55 & as.numeric(cpsm16) < 998~ 3
   ))->ces97
 
 val_labels(ces97$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
