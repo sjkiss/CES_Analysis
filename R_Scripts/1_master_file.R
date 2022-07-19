@@ -957,4 +957,4 @@ table(ces$income_tertile, ces$election)
 # val_labels(ces$income2)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 # val_labels(ces$income3)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 val_labels(ces$income_tertile)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
-prop.table(table(ces$income_tertile, ces$election), 2)
+

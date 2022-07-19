@@ -129,9 +129,9 @@ val_labels(ces65$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4,
 #checks
 val_labels(ces65$income)
 table(ces65$income)
-
-ces65$income_tertile<-Recode(ces65$v336, "1:6=1; 7:9=2;10:11=3; 97=NA")
-table(ces65$income_tertile)
+val_labels(ces65$v336)
+ces65$income_tertile<-Recode(ces65$v336, "1:5=1; 6:8=2;9:11=3; 97=NA")
+prop.table(table(ces65$income_tertile))
 val_labels(ces65$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
 #recode Religiosity (v310)
 look_for(ces65, "church")

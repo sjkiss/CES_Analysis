@@ -154,7 +154,7 @@ table(ces68$income)
 #income2
 look_for(ces68, "income")
 #Simon's Version'
-ces68$income2<-Recode(ces68$var404, "1:4=1; 5:7=2; 8:9=3; 0=4; else=NA")
+# ces68$income2<-Recode(ces68$var404, "1:4=1; 5:7=2; 8:9=3; 0=4; else=NA")
 
 ces68 %>% 
   mutate(income2=case_when(
@@ -177,8 +177,8 @@ val_labels(ces68$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4,
 val_labels(ces68$income)
 table(ces68$income)
 #Terciles
-ces68$income_tertile<-Recode(ces68$var404, "1:6=1; 7:9=2; 0=3; else=NA")
-table(ces68$income_tertile)
+ces68$income_tertile<-Recode(ces68$var404, "1:5=1; 6:8=2; 0=3; 9=3; else=NA")
+prop.table(table(ces68$income_tertile))
 val_labels(ces68$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
 
 
