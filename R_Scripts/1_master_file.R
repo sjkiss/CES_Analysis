@@ -951,7 +951,7 @@ ces %>%
 #Create tertles
 table(ces$income)
 table(ces$income2, ces$election)
-table(ces$income_tertile, ces$election)
+prop.table(table(ces$income_tertile, ces$election), 2)
 # ces$income2<-Recode(ces$income, "1=1; 2:4=2; 5=3")
 # ces$income3<-Recode(ces$income, "1:2=1; 3=2; 4:5=3")
 # val_labels(ces$income2)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
