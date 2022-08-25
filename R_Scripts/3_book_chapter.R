@@ -1,9 +1,12 @@
 ### this is the analysis for the book chapter
-
+theme_set(theme_bw(base_size=20))
 #### Voting Shares of Working Class
+
 ces %>% 
   select(election, working_class, vote2) %>% 
+  #filter(is.na(election))
   group_by(election, working_class, vote2) %>% 
+  mutate(election=ymd(election, truncated=2L)) %>% 
   summarize(n=n()) %>% 
   filter(!is.na(vote2)) %>% 
   mutate(pct=(n/sum(n))*100) %>% 
@@ -12,21 +15,26 @@ ces %>%
   ggplot(., aes(x=election, y=pct, linetype=fct_relevel(vote2, "Liberal"), group=vote2))+
   geom_point()+
   geom_line()+
-  labs(y="Percent", x="Election")+scale_linetype_manual(values=c(1,3,5,6))
+  labs(y="Percent", x="Election", linetype="Vote")+scale_linetype_manual(values=c(1,3,5,6))+
+  scale_x_date(breaks= seq.Date(from=as.Date("1965-01-01"), to=as.Date("2021-01-01"), by="5 years"), date_labels="%Y")
+
+
 ggsave(here("Plots", "book_chapter_working_class_votes_for_parties.png"))
 
 ces %>% 
   select(election, working_class, vote2) %>% 
+  mutate(election=ymd(election, truncated=2L)) %>% 
   group_by(election,  vote2, working_class) %>% 
   summarize(n=n()) %>% 
   filter(!is.na(vote2)) %>% 
   mutate(pct=(n/sum(n))*100) %>% 
-  filter(working_class==1) %>% 
+  filter(working_class==1) 
   filter(vote2!="Green") %>% 
   ggplot(., aes(x=election, y=pct, linetype=fct_relevel(vote2, "Liberal"), shape=fct_relevel(vote2, "Liberal"),group=vote2))+
   geom_point()+
   geom_line()+
-  labs(y="Percent", x="Election", linetype="Vote", shape="Vote")
+  labs(y="Percent", x="Election", linetype="Vote", shape="Vote") +
+scale_x_date(breaks= seq.Date(from=as.Date("1965-01-01"), to=as.Date("2021-01-01"), by="4 years"), date_labels="%Y")
 ggsave("book_chapter_parties_share_working_class_votes.png")
 ces$Occupation<-Recode(ces$occupation4, "'Working_Class'='Working Class' ; 
                        'Routine_Nonmanual'='Routine Non-Manual'", levels=c(
@@ -34,7 +42,8 @@ ces$Occupation<-Recode(ces$occupation4, "'Working_Class'='Working Class' ;
                        ))
 ces %>% 
   select(election, Occupation, vote2) %>% 
-  filter(election>1978) %>% 
+  mutate(election=ymd(election, truncated=2L)) %>% 
+  filter(election>1978&election!=2000&election!=2021) %>% 
   group_by(election, Occupation, vote2) %>% 
   summarize(n=n()) %>% 
   filter(!is.na(vote2)) %>% 
@@ -45,23 +54,30 @@ filter(vote2!="Green") %>%
   geom_line()+
   facet_wrap(~vote2)+
   scale_linetype_manual(values=c(2,4,6,8,1))+labs(y="Percent", x="Election", 
-                                                  title="Raw Share of Class Voting Per Party")
+                                                  title="Raw Share of Class Voting Per Party") +
+scale_x_date(breaks= seq.Date(from=as.Date("1980-01-01"), to=as.Date("2021-01-01"), by="4 years"), date_labels="%Y")+
+  theme(axis.text.x=element_text(angle=90))
+
 ggsave(here("Plots", "book_occupation_share_per_party.png"))
 
 ces %>% 
   select(election, Occupation, vote2) %>% 
-  filter(election>1978) %>% 
+  filter(election>1978& election!=2000& election!=2021) %>% 
+  mutate(election=ymd(election, truncated=2L)) %>% 
   group_by(election, vote2, Occupation) %>% 
   summarize(n=n()) %>% 
-  filter(!is.na(vote2)) %>% 
+  #filter(!is.na(vote2)) %>% 
   mutate(pct=n/sum(n)) %>% 
   filter(vote2!="Green") %>% 
-  filter(!is.na(Occupation)) %>% 
+  #filter(!is.na(Occupation)) %>% 
   ggplot(., aes(x=election, y=pct*100, linetype=vote2, group=vote2))+
   geom_line()+
   facet_wrap(~Occupation)+scale_linetype_manual(values=c(1,2,3,4))+
-  labs(y="Percent", x="Election", title="Share Of Each Party's Electorate By Class",linetype="Vote")+theme(axis.text.x=element_text(angle=90))
-ggsave(here("Plots", "book_party_share_by_occupation.png"), width=8, height=4)
+  labs(y="Percent", x="Election", title="Share Of Each Party's Electorate By Class",linetype="Vote")+
+  theme(axis.text.x=element_text(angle=90))+
+  scale_x_date(breaks= seq.Date(from=as.Date("1980-01-01"), to=as.Date("2021-01-01"), by="5 years"), date_labels="%Y")
+  
+ggsave(here("Plots", "book_party_share_by_occupation.png"), width=10, height=8)
 
 ces$region2<-factor(ces$region2, levels=c("Atlantic", "Quebec", "Ontario", "West"))
 ces$income_tertile
@@ -104,6 +120,7 @@ ces19phone %>%
   group_by(occupation3, vote) %>% 
   #Count
   summarize(n=n()) %>% 
+  View()
   #Form percents
   #This should be the vote flows of 2015 NDP voters by occupation 
   mutate(pct=n/sum(n)) %>% 
@@ -111,6 +128,7 @@ ces19phone %>%
   filter(!is.na(vote)) %>% 
   #We don't want people with other votes in 2019
   filter(vote!="Other") %>% 
+  filter(occupation3=="Skilled"|occupation3=="Unskilled")
   #This cleans up the occupation variable and combines the unskilled and skilled categories
   mutate(occupation4=Recode(occupation3, "'Routine_Nonmanual'='Routine Non-Manual'; 'Skilled'='Working Class';
                             'Unskilled'='Working Class'; 
@@ -146,7 +164,9 @@ mutate(Issue=Recode(mip, "'Jobs'='Jobs and Economy' ;
   #filter(Election==2019) %>% 
   filter(str_detect(Issue, "Jobs|Environment|Immigration|Health|Energy")) %>% 
   filter(!is.na(occupation3)) %>% 
-  ggplot(., aes(y=occupation3, x=Percent, fill=fct_relevel(Issue, "Environment", "Energy")))+
-  facet_grid(~Election)+geom_col(position="dodge")+labs(y="Class")+scale_fill_grey()
+  ggplot(., aes(y=fct_relevel(occupation3, "Working Class", "Routine Non-Manual", "Self-Employed", "Professional", "Managers"), x=Percent, fill=fct_relevel(Issue, "Environment", "Energy")))+
+  facet_grid(~Election)+geom_col(position="dodge")+labs(y="Class", fill="Issue")+scale_fill_grey(guide=guide_legend(reverse=T))
 ggsave(here("Plots", "book_mip_change.png"))
-  
+
+
+
