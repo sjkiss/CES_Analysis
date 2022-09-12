@@ -338,6 +338,9 @@ ces04 %>%
 table(ces04$survey, ces04$non_charter_language)
 ces04 %>% 
   rename(income_tertile=income_tertile04)->ces04
+ces04 %>% 
+  rename(national_retrospective=national_retrospective04)->ces04
+
 #### Rename CES06 ####
 ces06 %>% 
   rename(income2=income062)->ces06
@@ -444,6 +447,8 @@ ces06 %>%
   rename(market1=market061)->ces06
 ces06 %>% 
   rename(market2=market062)->ces06
+ces06 %>% 
+  rename(national_retrospective=national_retrospective06)->ces06
 table(ces06$survey, ces06$non_charter_language)
 
 #### Rename CES08 ####
@@ -553,6 +558,8 @@ ces08 %>%
   rename(market1=market081)->ces08
 ces08 %>% 
   rename(market2=market082)->ces08
+ces08 %>% 
+  rename(national_retrospective=national_retrospective08)->ces08
 table(ces08$survey, ces08$non_charter_language)
 
 #### Rename CES11 ####
@@ -662,6 +669,9 @@ ces11 %>%
   rename(market2=market112)->ces11
 ces11 %>% 
   rename(income_tertile=income_tertile11)->ces11
+ces11 %>% 
+  rename(national_retrospective=national_retrospective11)->ces11
+
 #### Rejoin the Files To Make CES ####
 
 #For some years there are no variables (e.g. 1965 does not have a union variable)
@@ -700,7 +710,7 @@ common_vars<-c('male',
                'traditionalism2', 
                'trad1', 'trad2', 'immigration_rates',
                'market1','market2',
-               'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 
+               'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 
                'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2')
 #Start with the data frame
 ces.list %>% 

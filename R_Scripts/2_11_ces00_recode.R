@@ -545,6 +545,14 @@ val_labels(ces00$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 val_labels(ces00$personal_retrospective)
 table(ces00$personal_retrospective, ces00$cpsc1 , useNA = "ifany" )
 
+#recode National Retrospective (cpsg1)
+look_for(ces00, "economy")
+ces00$national_retrospective<-Recode(ces00$cpsg1, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces00$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces00$national_retrospective)
+table(ces00$national_retrospective, ces00$cpsg1 , useNA = "ifany" )
+
 #recode Ideology (cpspla36)
 look_for(ces00, "the left")
 ces00$ideology<-Recode(ces00$cpspla36, "1=0; 3=1; 5=0.5; else=NA")

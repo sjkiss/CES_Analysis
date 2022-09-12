@@ -586,6 +586,14 @@ val_labels(ces93$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 val_labels(ces93$personal_retrospective)
 table(ces93$personal_retrospective, ces93$CPSC1 , useNA = "ifany" )
 
+#recode National Retrospective (CPSH1)
+look_for(ces93, "economy")
+ces93$national_retrospective<-Recode(ces93$CPSH1, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces93$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces93$national_retrospective)
+table(ces93$national_retrospective, ces93$CPSH1 , useNA = "ifany" )
+
 #recode Ideology (REFH211)
 look_for(ces93, "self")
 ces93$ideology<-Recode(ces93$REFH21 , "1=0; 3=1; 5=0.5; else=NA")

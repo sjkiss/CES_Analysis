@@ -643,6 +643,14 @@ val_labels(ces0411$personal_retrospective04)<-c(Worse=0, Same=0.5, Better=1)
 val_labels(ces0411$personal_retrospective04)
 table(ces0411$personal_retrospective04, ces0411$ces04_CPS_F1 , useNA = "ifany" )
 
+#### recode National Retrospective (ces04_CPS_M1) ####
+look_for(ces0411, "economy")
+ces0411$national_retrospective04<-Recode(ces0411$ces04_CPS_M1, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$national_retrospective04)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces0411$national_retrospective04)
+table(ces0411$national_retrospective04, ces0411$ces04_CPS_M1 , useNA = "ifany" )
+
 #### recode Ideology (ces04_MBS_H10) ####
 look_for(ces0411, "scale")
 ces0411$ideology04<-Recode(ces0411$ces04_MBS_H10, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
@@ -1420,6 +1428,14 @@ val_labels(ces0411$personal_retrospective06)<-c(Worse=0, Same=0.5, Better=1)
 #checks
 val_labels(ces0411$personal_retrospective06)
 table(ces0411$personal_retrospective06, ces0411$ces06_CPS_F1 , useNA = "ifany" )
+
+#### recode National Retrospective (ces06_CPS_M1) ####
+look_for(ces0411, "economy")
+ces0411$national_retrospective06<-Recode(ces0411$ces06_CPS_M1, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$national_retrospective06)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces0411$national_retrospective06)
+table(ces0411$national_retrospective06, ces0411$ces06_CPS_M1 , useNA = "ifany" )
 
 #### #recode Immigrants take Jobs away (ces06_PES_G10)#### 
 look_for(ces0411, "jobs")
@@ -2288,11 +2304,6 @@ table(ces0411$education08, ces0411$ces08_PES_D1D , useNA = "ifany" )
 
 ####recode Personal Retrospective (ces08_CPS_F1 & ces08_PES_F1N) ####
 look_for(ces0411, "financial")
-ces0411$personal_retrospective11<-Recode(ces0411$ces08_CPS_F1, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
-val_labels(ces0411$personal_retrospective11)<-c(Worse=0, Same=0.5, Better=1)
-#checks
-val_labels(ces0411$personal_retrospective11)
-table(ces0411$personal_retrospective11, ces0411$CPS11_66 , useNA = "ifany" )
 
 ces0411 %>% 
   mutate(personal_retrospective08=case_when(
@@ -2306,6 +2317,22 @@ val_labels(ces0411$personal_retrospective08)<-c(Worse=0, Same=0.5, Better=1)
 val_labels(ces0411$personal_retrospective08)
 table(ces0411$personal_retrospective08, ces0411$ces08_CPS_F1, ces0411$ces08_PES_F1N, useNA = "ifany" )
 table(ces0411$personal_retrospective08, useNA = "ifany" )
+
+#### recode National Retrospective (ces08_CPS_M1 & ces08_PES_M1) ####
+look_for(ces0411, "economy")
+
+ces0411 %>% 
+  mutate(national_retrospective08=case_when(
+    ces08_CPS_M1==1 | ces08_PES_M1==1~ 1,
+    ces08_CPS_M1==3 | ces08_PES_M1==3~ 0,
+    ces08_CPS_M1==5 | ces08_PES_M1==5~ 0.5,
+    ces08_CPS_M1==8 | ces08_PES_M1==8~ 0.5,
+  ))->ces0411
+val_labels(ces0411$national_retrospective08)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces0411$national_retrospective08)
+table(ces0411$national_retrospective08, ces0411$ces08_CPS_M1, ces0411$ces08_PES_M1, useNA = "ifany" )
+table(ces0411$national_retrospective08, useNA = "ifany" )
 
 #### recode Ideology (ces08_MBS_I12) ####
 look_for(ces0411, "scale")
@@ -2906,6 +2933,14 @@ val_labels(ces0411$personal_retrospective11)<-c(Worse=0, Same=0.5, Better=1)
 #checks
 val_labels(ces0411$personal_retrospective11)
 table(ces0411$personal_retrospective11, ces0411$CPS11_66 , useNA = "ifany" )
+
+#### recode National Retrospective (CPS11_39) ####
+look_for(ces0411, "economy")
+ces0411$national_retrospective11<-Recode(ces0411$CPS11_39, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$national_retrospective11)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces0411$national_retrospective11)
+table(ces0411$national_retrospective11, ces0411$CPS11_39 , useNA = "ifany" )
 
 #### recode Ideology (MBS11_K5) ####
 look_for(ces0411, "scale")
