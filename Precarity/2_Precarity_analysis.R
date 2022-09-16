@@ -32,6 +32,7 @@ cor(cps$income, cps$consequence, use="complete.obs")
 ## Is probability of job loss correlated with income?
 cor(cps$income, cps$probability, use="complete.obs")
 #Answer, the greater the income , the lower the probability of job loss. 
+#### Factor analysis
 
 #### Voting for the Right ####
 m1<-glm(right~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner), family="binomial", data=cps)
@@ -170,8 +171,81 @@ library(gt)
 library(knitr)
 library(xtable)
 library(kableExtra)
+
+
+#### 
+cps %>% 
+  select(starts_with("precarity"))
 save_kable(kable(cor(cps$education, cps$probability, use="complete.obs"),format="html" , caption="Correlation Between Years of Education And Probability of Job Loss"), file=here("Precarity", "Tables", "Correlation_years_education_probability_job_loss.html"))
 lookfor(cps, "employ")
 prop.table(table(as_factor(cps$cps19_employment), cps$probability),2)
 
-View(var_label(cps))
+
+# 
+names(cps)
+#Weight the thing
+library(survey)
+lookfor(cps, "weight")
+cps$region<-as_factor(cps$region)
+cps_des<-svydesign(ids=~0, weights=~cps19_weight_general_lfs, 
+          data=subset(cps, !is.na(cps$cps19_weight_general_lfs)))
+cps_des
+table(cps$region2)
+as_factor(cps$region)
+names(cps)
+m1<-svyglm(right~volatility_x+probability_x+consequence_x+
+             region+
+           age+
+             degree+
+             #male+
+             income+
+             homeowner+
+             native+
+             ideology+immigrants,
+           #  as_factor(cps$region), 
+           design=cps_des)
+
+m2<-svyglm(right~volatility_x+probability_x+consequence_x+
+             region+
+             age+
+             degree+
+             male+
+             income+
+             homeowner+
+             native+
+             ideology+
+             immigrants+volatility_x*immigrants,
+           #  as_factor(cps$region), 
+           design=cps_des)
+
+m3<-svyglm(right~volatility_x+probability_x+consequence_x+
+             region+
+             age+
+             degree+
+             male+
+             income+
+             homeowner+
+             native+
+             ideology+
+             immigrants+probability_x*immigrants,
+           #  as_factor(cps$region), 
+           design=cps_des)
+m4<-svyglm(right~volatility_x+probability_x+consequence_x+
+             region+
+             age+
+             degree+
+             male+
+             income+
+             homeowner+
+             native+
+             ideology+
+             immigrants+consequence_x*immigrants,
+           #  as_factor(cps$region), 
+           design=cps_des)
+cps$immigrants
+library(modelsummary)
+modelsummary(list(m1, m2, m3, m4), stars=T)
+str(m1)
+library(ggeffects)
+
+ggpredict(m2, terms=c("volatility_x", "nativism[meansd]")) 

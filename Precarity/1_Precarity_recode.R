@@ -17,11 +17,23 @@ cps<-ces19_kiss
 
 #### Search For precarity variables#### 
 #search for our variables
+
+conv_names <- function(x) {
+  setNames(x, iconv(names(x), from="latin1", to="UTF-8"))
+}
+conv_val_labels <- function(x) {
+  if(is.labelled(x)) {
+  val_labels(x) <- conv_names(val_labels(x))
+  x}
+  else{x}
+}
+
+is.labelled(cps$cps19_imp_iss)
+cps <- map_dfc(cps, conv_val_labels)
 library(labelled)
 look_for(cps, "income") #income volatility is kiss_q1
 look_for(cps, "job")
 look_for(cps, "business")
-
 ##looks like kiss_q1 is income volatility; kiss_q2_* are the probability of loss; and kiss_q3_* are the consequences. 
 
 #Print all the variable labels
@@ -41,6 +53,7 @@ cps %>%
 #### Scaling Precarity Variables
 ## Note, low numbers are currently high risk, high numbers are low risk; we should reverse these and set 6 to missing 
 #this code takes 1q, sets 5 to be NA and reverses the values. 
+
 cps %>% 
   mutate(kiss_q1_out=case_when(
     kiss_q1== 1 ~ 3,
@@ -66,6 +79,7 @@ cps %>%
 #let's rename the variables right away
 cps %>% 
   rename(., "volatility"=kiss_q1_out, "job_prob"=kiss_q2_job_out, "job_cons"=kiss_q3_job_out, "bus_prob"=kiss_q2_business_out, "bus_cons"=kiss_q3_business_out)-> cps
+
 names(cps)
 table(cps$volatility,  useNA = "ifany" )
 table(cps$job_prob,  useNA = "ifany" )
@@ -96,22 +110,16 @@ cps %>%
   ))->cps
 table(cps$consequence, useNA = "ifany" )
 
+#### Rescale 0 to 1
+cps %>% 
+  mutate(across(c(probability, volatility, consequence), scales::rescale, .names="{.col}_x"))->cps
+
 #### Combine Precarity Index
 #recode into a precarity index (combines volatility + probability + consequence)
 cps$precarity1<-cps$volatility
 cps$precarity2<-cps$probability
 cps$precarity3<-cps$consequence
 
-cps %>% 
-  rowwise() %>% 
-  mutate(precarity=mean(
-    c_across(precarity1:precarity3)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('precarity1', 'precarity2', 'precarity3', 'precarity')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na<4)
 
 
 #Scale Averaging 
@@ -140,6 +148,8 @@ cps %>%
   select(precarity1, precarity2, precarity3) %>% 
   cor(., use="complete.obs")
 
+library(psych)
+scree(cps[,c("precarity1", "precarity2", "precarity3")])
 #### recode control variables ####
 #recode Gender (cps19_gender)
 look_for(cps, "gender")
@@ -547,4 +557,12 @@ cps %>%
 cps %>% 
   select(authoritarian1, authoritarian2) %>% 
   cor(., use="complete.obs")
-
+cps %>% 
+  select(starts_with("precarity"), male) %>% 
+  as_factor() %>% 
+  pivot_longer(1:3) %>% 
+  group_by(male, name) %>% 
+  summarize(average=mean(value, na.rm=T)) %>% 
+  ggplot(., aes(x=male, y=average))+geom_point()+facet_wrap(~name)
+  
+  
