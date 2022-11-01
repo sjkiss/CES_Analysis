@@ -165,6 +165,6 @@ cps %>%
 ## Descriptives
 table(as_factor(cps$cps19_employment))
 look_for(cps, "employ")
-?poly
+
 poly(cps$cps19_income_number, 2)
 str(cps)

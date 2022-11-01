@@ -27,10 +27,10 @@ conv_val_labels <- function(x) {
   x}
   else{x}
 }
-
+library(labelled)
 is.labelled(cps$cps19_imp_iss)
 cps <- map_dfc(cps, conv_val_labels)
-library(labelled)
+f
 look_for(cps, "income") #income volatility is kiss_q1
 look_for(cps, "job")
 look_for(cps, "business")
@@ -147,8 +147,19 @@ cps %>%
 cps %>% 
   select(precarity1, precarity2, precarity3) %>% 
   cor(., use="complete.obs")
+cps %>% 
+  select(precarity1, precarity2, precarity3) %>% 
+  cor(., use="complete.obs")->precarity_matrix
+principal(precarity_matrix)
+principal(precarity_matrix, nfactors=2)
+principal(precarity_matrix, nfactors=3)
+?fa
 
 library(psych)
+cps %>% 
+  select(precarity1, precarity2, precarity3) %>% 
+  corr.test(.) %>% 
+  print(., short=F)
 scree(cps[,c("precarity1", "precarity2", "precarity3")])
 #### recode control variables ####
 #recode Gender (cps19_gender)

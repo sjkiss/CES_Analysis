@@ -29,42 +29,7 @@
 #
 # #Overwrite ces19phone with out
 # ces19phone<-out
-# #### Add Occupations to 2019 phone####
-# # data("ces19phone")
-#
-# noc<-read_excel(path="/Users/skiss/OneDrive - Wilfrid Laurier University/projects_folder/CES_Folder/Data/unique-occupations-updated.xls", col_names=T)
-# head(noc)
-# ces19phone$p52<-tolower(ces19phone$p52)
-# #
-# #
-# noc %>%
-#   select(p52, NOC) %>%
-#   full_join(ces19phone, ., by="p52")->out
-# out$NOC
-# #Provide Check
-# #Jobs uNique to Government program
-# out %>%
-#   filter(NOC==4168) %>%
-#   select(p52)
-# #Teachers
-# out %>%
-#   filter(NOC==4031) %>%
-#   select(p52) %>%
-#   print(n=100)
-# #Carpenters
-# out %>%
-#   filter(NOC==7271) %>%
-#   select(p52) %>%
-#   print(n=100)
-# #Check that weird librarian
-# out[3059,'NOC']
-# #replace ces19phone with out
-# ces19phone<-out
-# ces19phone[3059,'NOC']
-# names(ces19phone)
-#
-# library(labelled)
-# library(tidyverse)
+
 #
 #
 # # #### Save ces19phone after NOC and MIP###
