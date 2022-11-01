@@ -340,6 +340,8 @@ ces04 %>%
   rename(income_tertile=income_tertile04)->ces04
 ces04 %>% 
   rename(national_retrospective=national_retrospective04)->ces04
+ces04 %>% 
+  rename(enviro=enviro04)->ces04
 
 #### Rename CES06 ####
 ces06 %>% 
@@ -449,6 +451,8 @@ ces06 %>%
   rename(market2=market062)->ces06
 ces06 %>% 
   rename(national_retrospective=national_retrospective06)->ces06
+ces06 %>% 
+  rename(enviro=enviro06)->ces06
 table(ces06$survey, ces06$non_charter_language)
 
 #### Rename CES08 ####
@@ -560,6 +564,8 @@ ces08 %>%
   rename(market2=market082)->ces08
 ces08 %>% 
   rename(national_retrospective=national_retrospective08)->ces08
+ces08 %>% 
+  rename(enviro=enviro08)->ces08
 table(ces08$survey, ces08$non_charter_language)
 
 #### Rename CES11 ####
@@ -671,6 +677,8 @@ ces11 %>%
   rename(income_tertile=income_tertile11)->ces11
 ces11 %>% 
   rename(national_retrospective=national_retrospective11)->ces11
+ces11 %>% 
+  rename(enviro=enviro11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -711,7 +719,7 @@ common_vars<-c('male',
                'trad1', 'trad2', 'immigration_rates',
                'market1','market2',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 
-               'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2')
+               'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'enviro')
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
