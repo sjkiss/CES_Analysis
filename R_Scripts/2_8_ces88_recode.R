@@ -33,7 +33,7 @@ table(ces88$union_both)
 #recode Education (n3)
 look_for(ces88, "education")
 ces88$degree<-Recode(ces88$n3, "9:11=1; 1:8=0; else=NA")
-val_labels(ces88$degree)<-c(nodegree=0, degree=1)
+val_labels(ces88$degree)<-c(`No degree`=0, degree=1)
 #checks
 val_labels(ces88$degree)
 table(ces88$degree)
@@ -121,11 +121,13 @@ table(ces88$party_id)
 
 #recode Vote (xb2)
 look_for(ces88, "vote")
-ces88$vote<-Recode(ces88$xb2, "2=1; 1=2; 3=3; 4=2; 5=0; else=NA")
+
+ces88$vote<-car::Recode(as.numeric(ces88$xb2), "2=1; 1=2; 3=3; 4=2; 5=0; else=NA")
 val_labels(ces88$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
 val_labels(ces88$vote)
 table(ces88$vote)
+table(ces88$xb2)
 
 #recode Occupation (pinpor81)
 look_for(ces88, "occupation")
@@ -201,7 +203,7 @@ ces88 %>%
   mutate(market_liberalism=rowMeans(select(., matches('market[0-9]')), na.rm=T))->ces88
 
 
-cor(ces88$market_liberalism, ces88$market_liberalism2, use="complete.obs")
+#cor(ces88$market_liberalism, ces88$market_liberalism2, use="complete.obs")
 ces88 %>% 
   select(starts_with("market")) %>% 
   summary()
@@ -331,11 +333,25 @@ table(ces88$death_penalty, ces88$qf1)
 #recode Crime (qh11) (Left-Right)
 look_for(ces88, "crime")
 #remotes::install_github('sjkiss/skpersonal')
-#library(skpersonal)
-ces88$qh11
+library(skpersonal)
 
-ces88$crime<-skpersonal::revScale(as.numeric(ces88$qh11), reverse=T)
+#ces88$crime<-skpersonal::revScale(as.numeric(ces88$qh11), reverse=T)
+#First reverse code item so that 12 is most important and 1 is least important
+ces88$crime<-Recode(ces88$qh11, "12=1;
+       11=2;
+       10=3;
+       9=4;
+       8=5;
+       7=6;
+       6=7;
+       5=8;
+       4=9;
+       3=10;
+       2=11;
+       1=12", as.numeric=T)
+#Then scale to 0 and 1
 
+ces88$crime<-scales::rescale(as.numeric(ces88$crime))
 summary(ces88$crime)
 table(ces88$crime, ces88$qh11 , useNA = "ifany" )
 summary(ces88$qh11)
@@ -578,3 +594,4 @@ ces88$postgrad<-Recode(ces88$n3, "10:11=1; 1:9=0; else=NA")
 #checks
 table(ces88$postgrad)
 ces88$authoritarianism
+
