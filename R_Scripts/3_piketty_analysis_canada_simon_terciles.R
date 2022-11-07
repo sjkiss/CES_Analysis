@@ -1019,7 +1019,8 @@ ces %>%
   filter(election>1988 & election<2020) %>% 
   as_factor() %>% 
   #mutate(Income=fct_relevel(income2, "Lowest", "Middle", "Highest")) %>% 
-  rename(Degree=postgrad, Vote=vote2, Redistribution=redistribution, Election=election) %>% 
+  mutate(Degree=Recode(postgrad, "1='Degree'; 0='No Degree'", levels=c("No Degree", "Degree"))) %>% 
+  rename(Vote=vote2, Redistribution=redistribution, Election=election) %>% 
   #pivot_longer(., cols=c("Degree", "Income"), names_to=c("Variable"), values_to=c("Value")) %>% 
   group_by(Election, Vote, Degree) %>% 
   filter(!is.na(Vote)&Vote!="Green"& Vote!="BQ") %>% 
@@ -1027,9 +1028,12 @@ ces %>%
   filter(!is.na(Degree)) %>% 
   summarize(avg=mean(Redistribution, na.rm=T), n=n(), sd=sd(Redistribution, na.rm=T), se=sd/sqrt(n)) %>% 
   arrange(Election, Degree, Vote) %>% 
-  ggplot(. ,aes(x=avg, y=fct_reorder(Election, desc(Election)), col=Degree))+geom_point()+facet_grid(~Vote)+
+  ggplot(. ,aes(x=avg, y=fct_reorder(Election, desc(Election)), col=Degree))+
+  geom_point()+
+  facet_grid(~Vote)+
   scale_color_grey(start=0.8, end=0.2)+
-  geom_errorbar(aes(xmin=avg-(1.96*se), xmax=avg+(1.96*se), width=0))+geom_vline(xintercept=0.5, linetype=2)+
+  geom_errorbar(aes(xmin=avg-(1.96*se), xmax=avg+(1.96*se), width=0))+
+  geom_vline(xintercept=0.5, linetype=2)+
   labs(y="Year") 
 ggsave(filename=here("Plots", "means_postgrad_redistribution_party.png"), width=8, height=8)
 
@@ -1140,27 +1144,3 @@ interaction.models2 %>%
   ggplot(., aes(x=Period, y=estimate, col=Period))+geom_point()+facet_grid(term~fct_relevel(Party, "NDP", "Liberal"), scales="free")+scale_color_grey(start=0.8, end=0.2) +geom_errorbar(width=0, aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+   geom_hline(yintercept=0,  linetype=2)+theme(strip.text.y.right = element_text(angle = 0))+labs(y="Coefficient")
 ggsave(filename=here("Plots", "postgrad_redistribution_interaction_terms.png"), width=8, height=4)
 
-#### Check Cronbach's alpha ####
-
-library(psych)
-#Traditionalism
-ces %>% 
-  filter(election>1988 & election<2020) %>% 
-  select(trad1, trad2) %>% 
-  psych::alpha(.)
-
-ces %>% 
-  filter(election>1988 & election<2020) %>% 
-  select(trad1, trad2) %>% 
-  cor(., use="complete.obs")
-
-#Market Liberalism
-ces %>% 
-  filter(election>1988 & election<2020) %>% 
-  select(market1, market2) %>% 
-  psych::alpha(.)
-
-ces %>% 
-  filter(election>1988 & election<2020) %>% 
-  select(market1, market2) %>% 
-  cor(., use="complete.obs")
