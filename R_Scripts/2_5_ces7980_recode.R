@@ -250,6 +250,54 @@ val_labels(ces7980$turnout)
 table(ces7980$turnout)
 table(ces7980$turnout, ces7980$vote)
 
+#### recode political efficacy ####
+#recode No Say (V1044)
+look_for(ces7980, "no say")
+ces7980$efficacy_internal<-Recode(ces7980$V1044, "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+val_labels(ces7980$efficacy_internal)<-c(low=0, high=1)
+#checks
+val_labels(ces7980$efficacy_internal)
+table(ces7980$efficacy_internal)
+table(ces7980$efficacy_internal, ces7980$V24 , useNA = "ifany" )
+
+#recode MPs lose touch (V1041)
+look_for(ces7980, "lose touch")
+ces7980$efficacy_external<-Recode(ces7980$V1041, "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+val_labels(ces7980$efficacy_external)<-c(low=0, high=1)
+#checks
+val_labels(ces7980$efficacy_external)
+table(ces7980$efficacy_external)
+table(ces7980$efficacy_external, ces7980$V21 , useNA = "ifany" )
+
+#recode Official Don't Care (V1042)
+look_for(ces7980, "doesn't care")
+ces7980$efficacy_external2<-Recode(ces7980$V1042, "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+val_labels(ces7980$efficacy_external2)<-c(low=0, high=1)
+#checks
+val_labels(ces7980$efficacy_external2)
+table(ces7980$efficacy_external2)
+table(ces7980$efficacy_external2, ces7980$V22 , useNA = "ifany" )
+
+ces7980 %>% 
+  mutate(political_efficacy=rowMeans(select(., c("efficacy_external", "efficacy_external2", "efficacy_internal")), na.rm=T))->ces7980
+
+ces7980 %>% 
+  select(starts_with("efficacy")) %>% 
+  summary()
+#Check distribution of political_efficacy
+qplot(ces7980$political_efficacy, geom="histogram")
+table(ces7980$political_efficacy, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces7980 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  psych::alpha(.)
+#Check correlation
+ces7980 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  cor(., use="complete.obs")
+
 #recode Most Important Question (V1154)
 look_for(ces7980, "MOST IMPORTANT ISSUE")
 ces7980$mip<-Recode(ces7980$V1154, "1:7=7; 8=3; 9:10=9; 11:12=7; 13=6; 14=8; 15:16=15; 17=12; 18=0; 19:20=5;

@@ -566,6 +566,55 @@ val_labels(ces97$turnout)
 table(ces97$turnout)
 table(ces97$turnout, ces97$vote)
 
+#### recode political efficacy ####
+#recode No Say (cpsb10b)
+look_for(ces97, "not have say")
+ces97$efficacy_internal<-Recode(ces97$cpsb10b, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces97$efficacy_internal)<-c(low=0, high=1)
+#checks
+val_labels(ces97$efficacy_internal)
+table(ces97$efficacy_internal)
+table(ces97$efficacy_internal, ces97$cpsb10b , useNA = "ifany" )
+
+#recode MPs lose touch (cpsb10a)
+look_for(ces97, "lose touch")
+ces97$efficacy_external<-Recode(ces97$cpsb10a, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces97$efficacy_external)<-c(low=0, high=1)
+#checks
+val_labels(ces97$efficacy_external)
+table(ces97$efficacy_external)
+table(ces97$efficacy_external, ces97$cpsb10a , useNA = "ifany" )
+
+#recode Official Don't Care (cpsb10d)
+look_for(ces97, "cares what")
+ces97$efficacy_external2<-Recode(ces97$cpsb10d, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces97$efficacy_external2)<-c(low=0, high=1)
+#checks
+val_labels(ces97$efficacy_external2)
+table(ces97$efficacy_external2)
+table(ces97$efficacy_external2, ces97$cpsb10d , useNA = "ifany" )
+
+ces97 %>% 
+  mutate(political_efficacy=rowMeans(select(., c("efficacy_external", "efficacy_external2", "efficacy_internal")), na.rm=T))->ces97
+
+ces97 %>% 
+  select(starts_with("efficacy")) %>% 
+  summary()
+#Check distribution of political_efficacy
+qplot(ces97$political_efficacy, geom="histogram")
+table(ces97$political_efficacy, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces97 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  psych::alpha(.)
+#Check correlation
+ces97 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  cor(., use="complete.obs")
+
+
 #recode Most Important Question (cpsa1)
 look_for(ces97, "issue")
 ces97$mip<-Recode(ces97$cpsa1, "10:16=6; 20:25=7; 26=10; 30:34=7; 35=0; 36:38=7; 40:41=10; 42:43=3; 44=13; 45=15; 

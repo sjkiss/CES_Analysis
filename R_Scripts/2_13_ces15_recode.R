@@ -871,6 +871,54 @@ val_labels(ces15phone$turnout)
 table(ces15phone$turnout)
 table(ces15phone$turnout, ces15phone$vote)
 
+#### recode political efficacy ####
+#recode No Say (MBS15_A10)
+look_for(ces15phone, "have any say")
+ces15phone$efficacy_internal<-Recode(ces15phone$MBS15_A10, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces15phone$efficacy_internal)<-c(low=0, high=1)
+#checks
+val_labels(ces15phone$efficacy_internal)
+table(ces15phone$efficacy_internal)
+table(ces15phone$efficacy_internal, ces15phone$MBS15_A10 , useNA = "ifany" )
+
+#recode MPs lose touch (MBS15_A8)
+look_for(ces15phone, "lose touch")
+ces15phone$efficacy_external<-Recode(ces15phone$MBS15_A8, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces15phone$efficacy_external)<-c(low=0, high=1)
+#checks
+val_labels(ces15phone$efficacy_external)
+table(ces15phone$efficacy_external)
+table(ces15phone$efficacy_external, ces15phone$MBS15_A8 , useNA = "ifany" )
+
+#recode Official Don't Care (PES15_48)
+look_for(ces15phone, "care much")
+ces15phone$efficacy_external2<-Recode(ces15phone$PES15_48, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces15phone$efficacy_external2)<-c(low=0, high=1)
+#checks
+val_labels(ces15phone$efficacy_external2)
+table(ces15phone$efficacy_external2)
+table(ces15phone$efficacy_external2, ces15phone$PES15_48 , useNA = "ifany" )
+
+ces15phone %>% 
+  mutate(political_efficacy=rowMeans(select(., c("efficacy_external", "efficacy_external2", "efficacy_internal")), na.rm=T))->ces15phone
+
+ces15phone %>% 
+  select(starts_with("efficacy")) %>% 
+  summary()
+#Check distribution of political_efficacy
+qplot(ces15phone$political_efficacy, geom="histogram")
+table(ces15phone$political_efficacy, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces15phone %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  psych::alpha(.)
+#Check correlation
+ces15phone %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  cor(., use="complete.obs")
+
 #### recode satisfaction with democracy (CPS15_0) ####
 look_for(ces15phone, "dem")
 ces15phone$satdem<-Recode(ces15phone$CPS15_0, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
@@ -907,3 +955,10 @@ look_for(ces15phone, "education")
 ces15phone$postgrad<-Recode(ces15phone$CPS15_79, "10:11=1; 1:9=0; else=NA")
 #checks
 table(ces15phone$postgrad)
+
+#recode Perceive Inequality (PES15_32)
+look_for(ces15phone, "ineq")
+ces15phone$inequality<-Recode(ces15phone$PES15_32, "1=1; 5=0; 8=0.5; else=NA")
+#checks
+table(ces15phone$inequality)
+table(ces15phone$inequality, ces15phone$PES15_32)

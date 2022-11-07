@@ -784,3 +784,10 @@ look_for(ces19phone, "education")
 ces19phone$postgrad<-Recode(ces19phone$q61, "10:11=1; 1:9=0; else=NA")
 #checks
 table(ces19phone$postgrad)
+
+#recode efficacy rich (p20_n)
+look_for(ces19phone, "rich")
+ces19phone$efficacy_rich<-Recode(ces19phone$p20_n, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces19phone$efficacy_rich)
+table(ces19phone$efficacy_rich, ces19phone$p20_n)

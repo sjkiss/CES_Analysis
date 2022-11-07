@@ -267,7 +267,7 @@ val_labels(ces84$ideology)<-c(Left=0, Right=1)
 val_labels(ces84$ideology)
 table(ces84$ideology, ces84$VAR507  , useNA = "ifany")
 
-#recode turnout (vAR124)
+#recode turnout (VAR124)
 look_for(ces84, "vote")
 ces84$turnout<-Recode(ces84$VAR124, "1=1; 2=0;  8=0; else=NA")
 val_labels(ces84$turnout)<-c(No=0, Yes=1)
@@ -275,6 +275,54 @@ val_labels(ces84$turnout)<-c(No=0, Yes=1)
 val_labels(ces84$turnout)
 table(ces84$turnout)
 table(ces84$turnout, ces84$vote)
+
+#### recode political efficacy ####
+#recode No Say (VAR032)
+look_for(ces84, "have any say")
+ces84$efficacy_internal<-Recode(ces84$VAR032, "1=0; 2=0.25; 3=0.75; 4=1; 7=0.5; else=NA", as.numeric=T)
+val_labels(ces84$efficacy_internal)<-c(low=0, high=1)
+#checks
+val_labels(ces84$efficacy_internal)
+table(ces84$efficacy_internal)
+table(ces84$efficacy_internal, ces84$VAR032 , useNA = "ifany" )
+
+#recode MPs lose touch (VAR029)
+look_for(ces84, "touch")
+ces84$efficacy_external<-Recode(ces84$VAR029, "1=0; 2=0.25; 3=0.75; 4=1; 7=0.5; else=NA", as.numeric=T)
+val_labels(ces84$efficacy_external)<-c(low=0, high=1)
+#checks
+val_labels(ces84$efficacy_external)
+table(ces84$efficacy_external)
+table(ces84$efficacy_external, ces84$VAR029 , useNA = "ifany" )
+
+#recode Official Don't Care (VAR030)
+look_for(ces84, "doesn't care")
+ces84$efficacy_external2<-Recode(ces84$VAR030, "1=0; 2=0.25; 3=0.75; 4=1; 7=0.5; else=NA", as.numeric=T)
+val_labels(ces84$efficacy_external2)<-c(low=0, high=1)
+#checks
+val_labels(ces84$efficacy_external2)
+table(ces84$efficacy_external2)
+table(ces84$efficacy_external2, ces74$VAR030 , useNA = "ifany" )
+
+ces84 %>% 
+  mutate(political_efficacy=rowMeans(select(., c("efficacy_external", "efficacy_external2", "efficacy_internal")), na.rm=T))->ces84
+
+ces84 %>% 
+  select(starts_with("efficacy")) %>% 
+  summary()
+#Check distribution of political_efficacy
+qplot(ces84$political_efficacy, geom="histogram")
+table(ces84$political_efficacy, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces84 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  psych::alpha(.)
+#Check correlation
+ces84 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  cor(., use="complete.obs")
 
 #recode Most Important Question (VAR065)
 look_for(ces84, "issue")

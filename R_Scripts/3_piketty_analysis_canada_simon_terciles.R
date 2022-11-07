@@ -1140,3 +1140,27 @@ interaction.models2 %>%
   ggplot(., aes(x=Period, y=estimate, col=Period))+geom_point()+facet_grid(term~fct_relevel(Party, "NDP", "Liberal"), scales="free")+scale_color_grey(start=0.8, end=0.2) +geom_errorbar(width=0, aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+   geom_hline(yintercept=0,  linetype=2)+theme(strip.text.y.right = element_text(angle = 0))+labs(y="Coefficient")
 ggsave(filename=here("Plots", "postgrad_redistribution_interaction_terms.png"), width=8, height=4)
 
+#### Check Cronbach's alpha ####
+
+library(psych)
+#Traditionalism
+ces %>% 
+  filter(election>1988 & election<2020) %>% 
+  select(trad1, trad2) %>% 
+  psych::alpha(.)
+
+ces %>% 
+  filter(election>1988 & election<2020) %>% 
+  select(trad1, trad2) %>% 
+  cor(., use="complete.obs")
+
+#Market Liberalism
+ces %>% 
+  filter(election>1988 & election<2020) %>% 
+  select(market1, market2) %>% 
+  psych::alpha(.)
+
+ces %>% 
+  filter(election>1988 & election<2020) %>% 
+  select(market1, market2) %>% 
+  cor(., use="complete.obs")

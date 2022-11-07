@@ -570,6 +570,54 @@ val_labels(ces00$turnout)
 table(ces00$turnout)
 table(ces00$turnout, ces00$vote)
 
+#### recode political efficacy ####
+#recode No Say (mbsc12)
+look_for(ces00, "not have say")
+ces00$efficacy_internal<-Recode(ces00$mbsc12, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces00$efficacy_internal)<-c(low=0, high=1)
+#checks
+val_labels(ces00$efficacy_internal)
+table(ces00$efficacy_internal)
+table(ces00$efficacy_internal, ces00$mbsc12 , useNA = "ifany" )
+
+#recode MPs lose touch (mbsc5)
+look_for(ces00, "lose touch")
+ces00$efficacy_external<-Recode(ces00$mbsc5, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces00$efficacy_external)<-c(low=0, high=1)
+#checks
+val_labels(ces00$efficacy_external)
+table(ces00$efficacy_external)
+table(ces00$efficacy_external, ces00$mbsc5 , useNA = "ifany" )
+
+#recode Official Don't Care (cpsb10d)
+look_for(ces00, "cares much")
+ces00$efficacy_external2<-Recode(ces00$cpsb10d, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces00$efficacy_external2)<-c(low=0, high=1)
+#checks
+val_labels(ces00$efficacy_external2)
+table(ces00$efficacy_external2)
+table(ces00$efficacy_external2, ces00$cpsb10d , useNA = "ifany" )
+
+ces00 %>% 
+  mutate(political_efficacy=rowMeans(select(., c("efficacy_external", "efficacy_external2", "efficacy_internal")), na.rm=T))->ces00
+
+ces00 %>% 
+  select(starts_with("efficacy")) %>% 
+  summary()
+#Check distribution of political_efficacy
+qplot(ces00$political_efficacy, geom="histogram")
+table(ces00$political_efficacy, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces00 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  psych::alpha(.)
+#Check correlation
+ces00 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  cor(., use="complete.obs")
+
 #recode Most Important Question (cpsa1)
 look_for(ces00, "issue")
 ces00$mip<-Recode(ces00$cpsa1, "10:15=6; 16=4; 17=0; 20:27=10; 30:36=7; 40:42=0; 43:44=16; 45=0; 46=3; 47=11; 

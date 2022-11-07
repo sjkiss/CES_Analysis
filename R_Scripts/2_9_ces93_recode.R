@@ -1,6 +1,7 @@
 #File to Recode 1993 CES Data 
 #load data
 data("ces93")
+
 #### gender#### 
 #recode Gender (CPSRGEN)
 look_for(ces93, "gender")
@@ -9,6 +10,7 @@ val_labels(ces93$male)<-c(Female=0, Male=1)
 #checks
 val_labels(ces93$male)
 table(ces93$male)
+
 #### union #### 
 #recode Union Household (CPSJOB6)
 look_for(ces93, "union")
@@ -24,6 +26,7 @@ ces93$union_both<-ces93$union
 #checks
 val_labels(ces93$union_both)
 table(ces93$union_both)
+
 ####education  #### 
 #recode Education (CPSO3)
 look_for(ces93, "education")
@@ -46,6 +49,7 @@ val_labels(ces93$degree)<-c(nodegree=0, degree=1)
 #checks
 val_labels(ces93$degree)
 table(ces93$degree)
+
 ####region  #### 
 #recode Region (CPSPROV)
 look_for(ces93, "province")
@@ -54,6 +58,7 @@ val_labels(ces93$region)<-c(Atlantic=1, Ontario=2, West=3)
 #checks
 val_labels(ces93$region)
 table(ces93$region)
+
 #### quebec#### 
 #recode Quebec (CPSPROV)
 look_for(ces93, "province")
@@ -62,6 +67,7 @@ val_labels(ces93$quebec)<-c(Other=0, Quebec=1)
 #checks
 val_labels(ces93$quebec)
 table(ces93$quebec)
+
 #### age#### 
 #recode Age (CPSAGE)
 look_for(ces93, "age")
@@ -69,6 +75,7 @@ ces93$yob<-Recode(ces93$CPSAGE, "9997:9999=NA")
 ces93$age<-1993-ces93$yob
 #check
 table(ces93$age)
+
 #### religion #### 
 #recode Religion (CPSO9)
 look_for(ces93, "relig")
@@ -77,6 +84,7 @@ val_labels(ces93$religion)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 #checks
 val_labels(ces93$religion)
 table(ces93$religion)
+
 #### language#### 
 #recode Language (PESLANG)
 look_for(ces93, "language")
@@ -88,6 +96,7 @@ val_labels(ces93$language)<-c(French=0, English=1)
 #checks
 val_labels(ces93$language)
 table(ces93$language)
+
 #### non-charter language#### 
 #recode Non-charter Language (CPSO16 and REFN16)
 look_for(ces93, "language")
@@ -102,6 +111,7 @@ val_labels(ces93$non_charter_language)<-c(Charter=0, Non_Charter=1)
 #checks
 val_labels(ces93$non_charter_language)
 table(ces93$non_charter_language)
+
 #### employment#### 
 #recode Employment (CPSJOB1)
 look_for(ces93, "employment")
@@ -111,6 +121,7 @@ val_labels(ces93$employment)<-c(Unemployed=0, Employed=1)
 #checks
 val_labels(ces93$employment)
 table(ces93$employment)
+
 #### sector#### 
 #recode Sector (CPSJOB5 & CPSJOB1)
 look_for(ces93, "sector")
@@ -129,6 +140,7 @@ val_labels(ces93$sector)<-c(Private=0, Public=1)
 #checks
 val_labels(ces93$sector)
 table(ces93$sector)
+
 ####party id #### 
 #recode Party ID (PESL1)
 look_for(ces93, "identification")
@@ -137,6 +149,7 @@ val_labels(ces93$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces93$party_id)
 table(ces93$party_id)
+
 #### vote#### 
 #recode Vote (PESA4)
 look_for(ces93, "vote")
@@ -147,6 +160,7 @@ val_labels(ces93$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Gre
 #checks
 val_labels(ces93$vote)
 table(ces93$vote)
+
 #### occupation#### 
 #recode Occupation (CPSPINPR)
 look_for(ces93, "occupation")
@@ -166,10 +180,10 @@ val_labels(ces93$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3
 #checks
 val_labels(ces93$occupation3)
 table(ces93$occupation3)
+
 ####income #### 
 #recode Income (CPSO18 and CPSO18A)
 look_for(ces93, "income")
-
 
 ces93 %>%
   mutate(income=case_when(
@@ -230,6 +244,7 @@ table(ces93$income, ces93$CPSO18)
 #checks
 val_labels(ces93$income)
 table(ces93$income)
+
 #####recode Religiosity (CPSO10 & REFN10)####
 look_for(ces93, "god")
 ces93 %>% 
@@ -283,7 +298,6 @@ val_labels(ces93$market2)<-NULL
 #   rowwise() %>% 
 #   mutate(market_liberalism=mean(
 #   c_across(market1:market2))) -> out
-# 
 # 
 # out %>% 
 #   ungroup() %>% 
@@ -501,7 +515,6 @@ ces93 %>%
 ces93 %>% 
   mutate(authoritarianism=rowMeans(select(., num_range("author", 1:4)), na.rm=T))->ces93
   
-
 ces93 %>% 
   select(starts_with("author")) %>% 
   summary()
@@ -524,7 +537,6 @@ look_for(ces93, "quebec")
 ces93$quebec_accom<-Recode(ces93$PRC4, "1=1; 5=0; 3=0.5; 8=0.5; else=NA")
 #checks
 table(ces93$quebec_accom)
-
 
 #recode Liberal leader (PESD2B)
 look_for(ces93, "Chretien")
@@ -612,6 +624,54 @@ val_labels(ces93$turnout)<-c(No=0, Yes=1)
 val_labels(ces93$turnout)
 table(ces93$turnout)
 table(ces93$turnout, ces93$vote)
+
+#### recode political efficacy ####
+#recode No Say (MBSD8)
+look_for(ces93, "have any say")
+ces93$efficacy_internal<-Recode(ces93$MBSD8, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces93$efficacy_internal)<-c(low=0, high=1)
+#checks
+val_labels(ces93$efficacy_internal)
+table(ces93$efficacy_internal)
+table(ces93$efficacy_internal, ces93$MBSD8 , useNA = "ifany" )
+
+#recode MPs lose touch (MBSD1)
+look_for(ces93, "touch")
+ces93$efficacy_external<-Recode(ces93$MBSD1, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces93$efficacy_external)<-c(low=0, high=1)
+#checks
+val_labels(ces93$efficacy_external)
+table(ces93$efficacy_external)
+table(ces93$efficacy_external, ces93$MBSD1 , useNA = "ifany" )
+
+#recode Official Don't Care (MBSD5)
+look_for(ces93, "cares what")
+ces93$efficacy_external2<-Recode(ces93$MBSD5, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces93$efficacy_external2)<-c(low=0, high=1)
+#checks
+val_labels(ces93$efficacy_external2)
+table(ces93$efficacy_external2)
+table(ces93$efficacy_external2, ces93$MBSD5 , useNA = "ifany" )
+
+ces93 %>% 
+  mutate(political_efficacy=rowMeans(select(., c("efficacy_external", "efficacy_external2", "efficacy_internal")), na.rm=T))->ces93
+
+ces93 %>% 
+  select(starts_with("efficacy")) %>% 
+  summary()
+#Check distribution of political_efficacy
+qplot(ces93$political_efficacy, geom="histogram")
+table(ces93$political_efficacy, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces93 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  psych::alpha(.)
+#Check correlation
+ces93 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  cor(., use="complete.obs")
 
 #recode Most Important Question (CPSA1)
 look_for(ces93, "issue")

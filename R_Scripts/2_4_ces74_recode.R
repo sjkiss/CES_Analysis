@@ -218,6 +218,55 @@ val_labels(ces74$turnout)
 table(ces74$turnout)
 table(ces74$turnout, ces74$vote)
 
+#### recode political efficacy ####
+#recode No Say (V24)
+look_for(ces74, "have say")
+ces74$efficacy_internal<-Recode(ces74$V24, "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+val_labels(ces74$efficacy_internal)<-c(low=0, high=1)
+#checks
+val_labels(ces74$efficacy_internal)
+table(ces74$efficacy_internal)
+table(ces74$efficacy_internal, ces74$V24 , useNA = "ifany" )
+
+#recode MPs lose touch (V21)
+look_for(ces74, "lose touch")
+ces74$efficacy_external<-Recode(ces74$V21, "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+val_labels(ces74$efficacy_external)<-c(low=0, high=1)
+#checks
+val_labels(ces74$efficacy_external)
+table(ces74$efficacy_external)
+table(ces74$efficacy_external, ces74$V21 , useNA = "ifany" )
+
+#recode Official Don't Care (V22)
+look_for(ces74, "doesnt care")
+ces74$efficacy_external2<-Recode(ces74$V22, "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+val_labels(ces74$efficacy_external2)<-c(low=0, high=1)
+#checks
+val_labels(ces74$efficacy_external2)
+table(ces74$efficacy_external2)
+table(ces74$efficacy_external2, ces74$V22 , useNA = "ifany" )
+
+ces74 %>% 
+  mutate(political_efficacy=rowMeans(select(., c("efficacy_external", "efficacy_external2", "efficacy_internal")), na.rm=T))->ces74
+
+ces74 %>% 
+  select(starts_with("efficacy")) %>% 
+  summary()
+#Check distribution of political_efficacy
+qplot(ces74$political_efficacy, geom="histogram")
+table(ces74$political_efficacy, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces74 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  psych::alpha(.)
+#Check correlation
+ces74 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  cor(., use="complete.obs")
+
+
 names(ces74)
 ces74$V92
 look_for(ces74, "issue")

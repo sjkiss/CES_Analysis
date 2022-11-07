@@ -158,6 +158,54 @@ val_labels(ces65$turnout)
 table(ces65$turnout)
 table(ces65$turnout, ces65$vote)
 
+#### recode political efficacy ####
+#recode No Say (v45)
+look_for(ces65, "political power")
+ces65$efficacy_internal<-Recode(ces65$v45, "1=0; 2=1; else=NA", as.numeric=T)
+val_labels(ces65$efficacy_internal)<-c(low=0, high=1)
+#checks
+val_labels(ces65$efficacy_internal)
+table(ces65$efficacy_internal)
+table(ces65$efficacy_internal, ces65$v45 , useNA = "ifany" )
+
+#recode MPs lose touch (v46)
+look_for(ces65, "lose touch")
+ces65$efficacy_external<-Recode(ces65$v46, "1=0; 2=1; else=NA", as.numeric=T)
+val_labels(ces65$efficacy_external)<-c(low=0, high=1)
+#checks
+val_labels(ces65$efficacy_external)
+table(ces65$efficacy_external)
+table(ces65$efficacy_external, ces65$v46 , useNA = "ifany" )
+
+#recode Official Don't Care (v43)
+look_for(ces65, "don't care")
+ces65$efficacy_external2<-Recode(ces65$v43, "1=0; 2=1; else=NA", as.numeric=T)
+val_labels(ces65$efficacy_external2)<-c(low=0, high=1)
+#checks
+val_labels(ces65$efficacy_external2)
+table(ces65$efficacy_external2)
+table(ces65$efficacy_external2, ces65$v43 , useNA = "ifany" )
+
+ces65 %>% 
+  mutate(political_efficacy=rowMeans(select(., c("efficacy_external", "efficacy_external2", "efficacy_internal")), na.rm=T))->ces65
+
+ces65 %>% 
+  select(starts_with("efficacy")) %>% 
+  summary()
+#Check distribution of political_efficacy
+qplot(ces65$political_efficacy, geom="histogram")
+table(ces65$political_efficacy, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces65 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  psych::alpha(.)
+#Check correlation
+ces65 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  cor(., use="complete.obs")
+
 #recode Most Important Question (v8a)
 look_for(ces65, "most")
 ces65$mip<-Recode(ces65$v8a, "11=9; 12:13=7; 14=6; 15=0; 16:17=15; 18=8; 19=0; 20=4; 21:22=14; 23:26=12; 

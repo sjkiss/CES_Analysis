@@ -668,6 +668,55 @@ val_labels(ces0411$turnout04)
 table(ces0411$turnout04)
 table(ces0411$turnout04, ces0411$vote04)
 
+#### recode political efficacy ####
+
+#recode No Say (ces04_MBS_E11)
+look_for(ces0411, "have any say")
+ces0411$efficacy_internal04<-Recode(ces0411$ces04_MBS_E11, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$efficacy_internal04)<-c(low=0, high=1)
+#checks
+val_labels(ces0411$efficacy_internal04)
+table(ces0411$efficacy_internal04)
+table(ces0411$efficacy_internal04, ces0411$ces04_MBS_E11 , useNA = "ifany" )
+
+#recode MPs lose touch (ces04_MBS_E5)
+look_for(ces0411, "lose touch")
+ces0411$efficacy_external04<-Recode(ces0411$ces04_MBS_E5, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$efficacy_external04)<-c(low=0, high=1)
+#checks
+val_labels(ces0411$efficacy_external04)
+table(ces0411$efficacy_external04)
+table(ces0411$efficacy_external04, ces0411$ces04_MBS_E5 , useNA = "ifany" )
+
+#recode Official Don't Care (ces04_PES_G3)
+look_for(ces0411, "cares much")
+ces0411$efficacy_external204<-Recode(ces0411$ces04_PES_G3, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$efficacy_external204)<-c(low=0, high=1)
+#checks
+val_labels(ces0411$efficacy_external204)
+table(ces0411$efficacy_external204)
+table(ces0411$efficacy_external204, ces0411$ces04_PES_G3 , useNA = "ifany" )
+
+ces0411 %>% 
+  mutate(political_efficacy04=rowMeans(select(., c("efficacy_external04", "efficacy_external204", "efficacy_internal04")), na.rm=T))->ces0411
+
+ces0411 %>% 
+  select(starts_with("efficacy")) %>% 
+  summary()
+#Check distribution of political_efficacy
+qplot(ces0411$political_efficacy04, geom="histogram")
+table(ces0411$political_efficacy04, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces0411 %>% 
+  select(efficacy_external04, efficacy_external204, efficacy_internal04) %>% 
+  psych::alpha(.)
+#Check correlation
+ces0411 %>% 
+  select(efficacy_external04, efficacy_external204, efficacy_internal04) %>% 
+  cor(., use="complete.obs")
+
 #### recode Most Important Question (ces04_CPS_A7) ####
 look_for(ces0411, "important issue")
 ces0411$mip04<-Recode(ces0411$ces04_CPS_A7, "1=0; 10=6; 20:26=10; 30=7; 35:36=0; 39=5; 48=12; 50=9; 57:59=8; 60:64=15; 
@@ -1442,6 +1491,23 @@ look_for(ces0411, "jobs")
 ces0411$immigration_job06<-Recode(ces0411$ces06_PES_G10, "7=0; 5=0.25; 3=0.75; 1=1; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces0411$immigration_job06, ces0411$ces06_PES_G10, useNA = "ifany" )
+
+#### recode political efficacy ####
+
+#recode No Say N/A
+#recode Lose Touch N/A
+
+#recode Official Don't Care (ces06_PES_G2)
+look_for(ces0411, "cares much")
+ces0411$efficacy_external206<-Recode(ces0411$ces06_PES_G2, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$efficacy_external206)<-c(low=0, high=1)
+#checks
+val_labels(ces0411$efficacy_external206)
+table(ces0411$efficacy_external206)
+table(ces0411$efficacy_external206, ces0411$ces06_PES_G2 , useNA = "ifany" )
+
+ces0411$political_efficacy06<-ces0411$efficacy_external206
+table(ces0411$political_efficacy06)
 
 #### recode turnout (ces06_PES_B1) ####
 look_for(ces0411, "vote")
@@ -2357,6 +2423,55 @@ val_labels(ces0411$turnout08)
 table(ces0411$turnout08)
 table(ces0411$turnout08, ces0411$vote08)
 
+#### recode political efficacy ####
+
+#recode No Say (ces08_MBS_E11)
+look_for(ces0411, "have any say")
+ces0411$efficacy_internal08<-Recode(ces0411$ces08_MBS_E11, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$efficacy_internal08)<-c(low=0, high=1)
+#checks
+val_labels(ces0411$efficacy_internal08)
+table(ces0411$efficacy_internal08)
+table(ces0411$efficacy_internal08, ces0411$ces08_MBS_E11 , useNA = "ifany" )
+
+#recode MPs lose touch (ces08_MBS_E5)
+look_for(ces0411, "lose touch")
+ces0411$efficacy_external08<-Recode(ces0411$ces08_MBS_E5, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$efficacy_external08)<-c(low=0, high=1)
+#checks
+val_labels(ces0411$efficacy_external08)
+table(ces0411$efficacy_external08)
+table(ces0411$efficacy_external08, ces0411$ces08_MBS_E5 , useNA = "ifany" )
+
+#recode Official Don't Care (ces08_PES_G2)
+look_for(ces0411, "cares much")
+ces0411$efficacy_external208<-Recode(ces0411$ces08_PES_G2, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$efficacy_external208)<-c(low=0, high=1)
+#checks
+val_labels(ces0411$efficacy_external208)
+table(ces0411$efficacy_external208)
+table(ces0411$efficacy_external208, ces0411$ces08_PES_G2 , useNA = "ifany" )
+
+ces0411 %>% 
+  mutate(political_efficacy08=rowMeans(select(., c("efficacy_external08", "efficacy_external208", "efficacy_internal08")), na.rm=T))->ces0411
+
+ces0411 %>% 
+  select(starts_with("efficacy")) %>% 
+  summary()
+#Check distribution of political_efficacy
+qplot(ces0411$political_efficacy08, geom="histogram")
+table(ces0411$political_efficacy08, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces0411 %>% 
+  select(efficacy_external08, efficacy_external208, efficacy_internal08) %>% 
+  psych::alpha(.)
+#Check correlation
+ces0411 %>% 
+  select(efficacy_external08, efficacy_external208, efficacy_internal08) %>% 
+  cor(., use="complete.obs")
+
 #### recode Most Important Question (ces08_CPS_A2) ####
 look_for(ces0411, "important issue")
 ces0411$mip08<-Recode(ces0411$ces08_CPS_A2, "1:6=0; 10=6; 20:26=10; 30:32=7; 33=8; 35:36=0; 39=5; 45=12; 46=11; 47=0; 48=12; 48=12; 
@@ -2964,6 +3079,55 @@ val_labels(ces0411$turnout11)<-c(No=0, Yes=1)
 val_labels(ces0411$turnout11)
 table(ces0411$turnout11)
 table(ces0411$turnout11, ces0411$vote11)
+
+#### recode political efficacy ####
+
+#recode No Say (MBS11_A10)
+look_for(ces0411, "have any say")
+ces0411$efficacy_internal11<-Recode(ces0411$MBS11_A10, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$efficacy_internal11)<-c(low=0, high=1)
+#checks
+val_labels(ces0411$efficacy_internal11)
+table(ces0411$efficacy_internal11)
+table(ces0411$efficacy_internal11, ces0411$MBS11_A10 , useNA = "ifany" )
+
+#recode MPs lose touch (MBS11_A8)
+look_for(ces0411, "lose touch")
+ces0411$efficacy_external11<-Recode(ces0411$MBS11_A8, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$efficacy_external11)<-c(low=0, high=1)
+#checks
+val_labels(ces0411$efficacy_external11)
+table(ces0411$efficacy_external11)
+table(ces0411$efficacy_external11, ces0411$MBS11_A8 , useNA = "ifany" )
+
+#recode Official Don't Care (PES11_48)
+look_for(ces0411, "care much")
+ces0411$efficacy_external211<-Recode(ces0411$PES11_48, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$efficacy_external211)<-c(low=0, high=1)
+#checks
+val_labels(ces0411$efficacy_external211)
+table(ces0411$efficacy_external211)
+table(ces0411$efficacy_external211, ces0411$PES11_48 , useNA = "ifany" )
+
+ces0411 %>% 
+  mutate(political_efficacy11=rowMeans(select(., c("efficacy_external11", "efficacy_external211", "efficacy_internal11")), na.rm=T))->ces0411
+
+ces0411 %>% 
+  select(starts_with("efficacy")) %>% 
+  summary()
+#Check distribution of political_efficacy
+qplot(ces0411$political_efficacy11, geom="histogram")
+table(ces0411$political_efficacy11, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces0411 %>% 
+  select(efficacy_external11, efficacy_external211, efficacy_internal11) %>% 
+  psych::alpha(.)
+#Check correlation
+ces0411 %>% 
+  select(efficacy_external11, efficacy_external211, efficacy_internal11) %>% 
+  cor(., use="complete.obs")
 
 #### recode Most Important Question (CPS11_1) ####
 look_for(ces0411, "important issue")

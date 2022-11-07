@@ -74,3 +74,59 @@ ces19web %>%
   ))->ces19web
 ces19web$cps19_ethnicity_41_TEXT
 prop.table(table(ces19web$vismin))
+
+
+#### recode political efficacy ####
+#recode No Say (cps19_govt_say)
+look_for(ces19web, "have any say")
+ces19web$efficacy_internal<-Recode(ces19web$cps19_govt_say, "1=1; 2=0.75; 3=0.25; 4=0; 5=0.5; else=NA", as.numeric=T)
+val_labels(ces19web$efficacy_internal)<-c(low=0, high=1)
+#checks
+val_labels(ces19web$efficacy_internal)
+table(ces19web$efficacy_internal)
+table(ces19web$efficacy_internal, ces19web$cps19_govt_say , useNA = "ifany" )
+
+#recode MPs lose touch (pes19_losetouch)
+look_for(ces19web, "lose touch")
+ces19web$efficacy_external<-Recode(ces19web$pes19_losetouch, "1=1; 2=0.25; 3=0.5; 4=0.75; 5=0; 6=0.5; else=NA", as.numeric=T)
+val_labels(ces19web$efficacy_external)<-c(low=0, high=1)
+#checks
+val_labels(ces19web$efficacy_external)
+table(ces19web$efficacy_external)
+table(ces19web$efficacy_external, ces19web$pes19_losetouch , useNA = "ifany" )
+
+#recode Official Don't Care (pes19_govtcare)
+look_for(ces19web, "care much")
+ces19web$efficacy_external2<-Recode(ces19web$pes19_govtcare, "1=1; 2=0.25; 3=0.5; 4=0.75; 5=0; 6=0.5; else=NA", as.numeric=T)
+val_labels(ces19web$efficacy_external2)<-c(low=0, high=1)
+#checks
+val_labels(ces19web$efficacy_external2)
+table(ces19web$efficacy_external2)
+table(ces19web$efficacy_external2, ces19web$pes19_govtcare , useNA = "ifany" )
+
+ces19web %>% 
+  mutate(political_efficacy=rowMeans(select(., c("efficacy_external", "efficacy_external2", "efficacy_internal")), na.rm=T))->ces19web
+
+ces19web %>% 
+  select(starts_with("efficacy")) %>% 
+  summary()
+#Check distribution of political_efficacy
+qplot(ces19web$political_efficacy, geom="histogram")
+table(ces19web$political_efficacy, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces19web %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  psych::alpha(.)
+#Check correlation
+ces19web %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  cor(., use="complete.obs")
+
+#recode efficacy rich (pes19_populism_8)
+look_for(ces19web, "rich")
+ces19web$efficacy_rich<-Recode(ces19web$pes19_populism_8, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 6=0.5; else=NA")
+#checks
+table(ces19web$efficacy_rich)
+table(ces19web$efficacy_rich, ces19web$pes19_populism_8)

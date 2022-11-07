@@ -448,6 +448,54 @@ val_labels(ces21$turnout)
 table(ces21$turnout)
 table(ces21$turnout, ces21$vote)
 
+#### recode political efficacy ####
+#recode No Say (cps21_govt_say)
+look_for(ces21, "have any say")
+ces21$efficacy_internal<-Recode(ces21$cps21_govt_say, "1=1; 2=0.75; 3=0.25; 4=0; 5=0.5; else=NA", as.numeric=T)
+val_labels(ces21$efficacy_internal)<-c(low=0, high=1)
+#checks
+val_labels(ces21$efficacy_internal)
+table(ces21$efficacy_internal)
+table(ces21$efficacy_internal, ces21$cps21_govt_say , useNA = "ifany" )
+
+#recode MPs lose touch (pes21_losetouch)
+look_for(ces21, "lose touch")
+ces21$efficacy_external<-Recode(ces21$pes21_losetouch, "1=1; 2=0.25; 3=0.5; 4=0.75; 5=0; 6=0.5; else=NA", as.numeric=T)
+val_labels(ces21$efficacy_external)<-c(low=0, high=1)
+#checks
+val_labels(ces21$efficacy_external)
+table(ces21$efficacy_external)
+table(ces21$efficacy_external, ces21$pes21_losetouch , useNA = "ifany" )
+
+#recode Official Don't Care (pes21_govtcare)
+look_for(ces21, "care much")
+ces21$efficacy_external2<-Recode(ces21$pes21_govtcare, "1=1; 2=0.25; 3=0.25; 4=0; 5=0.5; else=NA", as.numeric=T)
+val_labels(ces21$efficacy_external2)<-c(low=0, high=1)
+#checks
+val_labels(ces21$efficacy_external2)
+table(ces21$efficacy_external2)
+table(ces21$efficacy_external2, ces21$pes21_govtcare , useNA = "ifany" )
+
+ces21 %>% 
+  mutate(political_efficacy=rowMeans(select(., c("efficacy_external", "efficacy_external2", "efficacy_internal")), na.rm=T))->ces21
+
+ces21 %>% 
+  select(starts_with("efficacy")) %>% 
+  summary()
+#Check distribution of political_efficacy
+qplot(ces21$political_efficacy, geom="histogram")
+table(ces21$political_efficacy, useNA="ifany")
+
+#Calculate Cronbach's alpha
+library(psych)
+ces21 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  psych::alpha(.)
+#Check correlation
+ces21 %>% 
+  select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
+  cor(., use="complete.obs")
+
 # recode satisfaction with democracy (cps21_demsat & pes21_dem_sat)
 look_for(ces21, "dem")
 ces21$satdem<-Recode(ces21$cps21_demsat, "1=1; 2=0.75; 3=0.25; 4=0; 5=0.5; else=NA", as.numeric=T)
@@ -463,3 +511,17 @@ look_for(ces21, "education")
 ces21$postgrad<-Recode(ces21$cps21_education, "10:11=1; 1:9=0; else=NA")
 #checks
 table(ces21$postgrad)
+
+#recode Perceive Inequality (pes21_inequal)
+look_for(ces21, "ineq")
+ces21$inequality<-Recode(ces21$pes21_inequal, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 6=0.5; else=NA")
+#checks
+table(ces21$inequality)
+table(ces21$inequality, ces21$pes21_inequal)
+
+#recode efficacy rich (pes21_populism_8)
+look_for(ces21, "rich")
+ces21$efficacy_rich<-Recode(ces21$pes21_populism_8, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 6=0.5; else=NA")
+#checks
+table(ces21$efficacy_rich)
+table(ces21$efficacy_rich, ces21$pes21_populism_8)

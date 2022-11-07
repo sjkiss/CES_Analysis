@@ -342,6 +342,14 @@ ces04 %>%
   rename(national_retrospective=national_retrospective04)->ces04
 ces04 %>% 
   rename(enviro=enviro04)->ces04
+ces04 %>% 
+  rename(efficacy_external=efficacy_external04)->ces04
+ces04 %>% 
+  rename(efficacy_external2=efficacy_external204)->ces04
+ces04 %>% 
+  rename(efficacy_internal=efficacy_internal04)->ces04
+ces04 %>% 
+  rename(political_efficacy=political_efficacy04)->ces04
 
 #### Rename CES06 ####
 ces06 %>% 
@@ -444,7 +452,6 @@ ces06 %>%
   rename(satdem=satdem06)->ces06
 ces06 %>% 
   rename(postgrad=postgrad06)->ces06
-
 ces06 %>% 
   rename(market1=market061)->ces06
 ces06 %>% 
@@ -453,6 +460,14 @@ ces06 %>%
   rename(national_retrospective=national_retrospective06)->ces06
 ces06 %>% 
   rename(enviro=enviro06)->ces06
+ces06 %>% 
+  rename(efficacy_external=efficacy_external06)->ces06
+ces06 %>% 
+  rename(efficacy_external2=efficacy_external206)->ces06
+ces06 %>% 
+  rename(efficacy_internal=efficacy_internal06)->ces06
+ces06 %>% 
+  rename(political_efficacy=political_efficacy06)->ces06
 table(ces06$survey, ces06$non_charter_language)
 
 #### Rename CES08 ####
@@ -566,6 +581,14 @@ ces08 %>%
   rename(national_retrospective=national_retrospective08)->ces08
 ces08 %>% 
   rename(enviro=enviro08)->ces08
+ces08 %>% 
+  rename(efficacy_external=efficacy_external08)->ces08
+ces08 %>% 
+  rename(efficacy_external2=efficacy_external208)->ces08
+ces08 %>% 
+  rename(efficacy_internal=efficacy_internal08)->ces08
+ces08 %>% 
+  rename(political_efficacy=political_efficacy08)->ces08
 table(ces08$survey, ces08$non_charter_language)
 
 #### Rename CES11 ####
@@ -679,6 +702,14 @@ ces11 %>%
   rename(national_retrospective=national_retrospective11)->ces11
 ces11 %>% 
   rename(enviro=enviro11)->ces11
+ces11 %>% 
+  rename(efficacy_external=efficacy_external11)->ces11
+ces11 %>% 
+  rename(efficacy_external2=efficacy_external211)->ces11
+ces11 %>% 
+  rename(efficacy_internal=efficacy_internal11)->ces11
+ces11 %>% 
+  rename(political_efficacy=political_efficacy11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -719,7 +750,8 @@ common_vars<-c('male',
                'trad1', 'trad2', 'immigration_rates',
                'market1','market2',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 
-               'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'enviro')
+               'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich',
+               'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'enviro', 'ideology')
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
@@ -976,3 +1008,10 @@ prop.table(table(ces$income_tertile, ces$election), 2)
 # val_labels(ces$income3)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 val_labels(ces$income_tertile)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 
+table(ces$political_efficacy, ces$election)
+table(ces$efficacy_internal, ces$election)
+table(ces$efficacy_external, ces$election)
+table(ces$efficacy_external2, ces$election)
+table(ces$efficacy_rich, ces$election)
+table(ces$inequality, ces$election)
+table(ces$turnout, ces$election)
