@@ -749,7 +749,7 @@ common_vars<-c('male',
                'traditionalism2', 
                'trad1', 'trad2', 'immigration_rates',
                'market1','market2',
-               'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 
+               'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 'vote3',
                'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich',
                'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'enviro', 'ideology')
 #Start with the data frame
@@ -1015,3 +1015,4 @@ table(ces$efficacy_external2, ces$election)
 table(ces$efficacy_rich, ces$election)
 table(ces$inequality, ces$election)
 table(ces$turnout, ces$election)
+table(ces$vote3, ces$election)

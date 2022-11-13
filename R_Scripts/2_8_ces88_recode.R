@@ -121,12 +121,20 @@ table(ces88$party_id)
 
 #recode Vote (xb2)
 look_for(ces88, "vote")
-
 ces88$vote<-car::Recode(as.numeric(ces88$xb2), "2=1; 1=2; 3=3; 4=2; 5=0; else=NA")
 val_labels(ces88$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
 val_labels(ces88$vote)
 table(ces88$vote)
+table(ces88$xb2)
+
+#recode Vote splitting Conservatives (xb2)
+look_for(ces88, "vote")
+ces88$vote3<-car::Recode(as.numeric(ces88$xb2), "2=1; 1=2; 3=3; 4=6; 5=0; else=NA")
+val_labels(ces88$vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, Reform=6)
+#checks
+val_labels(ces88$vote3)
+table(ces88$vote3)
 table(ces88$xb2)
 
 #recode Occupation (pinpor81)

@@ -469,7 +469,7 @@ table(ces21$efficacy_external, ces21$pes21_losetouch , useNA = "ifany" )
 
 #recode Official Don't Care (pes21_govtcare)
 look_for(ces21, "care much")
-ces21$efficacy_external2<-Recode(ces21$pes21_govtcare, "1=1; 2=0.25; 3=0.25; 4=0; 5=0.5; else=NA", as.numeric=T)
+ces21$efficacy_external2<-Recode(ces21$pes21_govtcare, "1=1; 2=0.25; 3=0.5; 4=0.75; 5=0; 6=0.5; else=NA", as.numeric=T)
 val_labels(ces21$efficacy_external2)<-c(low=0, high=1)
 #checks
 val_labels(ces21$efficacy_external2)

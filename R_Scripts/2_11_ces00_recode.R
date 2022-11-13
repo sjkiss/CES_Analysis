@@ -146,6 +146,23 @@ val_labels(ces00$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Gre
 val_labels(ces00$vote)
 table(ces00$vote)
 
+#recode Vote splitting Conservatives (pesa3a)
+look_for(ces00, "vote")
+ces00 %>% 
+  mutate(vote3=case_when(
+    pesa3a==1 | pesa3b==1 ~ 1,
+    pesa3a==2 | pesa3b==2 ~ 2,
+    pesa3a==3 | pesa3b==3 ~ 3,
+    pesa3a==4 | pesa3b==4 ~ 6,
+    pesa3a==0 | pesa3b==0 ~ 0,
+    pesa3a==5 | pesa3b==5 ~ 4,
+  ))->ces00
+val_labels(ces00$vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, Reform=6)
+#checks
+val_labels(ces00$vote3)
+table(ces00$vote3)
+table(ces00$pesa4)
+
 # No occupation variable
 #### income#### 
 #recode Income (cpsm16 and cpsm16a)

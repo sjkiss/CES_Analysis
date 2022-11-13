@@ -132,6 +132,16 @@ val_labels(ces97$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Gre
 #checks
 val_labels(ces97$vote)
 table(ces97$vote)
+
+#recode Vote splitting Conservatives (pesa4)
+look_for(ces97, "vote")
+ces97$vote3<-car::Recode(as.numeric(ces97$pesa4), "1=2; 2=1; 3=3; 5=4; 4=6; 0=0; else=NA")
+val_labels(ces97$vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, Reform=6)
+#checks
+val_labels(ces97$vote3)
+table(ces97$vote3)
+table(ces97$pesa4)
+
 #### #recode Occupation (pinporr)#### 
 
 look_for(ces97, "occupation")

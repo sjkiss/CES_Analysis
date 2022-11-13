@@ -153,13 +153,21 @@ table(ces93$party_id)
 #### vote#### 
 #recode Vote (PESA4)
 look_for(ces93, "vote")
-
 table(ces93$PESA4)
 ces93$vote<-Recode(ces93$PESA4, "1=2; 2=1; 3=3; 5=4; 4=2; 0=0; else=NA")
 val_labels(ces93$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
 val_labels(ces93$vote)
 table(ces93$vote)
+
+#recode Vote splitting Conservatives (PESA4)
+look_for(ces93, "vote")
+ces93$vote3<-car::Recode(as.numeric(ces93$PESA4), "1=2; 2=1; 3=3; 5=4; 4=6; 0=0; else=NA")
+val_labels(ces93$vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, Reform=6)
+#checks
+val_labels(ces93$vote3)
+table(ces93$vote3)
+table(ces93$PESA4)
 
 #### occupation#### 
 #recode Occupation (CPSPINPR)
