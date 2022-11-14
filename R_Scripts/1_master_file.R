@@ -1015,4 +1015,5 @@ table(ces$efficacy_external2, ces$election)
 table(ces$efficacy_rich, ces$election)
 table(ces$inequality, ces$election)
 table(ces$turnout, ces$election)
+
 table(ces$vote3, ces$election)
