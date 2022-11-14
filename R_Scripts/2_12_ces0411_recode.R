@@ -3170,6 +3170,6 @@ table(ces0411$welfare11, ces0411$CPS11_33, useNA = "ifany" )
 
 #### recode Postgrad (CPS11_79) ####
 look_for(ces0411, "education")
-ces0411$postgrad11<-Recode(ces0411$CPS11_79, "10:11=1; 1:8=0; else=NA")
+ces0411$postgrad11<-Recode(ces0411$CPS11_79, "10:11=1; 1:9=0; else=NA")
 #checks
 table(ces0411$postgrad11, useNA = "ifany" )

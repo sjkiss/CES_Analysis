@@ -1009,7 +1009,7 @@ ces %>%
   ggplot(., aes(y=election, x=average, group=Variable, col=`Group`))+geom_point()+
   facet_wrap(~fct_relevel(name, "Immigration Rates","Moral Traditionalism", "Market Liberalism", "Redistribution"), nrow=2)+
   theme(axis.text.x=element_text(angle=90))+scale_y_discrete(limits=rev)+
-  scale_color_manual(values=rep(c('black', 'grey'),2))+
+  scale_color_manual(values=rep(c('grey', 'black'),2))+
   geom_vline(xintercept=0.5, linetype=2)+labs(y="Election", x="Average")+labs(col="Degree Status")+
   geom_errorbar(width=0,aes(xmin=average-(1.96*se), xmax=average+(1.96*se)))
 ggsave(filename=here("Plots", "mean_attitudinal_preferences_postgrad.png"), width=8, height=8)
@@ -1019,16 +1019,16 @@ ces %>%
   filter(election>1988 & election<2020) %>% 
   as_factor() %>% 
   #mutate(Income=fct_relevel(income2, "Lowest", "Middle", "Highest")) %>% 
-  mutate(Degree=Recode(postgrad, "1='Degree'; 0='No Degree'", levels=c("No Degree", "Degree"))) %>% 
+  mutate(postgrad=Recode(postgrad, "1='Postgrad'; 0='Other'", levels=c("Postgrad", "Other"))) %>% 
   rename(Vote=vote2, Redistribution=redistribution, Election=election) %>% 
-  #pivot_longer(., cols=c("Degree", "Income"), names_to=c("Variable"), values_to=c("Value")) %>% 
-  group_by(Election, Vote, Degree) %>% 
+  #pivot_longer(., cols=c("postgrad", "Income"), names_to=c("Variable"), values_to=c("Value")) %>% 
+  group_by(Election, Vote, postgrad) %>% 
   filter(!is.na(Vote)&Vote!="Green"& Vote!="BQ") %>% 
   #filter(!is.na(Value)) %>% 
-  filter(!is.na(Degree)) %>% 
+  filter(!is.na(postgrad)) %>% 
   summarize(avg=mean(Redistribution, na.rm=T), n=n(), sd=sd(Redistribution, na.rm=T), se=sd/sqrt(n)) %>% 
-  arrange(Election, Degree, Vote) %>% 
-  ggplot(. ,aes(x=avg, y=fct_reorder(Election, desc(Election)), col=Degree))+
+  arrange(Election, postgrad, Vote) %>% 
+  ggplot(. ,aes(x=avg, y=fct_reorder(Election, desc(Election)), col=postgrad))+
   geom_point()+
   facet_grid(~Vote)+
   scale_color_grey(start=0.8, end=0.2)+
