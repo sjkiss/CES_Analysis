@@ -50,16 +50,38 @@ ces %>%
   mutate(pct=n/sum(n)) %>% 
 filter(vote2!="Green") %>% 
   filter(!is.na(Occupation)) %>% 
-  ggplot(., aes(x=election, y=pct*100, linetype=Occupation, group=Occupation))+
+  ggplot(., aes(x=election, y=pct*100, linetype=Occupation, size=Occupation))+
   geom_line()+
   facet_wrap(~vote2)+
-  scale_linetype_manual(values=c(2,4,6,8,1))+labs(y="Percent", x="Election", 
-                                                  title="Raw Share of Class Voting Per Party") +
+  scale_linetype_manual(values=c(3,4,2,5,1))+
+  scale_size_manual(values=c(1,1,1,1.5,1.5))+
+  labs(y="Percent", x="Election", title="Raw Support For Parties By Class", linetype="Class", size="Class") +
 scale_x_date(breaks= seq.Date(from=as.Date("1980-01-01"), to=as.Date("2021-01-01"), by="4 years"), date_labels="%Y")+
-  theme(axis.text.x=element_text(angle=90))
+  theme(axis.text.x=element_text(angle=90), legend.position = "bottom")+
+  guides(linetype=guide_legend(keywidth=5, ncol=2))
+ ggsave(here("Plots", "book_occupation_share_per_party.png"), width=8, height=8)
 
-ggsave(here("Plots", "book_occupation_share_per_party.png"))
 
+ ces %>% 
+   select(election, Occupation, vote2) %>% 
+   #mutate(election=ymd(election, truncated=2L)) %>% 
+   filter(election>1978&election!=2000&election!=2021) %>% 
+   group_by(election, Occupation, vote2) %>% 
+   summarize(n=n()) %>% 
+   filter(!is.na(vote2)) %>% 
+   mutate(pct=n/sum(n)) %>% 
+   filter(vote2!="Green") %>% 
+   filter(!is.na(Occupation)) %>% 
+   ggplot(., aes(x=as.factor(election), y=pct*100, fill=Occupation))+
+   geom_col(position="dodge")+
+   scale_fill_grey(start=0.8, end=0.2)+
+   facet_wrap(~vote2)+
+   labs(y="Percent", x="Election", title="Raw Support For Parties By Class", linetype="Class", size="Class") +
+   #scale_x_date(breaks= seq.Date(from=as.Date("1980-01-01"), to=as.Date("2021-01-01"), by="4 years"), date_labels="%Y")+
+   theme(axis.text.x=element_text(angle=90), legend.position = "bottom")+
+   guides(fill=guide_legend(nrow=2))
+ ggsave(here("Plots", "book_occupation_share_per_party_bar.png"), width=10, height=8)
+ 
 ces %>% 
   select(election, Occupation, vote2) %>% 
   filter(election>1978& election!=2000& election!=2021) %>% 
@@ -80,33 +102,36 @@ ces %>%
 ggsave(here("Plots", "book_party_share_by_occupation.png"), width=10, height=8)
 
 ces$region2<-factor(ces$region2, levels=c("Atlantic", "Quebec", "Ontario", "West"))
-ces$income_tertile
-ces$traditionalism2
+table(ces$election)
+table(ces$election, ces$Period)
 ces %>% 
-  filter(election>1988&Period==0)->ces.1
+  filter(election>1987&election<2004)->ces.1
+
 ces %>% 
-  filter(Period==1&election<2022)->ces.2
-table(ces.2$election)
-table(ces.1$election)
-ces$immi
-ndp1<-lm(ndp~region2+male+age+income_tertile+degree+catholic+no_religion+redistribution+market_liberalism+immigration_rates+traditionalism+`1993`+`1997`+`2000`, data=ces.1)
-ndp2<-lm(ndp~region2+male+age+income_tertile+degree+catholic+no_religion+redistribution+market_liberalism+immigration_rates+traditionalism+`2004`+`2006`+`2008`+`2011`+`2015`+`2019`, data=ces.2)
+  filter(Period==1&election<2021)->ces.2
 
-lib1<-lm(liberal~region2+male+age+income_tertile+degree+catholic+no_religion+redistribution+market_liberalism+immigration_rates+traditionalism+`1993`+`1997`+`2000`, data=ces.1)
-lib2<-lm(liberal~region2+male+age+income_tertile+degree+catholic+no_religion+redistribution+market_liberalism+immigration_rates+traditionalism+`2004`+`2006`+`2008`+`2011`+`2015`+`2019`, data=ces.2)
+ces %>% 
+  group_by(election) %>% 
+  select(election,  traditionalism2, working_class3, region2) %>% 
+summarize_all(function(x) sum(!is.na(x))) 
 
-con1<-lm(conservative~region2+male+age+income_tertile+degree+catholic+no_religion+redistribution+market_liberalism+immigration_rates+traditionalism+`1993`+`1997`+`2000`, data=ces.1)
-con2<-lm(conservative~region2+male+age+income_tertile+degree+catholic+no_religion+redistribution+market_liberalism+immigration_rates+traditionalism+`2004`+`2006`+`2008`+`2011`+`2015`+`2019`, data=ces.2)
+ndp1<-lm(ndp~region2+male+age+income+degree+union_both+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`1988`+`1993`+`1997`, data=subset(ces.1, working_class3==1))
+ndp2<-lm(ndp~region2+male+age+income+degree+union_both+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2004`+`2006`+`2008`+`2011`+`2015`+`2019`, data=subset(ces.2, working_class3==1))
+
+lib1<-lm(liberal~region2+male+age+income+degree+union_both+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`1988`+`1993`+`1997`, data=subset(ces.1, working_class3==1))
+lib2<-lm(liberal~region2+male+age+income+degree+union_both+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2004`+`2006`+`2008`+`2011`+`2015`+`2019`, data=subset(ces.2, working_class3==1))
+
+con1<-lm(conservative~region2+male+age+income+degree+union_both+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`1988`+`1993`+`1997`, data=subset(ces.1, working_class3==1))
+con2<-lm(conservative~region2+male+age+income+degree+union_both+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2004`+`2006`+`2008`+`2011`+`2015`+`2019`, data=subset(ces.2, working_class3==1))
 model.list<-list(ndp1, ndp2, lib1, lib2, con1, con2)
 library(stargazer)
+
 stargazer(model.list, 
-          type="html", out=here("Tables", "book_table_1_ols_pre_post.html"))
-lookfor(ces19phone, "last")
-lookfor(ces19phone, "vote")
-ces19phone %>% 
-  select(occupation4, vote2 ) %>% 
-  filter(vote2)
-ces19phone$past_vote
+          type="html", out=here("Tables", "book_table_1_ols_pre_post.html"), 
+          dep.var.labels = c("NDP", "Liberal", "Conservative"),stars=c("*"))
+
+
+
 #USe ces19phone
 ces19phone %>% 
   #WE need past_vote for 2015, vote for 2019 and occupation3 for the class variable that has the self-employed
@@ -166,8 +191,10 @@ mutate(Issue=Recode(mip, "'Jobs'='Jobs and Economy' ;
   ggplot(., aes(y=fct_relevel(occupation3, "Working Class", "Routine Non-Manual", "Self-Employed", "Professional", "Managers"), x=Percent, fill=fct_relevel(Issue, "Environment", "Energy")))+
   facet_grid(~Election)+geom_col(position="dodge")+labs(y="Class", fill="Issue")+scale_fill_grey(guide=guide_legend(reverse=T))
 ggsave(here("Plots", "book_mip_change.png"))
-
-
+levels(ces$occupation4)
+ces$working_class5<-Recode(ces$occupation4,"'Working_Class'='Working Class' ; 
+                           'Routine_Nonmanual'='Routine Non-manual';NA=NA;
+                           else='Other'", levels=c("Other", "Routine Non-manual", "Working Class"))
 #Do the moral traditionalism interaction
 ces %>% 
   #Keep only 2015 and 2019
@@ -175,7 +202,7 @@ ces %>%
   #Filter working_class 
  #filter(working_class4==1) %>% 
   #Select relevenat variables note no controls
-  select(working_class4, market_liberalism, traditionalism2, election, conservative, ndp) %>% 
+  #select(working_class5, market_liberalism, traditionalism2, election, conservative, ndp) %>% 
   #Nest the the data for the elections
   nest(data=-election) %>% 
   #we are mapping the model function onto the column data
@@ -183,27 +210,32 @@ ces %>%
   mutate(ndp=map(data, function(x) lm(ndp~working_class4+traditionalism2+market_liberalism+working_class4:traditionalism2, data=x)),
          #Then doing the same for consservatives
          conservative=map(data, function(x) lm(conservative~working_class4+traditionalism2+market_liberalism+working_class4:traditionalism2, data=x))) ->ndp_conservative_models
-ndp_conservative_models
-library(ggeffects)
-#Now mapping onto 
-ndp_conservative_models$ndp %>% 
-  map_dfr(., ggpredict, terms=c("traditionalism2[0,0.33, 0.66,1]", "working_class4[0,1]")) %>% 
-  mutate(Election=rep(c(2015, 2019), each=8), 
-         Vote=rep("NDP", nrow(.))) ->ndp_effects
 
-ndp_conservative_models$conservative %>% 
-  map_dfr(., ggpredict, terms=c("traditionalism2[0,0.33, 0.66,1]", "working_class4[0,1]")) %>% 
-mutate(Election=rep(c(2015, 2019), each=8), 
-       Vote=rep("Conservative", nrow(.)))->conservative_effects 
-conservative_effects
-ndp_effects %>% 
-  bind_rows(conservative_effects) %>% 
-data.frame() %>% 
-ggplot(., aes(x=x, y=predicted, shape=group, linetype=group))+
-  geom_line()+geom_point()+facet_grid(Vote~Election)+
-  scale_x_continuous(breaks=c(0,0.33, 0.66, 1), labels=c("0", "0.33","0.66", "1"))+
-  labs(shape="Class", linetype="Class",x="Traditionalism", y="Predicted Probability")
-ggsave(here("Plots", "book_traditionalism_class_ols.png"), width=10, height=6)
+#Print the models in the Viewer
+# library(marginaleffects)
+# library(modelsummary)
+# library(ggeffects)
+# modelsummary(ndp_conservative_models$ndp, stars=T)
+# modelsummary(ndp_conservative_models$conservative, stars=T)
+# ndp_conservative_models$ndp %>% 
+#   map_dfr(., ggpredict, 
+#           terms=c("working_class4", "traditionalism2[0,0.5,1]"))->ndp_effects
+# library(marginaleffects)
+# ndp_conservative_models$ndp %>% 
+#   map_dfr(., marginaleffects, by="working_class5", variables="traditionalism2")->ndp_effects
+# 
+# ndp_conservative_models$conservative %>% 
+#   map_dfr(., ggpredict, terms=c("working_class5", "traditionalism2[0]"))->conservative_effects 
+# conservative_effects
+# table(ces$election, ces$working_class5)
+# ndp_effects %>% 
+#   bind_rows(conservative_effects) %>% 
+# data.frame() %>% 
+# ggplot(., aes(x=x, y=predicted, shape=group, linetype=group))+
+#   geom_line()+geom_point()+facet_grid(Vote~Election)+
+#   scale_x_continuous(breaks=c(0,0.33, 0.66, 1), labels=c("0", "0.33","0.66", "1"))+
+#   labs(shape="Class", linetype="Class",x="Traditionalism", y="Predicted Probability")
+# ggsave(here("Plots", "book_traditionalism_class_ols.png"), width=10, height=6)
 
 ces %>% 
   filter(election>2014 &election<2020) %>% 
@@ -218,7 +250,6 @@ ces19phone %>%
 out15 %>% 
   bind_rows(out19) %>% 
   as_factor() %>% 
-
 rename(`Manage Economy`=1, Class=2, Vote=3) %>% 
   mutate(Election=factor(Election, levels=c("2019", "2015")), Class=Recode(Class, "
                       'Unskilled'='Working Class' ; 'Skilled'='Working Class' ;

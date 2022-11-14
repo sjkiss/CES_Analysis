@@ -397,6 +397,7 @@ table(ces93$censorship, useNA = "ifany")
 
 #recode Stay Home (CPSG7A)
 look_for(ces93, "home")
+table(ces93$CPSG7A)
 ces93$stay_home<-Recode(ces93$CPSG7A, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
 #checks
 table(ces93$stay_home,useNA = "ifany")
@@ -477,10 +478,19 @@ ces93 %>%
   cor(., use="complete.obs")
 
 #recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)
-
+names(ces93)
 ces93 %>% 
-  mutate(traditionalism2=rowMeans(select(., trad1:trad2)), na.rm=T)->ces93
- 
+  mutate(traditionalism2=rowMeans(select(., c('trad1', 'trad2')), na.rm=T))->ces93
+ summary(ces93$traditionalism2)
+ summary(ces93$trad1)
+ summary(ces93$trad2)
+ sum(is.na(ces93$trad1))
+ sum(!is.na(ces93$trad1))
+ sum(is.na(ces93$trad2))
+ sum(!is.na(ces93$trad2))
+ sum(is.na(ces93$traditionalism2))
+sum(!is.na(ces93$traditionalism2))
+
 #Check distribution of traditionalism
 qplot(ces93$traditionalism2, geom="histogram")
 table(ces93$traditionalism2, useNA="ifany")

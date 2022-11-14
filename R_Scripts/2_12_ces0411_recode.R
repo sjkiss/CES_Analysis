@@ -510,7 +510,7 @@ ces0411 %>%
   select(trad041:trad042)
 
 ces0411 %>% 
-mutate(traditionalism204=rowMeans(select(., trad041:trad042)))->ces0411
+mutate(traditionalism204=rowMeans(select(., c('trad041', 'trad042'))))->ces0411
  
 ces0411 %>% 
   select(starts_with("trad04")) %>% 
@@ -1342,7 +1342,7 @@ ces0411 %>%
 #   filter(na>0, na<6)
 #Scale Averaging 
 ces0411 %>% 
-mutate(traditionalism206=rowMeans(select(., trad061:trad062), na.rm=T))->ces0411
+mutate(traditionalism206=rowMeans(select(., c('trad061', 'trad062')), na.rm=T))->ces0411
   
 ces0411$traditionalism206
 ces0411 %>% 

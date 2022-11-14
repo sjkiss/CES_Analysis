@@ -296,7 +296,7 @@ table(ces00$pesg15, ces00$market2, useNA = "ifany")
 
 #Scale Averaging 
 ces00 %>% 
-  mutate(market_liberalism=rowMeans(select(., market1:market2)), na.rm=T)->ces00
+  mutate(market_liberalism=rowMeans(select(., c('market1', 'market2'))), na.rm=T)->ces00
 
 ces00 %>% 
   select(starts_with("market")) %>% 
@@ -438,7 +438,7 @@ ces00 %>%
 
 #recode Moral Traditionalism 2 (stay home & gay rights) (Left-Right)
 ces00 %>% 
-  mutate(traditionalism2=rowMeans(select(., trad1:trad2)), na.rm=T)->ces00
+  mutate(traditionalism2=rowMeans(select(., c('trad1', 'trad2'))), na.rm=T)->ces00
  
 
 ces00 %>% 

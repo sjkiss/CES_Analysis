@@ -1019,7 +1019,7 @@ ces %>%
   filter(election>1988 & election<2020) %>% 
   as_factor() %>% 
   #mutate(Income=fct_relevel(income2, "Lowest", "Middle", "Highest")) %>% 
-  mutate(postgrad=Recode(postgrad, "1='Postgrad'; 0='Other'", levels=c("Postgrad", "Other"))) %>% 
+  mutate(Degree=Recode(postgrad, "1='Post-Grad'; 0='Other'", levels=c("No Degree", "Degree"))) %>% 
   rename(Vote=vote2, Redistribution=redistribution, Election=election) %>% 
   #pivot_longer(., cols=c("postgrad", "Income"), names_to=c("Variable"), values_to=c("Value")) %>% 
   group_by(Election, Vote, postgrad) %>% 
