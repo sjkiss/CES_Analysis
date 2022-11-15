@@ -25,9 +25,7 @@ ces15phone %>%
   filter(is.na(PES15_NOC)==F&is.na(occupation)==T) %>% 
   select(PES15_NOC, occupation) %>% 
   print(n=264)
-ces19web %>% 
-  filter(is.na(NOC)==F&is.na(occupation)==T) %>% 
-  select(NOC, occupation)
+
 
 #### Check the MIP Problems have been added ####
 ces19phone$mip
