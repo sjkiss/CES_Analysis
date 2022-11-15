@@ -339,8 +339,6 @@ ces04 %>%
 ces04 %>% 
   rename(national_retrospective=national_retrospective04)->ces04
 ces04 %>% 
-  rename(enviro=enviro04)->ces04
-ces04 %>% 
   rename(efficacy_external=efficacy_external04)->ces04
 ces04 %>% 
   rename(efficacy_external2=efficacy_external204)->ces04
@@ -456,15 +454,13 @@ ces06 %>%
   rename(market2=market062)->ces06
 ces06 %>% 
   rename(national_retrospective=national_retrospective06)->ces06
-ces06 %>% 
-  rename(enviro=enviro06)->ces06
-ces06 %>% 
-  rename(efficacy_external=efficacy_external06)->ces06
-ces06 %>% 
+# ces06 %>% 
+#   rename(efficacy_external=efficacy_external06)->ces06
+ces06 %>%
   rename(efficacy_external2=efficacy_external206)->ces06
-ces06 %>% 
-  rename(efficacy_internal=efficacy_internal06)->ces06
-ces06 %>% 
+# ces06 %>% 
+#   rename(efficacy_internal=efficacy_internal06)->ces06
+ces06 %>%
   rename(political_efficacy=political_efficacy06)->ces06
 table(ces06$survey, ces06$non_charter_language)
 
@@ -577,8 +573,6 @@ ces08 %>%
   rename(market2=market082)->ces08
 ces08 %>% 
   rename(national_retrospective=national_retrospective08)->ces08
-ces08 %>% 
-  rename(enviro=enviro08)->ces08
 ces08 %>% 
   rename(efficacy_external=efficacy_external08)->ces08
 ces08 %>% 
@@ -698,8 +692,6 @@ ces11 %>%
   rename(income_tertile=income_tertile11)->ces11
 ces11 %>% 
   rename(national_retrospective=national_retrospective11)->ces11
-ces11 %>% 
-  rename(enviro=enviro11)->ces11
 ces11 %>% 
   rename(efficacy_external=efficacy_external11)->ces11
 ces11 %>% 
