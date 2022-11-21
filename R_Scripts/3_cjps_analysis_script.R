@@ -171,15 +171,19 @@ ggsave(filename=here("Plots", "canada_class_voting_1979_2019.png"), width=12, he
 #Load broom
 library(broom)
 #1979 -2019
+ces %>% 
+  select(election, working_class3) %>%
+  group_by(election) %>% 
+  summarize(sum(!is.na(working_class3)))
 ces %>%
-  filter(election> 1974 & election!=2000) %>%
-  nest(variables=-election) %>%
+  filter(election> 1974 & election!=2000&election!=2021) %>%
+  nest(variables=-election) %>% 
   mutate(model=map(variables, function(x) lm(ndp~region2+male+age+income+degree+as.factor(religion2)+working_class3+union_both, data=x)),
          tidied=map(model, tidy),
          vote=rep('NDP', nrow(.)))->ndp_models_complete1
 
 ces %>%
-  filter(election> 1974 & election!=2000) %>%
+  filter(election> 1974 & election!=2000&election!=2021) %>%
   nest(variables=-election) %>%
   mutate(model=map(variables, function(x) lm(conservative~region2+male+age+income+degree+as.factor(religion2)+working_class3+union_both, data=x)),
          tidied=map(model, tidy),
@@ -187,7 +191,7 @@ ces %>%
   )->conservative_models_complete1
 
 ces %>%
-  filter(election> 1974 & election!=2000) %>%
+  filter(election> 1974 & election!=2000&election!=2021) %>%
   nest(variables=-election) %>%
   mutate(model=map(variables, function(x) lm(liberal~region2+male+age+income+degree+as.factor(religion2)+working_class3+union_both, data=x)),
          tidied=map(model, tidy),
@@ -377,7 +381,12 @@ m36<-lm(conservative~region2+age+male+religion2+degree+income+occupation4+redist
 #Storing these here to avoid having to retype. 
 #"Degree", "Income", "Class (Managers)", "Class (Professionals)", "Class (Self-Employed)", "Class (Routine Non-Manual)", 
 summary(m19)
-stargazer(m19, m28, m20, m29, m21, m30, type="html", omit=c(1:8), out=here("Tables", "pooled_party_vote_choice.html"),  column.labels = c('1988-1997', '2004-2019', '1988-1997', '2004-2019', '1988-1997', '2004-2019'), covariate.labels=c("Degree", "Income", "Class (Managers)", "Class (Professionals)", "Class (Self-Employed)", "Class (Routine Non-Manual)", "Redistribution", "Market Liberalism", "Moral Traditionalism", "Immigration Rates"), dep.var.labels =c("NDP" ,"Liberals", "Conservatives"),star.cutoffs = c(0.05, 0.01, 0.001), single.row=F, font.size="small", digits=2)
+stargazer(m19, m28, m20, m29, m21, m30, type="html", 
+          omit=c(1:8), out=here("Tables", "pooled_party_vote_choice.html"),  
+          column.labels = c('1988-1997', '2004-2019', '1988-1997', '2004-2019', '1988-1997', '2004-2019'), 
+          covariate.labels=c("Degree", "Income", "Class (Managers)", "Class (Professionals)", "Class (Self-Employed)", "Class (Routine Non-Manual)", "Redistribution", "Market Liberalism", "Moral Traditionalism", "Immigration Rates"), dep.var.labels =c("NDP" ,"Liberals", "Conservatives"),
+          star.cutoffs = c(0.05, 0.01, 0.001), 
+          single.row=F, font.size="small", digits=2)
 
 # For Appendix (full controls displayed)
 stargazer(m19, m28, m20, m29, m21, m30, type="html", out=here("Tables", "pooled_party_vote_choice_full.html"),  column.labels = c('1988-1997', '2004-2019', '1988-1997', '2004-2019', '1988-1997', '2004-2019'), covariate.labels=c("Region (East", "Region (Ontario)", "Region (West)", "Age", "Male", "Religion (Catholic)", "Religion (Protestant)", "Religion (Other)", "Degree", "Income", "Class (Managers)", "Class (Professionals)", "Class (Self-Employed)", "Class (Routine Non-Manual)", "Redistribution", "Market Liberalism", "Moral Traditionalism", "Immigration Rates"), dep.var.labels =c("NDP" ,"Liberals", "Conservatives"),star.cutoffs = c(0.05, 0.01, 0.001), single.row=F, font.size="small", digits=2)
