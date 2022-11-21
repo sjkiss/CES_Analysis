@@ -236,13 +236,13 @@ ces %>%
   filter(election==2015| election==2019) %>% 
   select(working_class3,vote2, traditionalism2, election) %>% 
   group_by(election,vote2, working_class3) %>% 
- # filter(!is.na(working_class3)) %>% 
-  filter(working_class3==1) %>% 
+ filter(!is.na(working_class3)) %>% 
+ # filter(working_class3==1) %>% 
   filter(vote2=="Conservative"|vote2=="NDP") %>% 
   summarize(avg=mean(traditionalism2, na.rm=T), 
             n=n(), 
             sd=sd(traditionalism2, na.rm=T), se=sd/sqrt(n)) %>% 
-  ggplot(., aes(x=election, y=average, col=vote2))+geom_point()
+  ggplot(., aes(x=as.factor(working_class3), y=avg, col=vote2))+geom_point()+ylim(c(0,1))+facet_grid(~election)
 
 ces %>% 
   #Keep only 2015 and 2019
