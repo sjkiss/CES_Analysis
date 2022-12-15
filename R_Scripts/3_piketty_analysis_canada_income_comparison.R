@@ -4,57 +4,61 @@ library(stargazer)
 library(tidyverse)
 #### First cut Degree and Income gap for left-right block ####
 ces %>% 
-  filter(election<1993)
+  filter(election<1993) %>% 
   select(election, left, region, male, age, income, degree, religion2) %>% 
   group_by(election) %>% 
   summary()
 ces %>% 
-  filter(election>1979) %>% 
+  filter(election<2021) %>% 
   nest(variables=-election) %>%
   mutate(model=map(variables, function(x) lm(left~region2+male+age+income+degree+as.factor(religion2), data=x)),
          tidied=map(model, tidy))->ols_block_models
+
 ces %>% 
-  nest(variables=-election) %>%
-  mutate(model=map(variables, function(x) lm(left~region2+male+age+income2+degree+as.factor(religion2), data=x)),
+ filter(election<2021) %>% 
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(left~region2+male+age+income_tertile+degree+as.factor(religion2), data=x)),
          tidied=map(model, tidy))->ols_block_models2
 
-ces %>% 
-  nest(variables=-election) %>%
-  mutate(model=map(variables, function(x) lm(left~region2+male+age+income3+degree+as.factor(religion2), data=x)),
-         tidied=map(model, tidy))->ols_block_models3
-ces %>% 
-  nest(variables=-election) %>%
-  mutate(model=map(variables, function(x) lm(left~region2+male+age+income_tertile+degree+as.factor(religion2), data=x)),
-         tidied=map(model, tidy))->ols_block_models4
+# ces %>% 
+#   filter(election>1979&election<2021) %>% 
+#   nest(variables=-election) %>%
+#   mutate(model=map(variables, function(x) lm(left~region2+male+age+income_tertile+degree+as.factor(religion2), data=x)),
+#          tidied=map(model, tidy))->ols_block_models3
+# ces %>% 
+#   filter(election>1979&election<2021) %>% 
+#   nest(variables=-election) %>%
+#   mutate(model=map(variables, function(x) lm(left~region2+male+age+income_tertile+degree+as.factor(religion2), data=x)),
+#          tidied=map(model, tidy))->ols_block_models4
 ols_block_models2 %>% 
   unnest(tidied) %>% 
-  filter(term=="degree"|term=="income2") %>% 
+  filter(term=="degree"|term=="income_tertile") %>% 
   filter(election<2020)  %>% 
-  mutate(Measure=Recode(term, "'degree'='Degree' ; 'income2'='Income'")) %>% 
+  mutate(Measure=Recode(term, "'degree'='Degree' ; 'income_tertile'='Income'")) %>% 
   ggplot(., aes(x=election, y=estimate, col=Measure, group=Measure))+
   geom_point()+
   geom_line()+
   #geom_smooth(se=F)+
   labs(x="Election", y="Estimate")+
   scale_color_grey()+
-  geom_hline(yintercept=0, linetype=2)+labs(title="Income Categories 1, 2:4 and 5")
- # geom_errorbar(width=0,aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))
+  geom_hline(yintercept=0, linetype=2)+
+  geom_errorbar(width=0,aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))
 ggsave(here("Plots", "block_degree_income2.png"), width=8, height=6)
 
-ols_block_models3 %>% 
-  unnest(tidied) %>% 
-  filter(term=="degree"|term=="income3") %>% 
-  filter(election<2020)  %>% 
-  mutate(Measure=Recode(term, "'degree'='Degree' ; 'income3'='Income'")) %>% 
-  ggplot(., aes(x=election, y=estimate, col=Measure, group=Measure))+
-  geom_point()+
-  geom_line()+
-  #geom_smooth(se=F)+
-  labs(x="Election", y="Estimate")+
-  scale_color_grey()+
-  geom_hline(yintercept=0, linetype=2)+labs(title="Income Categories 1:2, 3 and 4:5")
-# geom_errorbar(width=0,aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))
-ggsave(here("Plots", "block_degree_income3.png"), width=8, height=6)
+# ols_block_models3 %>% 
+#   unnest(tidied) %>% 
+#   filter(term=="degree"|term=="income3") %>% 
+#   filter(election<2020)  %>% 
+#   mutate(Measure=Recode(term, "'degree'='Degree' ; 'income3'='Income'")) %>% 
+#   ggplot(., aes(x=election, y=estimate, col=Measure, group=Measure))+
+#   geom_point()+
+#   geom_line()+
+#   #geom_smooth(se=F)+
+#   labs(x="Election", y="Estimate")+
+#   scale_color_grey()+
+#   geom_hline(yintercept=0, linetype=2)+labs(title="Income Categories 1:2, 3 and 4:5")
+# # geom_errorbar(width=0,aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))
+# ggsave(here("Plots", "block_degree_income3.png"), width=8, height=6)
 
 #### Decompose By Party
 #### Basic Party vote models 1965-2021 ####
