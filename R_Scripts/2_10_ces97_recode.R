@@ -670,3 +670,15 @@ look_for(ces97, "education")
 ces97$postgrad<-Recode(ces97$cpsm3, "10:11=1; 1:9=0; else=NA")
 #checks
 table(ces97$postgrad)
+
+#recode Break Promise (cpsj13)
+look_for(ces97, "promise")
+ces97$promise<-Recode(ces97$cpsj13, "1=0; 3=0.5; 5=1; 7=0.5; else=NA", as.numeric=T)
+val_labels(ces97$promise)<-c(low=0, high=1)
+#checks
+val_labels(ces97$promise)
+table(ces97$promise)
+table(ces97$promise, ces97$cpsj13 , useNA = "ifany" )
+
+#recode Trust - not available
+

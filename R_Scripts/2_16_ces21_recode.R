@@ -309,6 +309,25 @@ ces21$education<-Recode(ces21$cps21_spend_educ, "3:4=0.5; 1=1; 2=0; else=NA")
 #val_labels(ces21$education)
 table(ces21$education, ces21$cps21_spend_educ , useNA = "ifany" )
 
+#recode Break Promise (pes21_keepromises)
+look_for(ces21, "promise")
+ces21$promise<-Recode(ces21$pes21_keepromises, "1=0; 2=0.5; 3=1; 4=1; 5=0.5; else=NA", as.numeric=T)
+val_labels(ces21$promise)<-c(low=0, high=1)
+#checks
+val_labels(ces21$promise)
+table(ces21$promise)
+table(ces21$promise, ces21$pes21_keepromises , useNA = "ifany" )
+
+#recode Trust (pes21_trust)
+look_for(ces21, "trust")
+ces21$trust<-Recode(ces21$pes21_trust, "1=1; 2=0; else=NA", as.numeric=T)
+val_labels(ces21$trust)<-c(no=0, yes=1)
+#checks
+val_labels(ces21$trust)
+table(ces21$trust)
+table(ces21$trust, ces21$pes21_trust , useNA = "ifany" )
+
+
 #recode Immigration (cps21_imm)
 look_for(ces21, "admit")
 ces21$immigration_rates<-Recode(ces21$cps21_imm, "1=0; 2=1; 3=0.5; 4=0.5; else=NA", as.numeric=T)

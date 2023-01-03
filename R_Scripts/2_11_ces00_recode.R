@@ -680,3 +680,21 @@ look_for(ces00, "education")
 ces00$postgrad<-Recode(ces00$cpsm3, "10:11=1; 1:9=0; else=NA")
 #checks
 table(ces00$postgrad)
+
+#recode Break Promise (cpsj13)
+look_for(ces00, "promise")
+ces00$promise<-Recode(ces00$cpsj13, "1=0; 3=0.5; 5=1; 7=0.5; else=NA", as.numeric=T)
+val_labels(ces00$promise)<-c(low=0, high=1)
+#checks
+val_labels(ces00$promise)
+table(ces00$promise)
+table(ces00$promise, ces00$cpsj13 , useNA = "ifany" )
+
+#recode Trust (pesg1)
+look_for(ces00, "trust")
+ces00$trust<-Recode(ces00$pesg1, "1=1; 2=0; else=NA", as.numeric=T)
+val_labels(ces00$trust)<-c(no=0, yes=1)
+#checks
+val_labels(ces00$trust)
+table(ces00$trust)
+table(ces00$trust, ces00$cpsj13 , useNA = "ifany" )

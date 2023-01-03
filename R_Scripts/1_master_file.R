@@ -346,6 +346,10 @@ ces04 %>%
   rename(efficacy_internal=efficacy_internal04)->ces04
 ces04 %>% 
   rename(political_efficacy=political_efficacy04)->ces04
+ces04 %>% 
+  rename(promise=promise04)->ces04
+ces04 %>% 
+  rename(trust=trust04)->ces04
 
 #### Rename CES06 ####
 ces06 %>% 
@@ -462,6 +466,10 @@ ces06 %>%
 #   rename(efficacy_internal=efficacy_internal06)->ces06
 ces06 %>%
   rename(political_efficacy=political_efficacy06)->ces06
+ces06 %>% 
+  rename(promise=promise06)->ces06
+#ces06 %>% 
+#  rename(trust=trust06)->ces06
 table(ces06$survey, ces06$non_charter_language)
 
 #### Rename CES08 ####
@@ -581,6 +589,10 @@ ces08 %>%
   rename(efficacy_internal=efficacy_internal08)->ces08
 ces08 %>% 
   rename(political_efficacy=political_efficacy08)->ces08
+ces08 %>% 
+  rename(promise=promise08)->ces08
+ces08 %>% 
+  rename(trust=trust08)->ces08
 table(ces08$survey, ces08$non_charter_language)
 
 #### Rename CES11 ####
@@ -700,6 +712,10 @@ ces11 %>%
   rename(efficacy_internal=efficacy_internal11)->ces11
 ces11 %>% 
   rename(political_efficacy=political_efficacy11)->ces11
+ces11 %>% 
+  rename(promise=promise11)->ces11
+ces11 %>% 
+  rename(trust=trust11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -740,7 +756,7 @@ common_vars<-c('male',
                'trad1', 'trad2', 'immigration_rates',
                'market1','market2',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 'vote3',
-               'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich',
+               'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich', 'promise', 'trust',
                'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'enviro', 'ideology')
 #Start with the data frame
 ces.list %>% 
@@ -1005,5 +1021,7 @@ table(ces$efficacy_external2, ces$election)
 table(ces$efficacy_rich, ces$election)
 table(ces$inequality, ces$election)
 table(ces$turnout, ces$election)
+table(ces$promise, ces$election)
+table(ces$trust, ces$election)
 
 table(ces$vote3, ces$election)

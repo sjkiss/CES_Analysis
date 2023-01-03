@@ -962,3 +962,21 @@ ces15phone$inequality<-Recode(ces15phone$PES15_32, "1=1; 5=0; 8=0.5; else=NA")
 #checks
 table(ces15phone$inequality)
 table(ces15phone$inequality, ces15phone$PES15_32)
+
+#recode Break Promise (PES15_54)
+look_for(ces15phone, "promise")
+ces15phone$promise<-Recode(ces15phone$PES15_54, "1=0; 3=0.5; 5=1; 7=0.5; else=NA", as.numeric=T)
+val_labels(ces15phone$promise)<-c(low=0, high=1)
+#checks
+val_labels(ces15phone$promise)
+table(ces15phone$promise)
+table(ces15phone$promise, ces15phone$PES15_54 , useNA = "ifany" )
+
+#recode Trust (PES15_89)
+look_for(ces15phone, "trust")
+ces15phone$trust<-Recode(ces15phone$PES15_89, "1=1; 5=0; else=NA", as.numeric=T)
+val_labels(ces15phone$trust)<-c(no=0, yes=1)
+#checks
+val_labels(ces15phone$trust)
+table(ces15phone$trust)
+table(ces15phone$trust, ces15phone$PES15_89 , useNA = "ifany" )

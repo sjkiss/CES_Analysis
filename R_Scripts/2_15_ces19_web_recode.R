@@ -130,3 +130,21 @@ ces19web$efficacy_rich<-Recode(ces19web$pes19_populism_8, "1=1; 2=0.75; 3=0.5; 4
 #checks
 table(ces19web$efficacy_rich)
 table(ces19web$efficacy_rich, ces19web$pes19_populism_8)
+
+#recode Break Promise (pes19_keepromises)
+look_for(ces19web, "promise")
+ces19web$promise<-Recode(ces19web$pes19_keepromises, "1=0; 2=0.5; 3=1; 4=1; 5=0.5; else=NA", as.numeric=T)
+val_labels(ces19web$promise)<-c(low=0, high=1)
+#checks
+val_labels(ces19web$promise)
+table(ces19web$promise)
+table(ces19web$promise, ces19web$pes19_keepromises , useNA = "ifany" )
+
+#recode Trust (pes19_trust)
+look_for(ces19web, "trust")
+ces19web$trust<-Recode(ces19web$pes19_trust, "1=1; 2=0; else=NA", as.numeric=T)
+val_labels(ces19web$trust)<-c(no=0, yes=1)
+#checks
+val_labels(ces19web$trust)
+table(ces19web$trust)
+table(ces19web$trust, ces19web$pes19_trust , useNA = "ifany" )

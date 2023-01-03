@@ -762,6 +762,24 @@ ces0411$postgrad04<-Recode(ces0411$ces04_CPS_S3, "10:11=1; 1:9=0; else=NA")
 #checks
 table(ces0411$postgrad04)
 
+#### recode Break Promise (ces04_CPS_P6) ####
+look_for(ces0411, "promise")
+ces0411$promise04<-Recode(ces0411$ces04_CPS_P6, "1=0; 3=0.5; 5=1; 7=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$promise04)<-c(low=0, high=1)
+#checks
+val_labels(ces0411$promise04)
+table(ces0411$promise04)
+table(ces0411$promise04, ces0411$ces04_CPS_P6 , useNA = "ifany" )
+
+#### recode Trust (ces04_PES_D7) ####
+look_for(ces0411, "trust")
+ces0411$trust04<-Recode(ces0411$ces04_PES_D7, "1=1; 5=0; else=NA", as.numeric=T)
+val_labels(ces0411$trust04)<-c(no=0, yes=1)
+#checks
+val_labels(ces0411$trust04)
+table(ces0411$trust04)
+table(ces0411$trust04, ces0411$ces04_PES_D7 , useNA = "ifany" )
+
 ###Recode 2006 2nd ####
 
 # Gender done at top
@@ -1563,6 +1581,18 @@ ces0411 %>%
 
 #checks
 table(ces0411$postgrad06)
+
+#### recode Break Promise (ces06_CPS_P9) ####
+look_for(ces0411, "promise")
+ces0411$promise06<-Recode(ces0411$ces06_CPS_P9, "1=0; 3=0.5; 5=1; 7=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$promise06)<-c(low=0, high=1)
+#checks
+val_labels(ces0411$promise06)
+table(ces0411$promise06)
+table(ces0411$promise06, ces0411$ces06_CPS_P9 , useNA = "ifany" )
+
+#### recode Trust (not available in 2006) ####
+
 
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
@@ -2523,6 +2553,24 @@ ces0411 %>%
 #checks
 table(ces0411$postgrad08)
 
+#### recode Break Promise (ces08_PES_G12) ####
+look_for(ces0411, "promise")
+ces0411$promise08<-Recode(ces0411$ces08_PES_G12, "1=0; 3=0.5; 5=1; 7=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$promise08)<-c(low=0, high=1)
+#checks
+val_labels(ces0411$promise08)
+table(ces0411$promise08)
+table(ces0411$promise08, ces0411$ces08_PES_G12 , useNA = "ifany" )
+
+#### recode Trust (ces08_PES_TRUST_1) ####
+look_for(ces0411, "trust")
+ces0411$trust08<-Recode(ces0411$ces08_PES_TRUST_1, "1=1; 5=0; else=NA", as.numeric=T)
+val_labels(ces0411$trust08)<-c(no=0, yes=1)
+#checks
+val_labels(ces0411$trust08)
+table(ces0411$trust08)
+table(ces0411$trust08, ces0411$ces08_PES_TRUST_1 , useNA = "ifany" )
+
 ####Recode 2011 4th ####
 
 # Gender done at top
@@ -3173,3 +3221,21 @@ look_for(ces0411, "education")
 ces0411$postgrad11<-Recode(ces0411$CPS11_79, "10:11=1; 1:9=0; else=NA")
 #checks
 table(ces0411$postgrad11, useNA = "ifany" )
+
+#### recode Break Promise (PES11_54) ####
+look_for(ces0411, "promise")
+ces0411$promise11<-Recode(ces0411$PES11_54, "1=0; 3=0.5; 5=1; 7=0.5; else=NA", as.numeric=T)
+val_labels(ces0411$promise11)<-c(low=0, high=1)
+#checks
+val_labels(ces0411$promise11)
+table(ces0411$promise11)
+table(ces0411$promise11, ces0411$PES11_54 , useNA = "ifany" )
+
+#### recode Trust (PES11_89) ####
+look_for(ces0411, "trust")
+ces0411$trust11<-Recode(ces0411$PES11_89, "1=1; 5=0; else=NA", as.numeric=T)
+val_labels(ces0411$trust11)<-c(no=0, yes=1)
+#checks
+val_labels(ces0411$trust11)
+table(ces0411$trust11)
+table(ces0411$trust11, ces0411$PES11_89 , useNA = "ifany" )
