@@ -2,81 +2,84 @@
 library(broom)
 library(stargazer)
 library(tidyverse)
-#### Voting Shares
-ces %>% 
-  select(election, working_class, vote2) %>% 
-  group_by(election, working_class, vote2) %>% 
-  summarize(n=n()) %>% 
-  filter(!is.na(vote2)) %>% 
-  mutate(pct=n/sum(n))
-
-ces %>% 
-  select(election, working_class, vote2) %>% 
-  group_by(election,  vote2, working_class) %>% 
-  summarize(n=n()) %>% 
-  filter(!is.na(vote2)) %>% 
-  mutate(pct=n/sum(n))
+# #### Voting Shares
+# ces %>% 
+#   select(election, working_class, vote2) %>% 
+#   group_by(election, working_class, vote2) %>% 
+#   summarize(n=n()) %>% 
+#   filter(!is.na(vote2)) %>% 
+#   mutate(pct=n/sum(n))
+# 
+# ces %>% 
+#   select(election, working_class, vote2) %>% 
+#   group_by(election,  vote2, working_class) %>% 
+#   summarize(n=n()) %>% 
+#   filter(!is.na(vote2)) %>% 
+#   mutate(pct=n/sum(n))
 
 #### First cut Degree and Income gap for left-right block ####
 
 ces %>% 
+  filter(election<2021) %>% 
   nest(variables=-election) %>%
-  mutate(model=map(variables, function(x) lm(left~region2+male+age+income2+degree+as.factor(religion2), data=x)),
+  mutate(model=map(variables, function(x) lm(left~region2+male+age+income_tertile+degree+as.factor(religion2), data=x)),
          tidied=map(model, tidy))->ols_block_models
 
 ols_block_models %>% 
-  unnest(tidied) %>% 
-  filter(term=="degree"|term=="income2") %>% 
+unnest(tidied) %>% 
+  filter(term=="degree"|term=="income_tertile") %>% 
   filter(election<2020)  %>% 
-  mutate(Measure=Recode(term, "'degree'='Degree' ; 'income2'='Income'")) %>% 
+  mutate(Measure=Recode(term, "'degree'='Degree' ; 'income_tertile'='Income'")) %>% 
   ggplot(., aes(x=election, y=estimate, col=Measure, group=Measure))+
   geom_point()+
   geom_line()+
-  #geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error), width=0))+
-  #geom_smooth(se=F, method="lm")+
+  #geom_smooth(se=F)+
   labs(x="Election", y="Estimate")+
   scale_color_grey()+
-  geom_hline(yintercept=0, linetype=2)
- # geom_errorbar(width=0,aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))
+  geom_hline(yintercept=0, linetype=2)+
+  geom_errorbar(width=0,aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))
 ggsave(here("Plots", "block_degree_income.png"), width=8, height=6)
 
 #### Decompose By Party
 #### Basic Party vote models 1965-2021 ####
 ces %>%
+  filter(election<2021) %>% 
   nest(variables=-election) %>%
-  mutate(model=map(variables, function(x) lm(ndp~region2+male+age+income2+degree+as.factor(religion2), data=x)),
+  mutate(model=map(variables, function(x) lm(ndp~region2+male+age+income_tertile+degree+as.factor(religion2), data=x)),
          tidied=map(model, tidy),
          vote=rep('NDP', nrow(.)))->ndp_models_complete1
 
 ces %>%
+  filter(election<2021) %>% 
   nest(variables=-election) %>%
-  mutate(model=map(variables, function(x) lm(conservative~region2+male+age+income2+degree+as.factor(religion2), data=x)),
+  mutate(model=map(variables, function(x) lm(conservative~region2+male+age+income_tertile+degree+as.factor(religion2), data=x)),
          tidied=map(model, tidy),
          vote=rep('Conservative', nrow(.))
   )->conservative_models_complete1
 
 ces %>%
+  filter(election<2021) %>% 
   nest(variables=-election) %>%
-  mutate(model=map(variables, function(x) lm(liberal~region2+male+age+income2+degree+as.factor(religion2), data=x)),
+  mutate(model=map(variables, function(x) lm(liberal~region2+male+age+income_tertile+degree+as.factor(religion2), data=x)),
          tidied=map(model, tidy),
          vote=rep('Liberal', nrow(.))
   )->liberal_models_complete1
 
-ces %>%
-  filter(election>2003) %>%
-  nest(variables=-election) %>%
-  mutate(model=map(variables, function(x) lm(green~region2+male+age+income2+degree+as.factor(religion2), data=x)),
-         tidied=map(model, tidy),
-         vote=rep('Green', nrow(.))
-  )->green_models_complete1
+# ces %>%
+#   filter(election>2003) %>%
+#   nest(variables=-election) %>%
+#   mutate(model=map(variables, function(x) lm(green~region2+male+age+income2+degree+as.factor(religion2), data=x)),
+#          tidied=map(model, tidy),
+#          vote=rep('Green', nrow(.))
+#   )->green_models_complete1
 #Join all parties and plot Degree coefficients
 ndp_models_complete1 %>%
   bind_rows(., liberal_models_complete1) %>%
   bind_rows(., conservative_models_complete1) %>%
   unnest(tidied) %>% 
-  filter(term=="degree"|term=="income2") %>%
+  filter(term=="degree"|term=="income_tertile") %>%
   filter(election<2021) %>% 
-  mutate(term=Recode(term, "'degree'='Degree'; 'income2'='Income'")) %>%
+  mutate(term=Recode(term, "'degree'='Degree'; 'income_tertile'='Income'")) %>%
   ggplot(., aes(x=election, y=estimate, col=vote, size=term, group=term))+
   geom_point()+facet_grid(~vote, switch="y")+
   scale_color_manual(values=c("navy blue", "red", "orange"), name="Vote")+

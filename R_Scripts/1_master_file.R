@@ -911,6 +911,13 @@ ces %>%
 ### Economic Views ###
 #Flip redistribution
 ces$redistribution_reversed<-1-ces$redistribution
+#Check for test
+
+ces %>% 
+  group_by(election, vote2) %>% 
+  summarize(avg_redistribution=mean(redistribution, na.rm=T)) %>% 
+  print(n=100)
+names(ces)
 #Start with data frame
 ces %>% 
   #Create new variable called economic 
