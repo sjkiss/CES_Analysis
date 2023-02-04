@@ -744,23 +744,24 @@ ces %>%
   nest(variables=-election) %>%
   filter(election>1984 & election<2021) %>% 
   mutate(model=map(variables, function(x) lm(left~region2+male+age+income_tertile+postgrad+as.factor(religion2), data=x)),
-         tidied=map(model, tidy))->ols_block_models
+         tidied=map(model, tidy))->ols_block_models2
 
-ols_block_models %>% 
+ols_block_models2 %>% 
   unnest(tidied) %>% 
   filter(term=="postgrad"|term=="income_tertile") %>% 
   filter(election>1984 & election<2021) %>% 
   mutate(Measure=Recode(term, "'postgrad'='Degree' ; 'income_tertile'='Income'")) %>% 
   ggplot(., aes(x=election, y=estimate, col=Measure, group=Measure))+
-  geom_point()+
+  geom_point(position=position_dodge(.5))+
   geom_line()+
-  #geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error), width=0))+
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), 
+                    ymax=estimate+(1.96*std.error), width=0), position=position_dodge(.5))+
   #geom_smooth(se=F, method="lm")+
   labs(x="Election", y="Estimate")+
   scale_color_grey()+
   geom_hline(yintercept=0, linetype=2)
 # geom_errorbar(width=0,aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))
-ggsave(here("Plots", "block_postgrad_income.png"), width=8, height=6)
+ggsave(here("Plots", "block_postgrad_income_with_error.png"), width=8, height=6)
 
 #### Decompose By Party
 #### Basic Party vote models 1965-2021 ####
