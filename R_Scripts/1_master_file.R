@@ -922,7 +922,7 @@ names(ces)
 ces %>% 
   #Create new variable called economic 
   #It is defined as the average (mean) of market1, market2 and redistribution_reviersed; missing values ignored
-  mutate(economic=rowMeans(select(., c("market1", "market2", "redistribution_reversed"))), na.rm=T) %>% 
+  mutate(economic=rowMeans(select(., c("market1", "market2", "redistribution_reversed")), na.rm=T)) %>% 
   #Select those variables 
   select(market1, market2, election, redistribution_reversed,economic) %>% 
   #Filter post 2004 to examine.
@@ -932,7 +932,7 @@ ces %>%
 ces %>% 
   #Create new variable called economic 
   #It is defined as the average (mean) of market1, market2 and redistribution_reviersed; missing values ignored
-  mutate(economic=rowMeans(select(., c("market1", "market2", "redistribution_reversed"))), na.rm=T) ->ces
+  mutate(economic=rowMeans(select(., c("market1", "market2", "redistribution_reversed")), na.rm=T)) ->ces
 
 
 ### Socio-cultural Views ###
@@ -979,8 +979,7 @@ val_labels(ces$right)<-c(Right=1, Other=0)
 val_labels(ces$left)<-c(Left=1, Other=0)
 val_labels(ces$rich)<-c(Rich=1, `Not Rich`=0)
 val_labels(ces$poor)<-c(Poor=1, `Not Poor`=0)
-#### Set Theme ####
-theme_set(theme_bw())
+
 
 #This command calls the file 2_diagnostics.R
 #source("R_scripts/3_recode_diagnostics.R", echo=T)

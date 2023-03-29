@@ -2,6 +2,9 @@
 library(broom)
 library(stargazer)
 library(tidyverse)
+#Set theme
+#### Set Theme ####
+theme_set(theme_bw(base_size=18))
 #### Voting Shares
 ces %>% 
   select(election, working_class, vote2) %>% 
@@ -153,6 +156,102 @@ ndp_models_complete1 %>%
 
 ggsave(here("Plots", "ols_degree_party_income_shaded.png"), width=8, height=4)
 
+#### Repeat the same with multinomial
+
+
+library(nnet)
+table(ces$vote3)
+ces$degree
+ces$degree<-as_factor(ces$degree)
+ces$male<-as_factor(ces$male)
+ces %>%
+  nest(variables=-election) %>%
+  filter(election<2021) %>% 
+  mutate(model=map(variables, function(x) multinom(vote2~region2+
+                                                     male+
+                                                     age+
+                                                     income_tertile+
+                                                     degree+
+                                                     religion2, data=x)), 
+         tidied=map(model, tidy)) ->multinom_models
+names(multinom_models)
+multinom_models$tidied
+#Get predicted probabilities
+# Degree
+library(modelsummary)
+library(marginaleffects)
+#Assign names to the list of models
+names(multinom_models$model)<-multinom_models$election
+names(multinom_models$tidied)<-multinom_models$election
+# Comparison of Predicted Probabilities for Degree
+glimpse(multinom_models)
+multinom_models$model%>%
+  map_df(., function(x)
+    avg_comparisons(x, variables=list(degree="reference"), .id="Election")) %>% 
+  filter(group!="Green"&group!="BQ") %>% 
+  mutate(Election=as.Date(Election, "%Y")) %>% 
+  ggplot(., aes(x=Election,y=estimate, col=group))+
+  geom_pointrange(aes(ymin=conf.low, ymax=conf.high))+
+  facet_grid(~group)+
+  #geom_smooth(method="loess", se=F)+
+ scale_color_manual(values=c("darkblue", "darkred", "orange"))+
+  theme(legend.position="none", strip.text.y = element_text(angle=0))+
+  labs(y="Delta Predicted Probability", caption="Change in Predicted Probability of Voting For Conservative, Liberal, NDP, degree holders compared to non-degree holders. , controlling for age, income, degree, region and religion")+
+  scale_x_date(date_labels="%Y")+
+  geom_smooth(method="loess", se=F, linewidth=0.5)
+ggsave(filename=here("Plots/comparison_predicted_probabilities_degree.png"), width=12, height=6)
+
+multinom_models$model%>%
+  map_df(., function(x)
+    avg_comparisons(x, variables=list(income_tertile=c(1,3))), .id="Election") %>% 
+  filter(group!="Green"&group!="BQ") %>% 
+  mutate(Election=as.Date(Election, "%Y")) %>% 
+  ggplot(., aes(x=Election,y=estimate, col=group))+
+  geom_pointrange(aes(ymin=conf.low, ymax=conf.high))+
+  facet_grid(~group)+
+  #geom_smooth(method="loess", se=F)+
+  scale_color_manual(values=c("darkblue", "darkred", "orange"))+
+  theme(legend.position="none")+
+  labs(y="Delta Predicted Probability", caption="Change in Predicted Probability of Voting For Conservative, Liberal, NDP, highest income tercile compared to the lowest, controlling for age, income, degree, region and religion")+
+  scale_x_date(date_labels="%Y")+
+  geom_smooth(method="loess", se=F, linewidth=0.5)
+ggsave(filename=here("Plots/comparison_predicted_probabilities_income.png"), width=12, height=6)
+
+
+
+#Coefficients for degree
+
+multinom_models$tidied %>% 
+  bind_rows(.id="Election") %>%
+  filter(term=="degreeDegree") %>% 
+  filter(y.level=="NDP"|y.level=="Liberal") %>% 
+  mutate(Election=as.Date(Election, format="%Y")) %>% 
+  ggplot(., aes(x=Election, y=estimate, group=y.level, col=y.level))+
+  geom_pointrange(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+
+  facet_grid(~y.level)+scale_x_date(date_labels="%Y")+
+  scale_color_manual(values=c("darkred", "orange"))+
+   geom_smooth(method="loess",se=F, linewidth=1)+
+  theme(legend.position="none")+
+  labs(y="Logit", caption="Effect of degree status on vote for Liberals / NDP v. Conservative\nControlling for age, gender, region, degree status,religion and income")
+ggsave(filename=here("Plots/coefficients_multinomial_degree.png"), width=8, height=6)
+
+# Coefficients for Income
+multinom_models$tidied %>% 
+  bind_rows(.id="Election") %>%
+  filter(term=="income_tertile") %>% 
+  filter(y.level=="NDP"|y.level=="Liberal") %>% 
+  mutate(Election=as.Date(Election, format="%Y")) %>% 
+  ggplot(., aes(x=Election, y=estimate, group=y.level, col=y.level))+
+  geom_pointrange(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+
+  facet_grid(~y.level)+scale_x_date(date_labels="%Y")+
+  geom_smooth(method="loess",se=F)+
+  scale_color_manual(values=c("darkred", "orange"))+
+  theme(legend.position="none")+
+  labs(y="Logit", caption="Effect of income on vote for Liberals / NDP v. Conservative\nControlling for age, gender, region, degree status,religion and income")
+ggsave(filename=here("Plots/coefficients_multinomial_income.png"), width=8, height=6)
+
+
+  
 
 #### Figure 3 and 4
 
@@ -213,181 +312,263 @@ ggsave(here("Plots", "ols_degree_party_income_shaded.png"), width=8, height=4)
   # ggsave(filename=here("Plots", "mean_attitudinal_preferences_income.png"), width=8, height=4)
   # 
   # 
-#### Figure 3 ####
-ces %>% 
-  #Select necessary variables
-  select(degree, redistribution, vote2, election) %>% 
-  #Filter only post-1988 elections
-  filter(election>1988 & election<2020) %>% 
-  #Convert everything to factor
-  as_factor() %>% 
-  #mutate(Income=fct_relevel(income2, "Lowest", "Middle", "Highest")) %>% 
-  #Provide some renames for pretty printing
-  rename(Degree=degree, Vote=vote2, Redistribution=redistribution, Election=election) %>% 
-  #pivot_longer(., cols=c("Degree", "Income"), names_to=c("Variable"), values_to=c("Value")) %>% 
-#Filter out some unnecessary rows
-  filter(!is.na(Vote)&Vote!="Green"& Vote!="BQ") %>% 
-  #filter(!is.na(Value)) %>% 
-  filter(!is.na(Degree)) ->
-  degree_election_vote_redistribution
-
-#Calculate full sample mean and merge bck in
-degree_election_vote_redistribution %>% 
-  group_by(Election) %>% 
-  mutate(Total=mean(Redistribution, na.rm=T)) %>% 
-  group_by(Election, Vote) %>% 
-  summarise(Average=mean(Redistribution, na.rm=T), n=n(), sd=sd(Redistribution, na.rm=T),se=sd/sqrt(n), Total=first(Total)) %>% 
-  mutate(Difference=Average-Total) %>% 
-  mutate(Measure="Party Gap")->election_vote_redistribution_difference 
-
-#Calculate party means on redistribution
-degree_election_vote_redistribution %>% 
-#Nest by election and Party vote choice to run the model at that level
-nest(-c(Election, Vote)) %>% 
-  #Provide new colum model which is the result of a t.test of redistribution on Degree for each
-  #Party in each election
-  mutate(model=map(data, function(x) t.test(Redistribution~factor(Degree, levels=c("Degree", "No degree")), data=x))) %>% 
-  #Now tidy the results of each t.test
-  mutate(tidied=map(model, tidy)) %>% 
-  #Unnest to turn everything into a nice neat data frame
-  unnest(tidied) %>% 
-  #Now mutate a new variable called Sig
-  mutate(Sig=case_when(
-    #which is 1 when significant
-    p.value<0.05 ~ 1,
-    #and 0 otherwise
-    p.value>0.05 ~ 0
-    #feed to plot
-  )) %>% 
-  #
-  mutate(Measure=rep(c('Degree gap'), nrow(.))) %>% 
-  #Set x to be estimate, y to be Elections, reordered in the right way
-  #1993 at the top
-  ggplot(., aes(x=estimate, y=fct_reorder(Election, desc(Election)), col=Vote, shape=Measure))+
-  #Add points, vary size with Significance
-  geom_point(position=position_dodge(0.5))+
-  #Set party colors
-  scale_color_manual(values=c("darkblue", "darkred", "orange"))+
-  #Add a dashed vertical line 
-  geom_vline(aes(xintercept=0), linetype=2)+
-  #add errorbars
-  #the variables are stored in the data frame that is created
-  #after unnesting the variable tidied (see above)
-  #Setting width=0 is necessary to remove the two crosshairs on the errorbar
-  #position_dodge is necessary to set the party bars off from each other because the overlop
-  geom_errorbar(aes(xmin=conf.low, xmax=conf.high), width=0,position=position_dodge(.5))+
-  #here guides turns off the legend for the size; I think we can add it in a caption 
-  guides(size = "none") +
-  theme(legend.position = "bottom")+
-  #Set labels
-  labs(x="Gap", y="Election")+
-  geom_pointrange(aes(x=Difference, y=Election, xmin=Difference-(1.96*se), xmax=Difference+(1.96*se), shape=Measure), data=election_vote_redistribution_difference, position=position_dodge(width=0.9))
-  # arrange(Election, Degree, Vote) %>% 
-  # ggplot(. ,aes(x=avg, y=fct_reorder(Election, desc(Election)), col=Degree))+geom_point()+facet_grid(~Vote)+
-  # scale_color_grey(start=0.8, end=0.2)+
-  # geom_errorbar(aes(xmin=avg-(1.96*se), xmax=avg+(1.96*se), width=0))+geom_vline(xintercept=0.5, linetype=2)+
-  # labs(y="Year") 
-ggsave(filename=here("Plots", "means_degree_party_gap.png"), width=8, height=8)
-#### Figure 4 ####
-
-ces %>% 
-  #Select necessary variables
-  select(election, redistribution, vote2, income_tertile) %>% 
-  #Filter only post-1988 elections
-  filter(election>1988 & election<2020) %>% 
-  #Convert everything to factor
-  as_factor() %>% 
-  mutate(Income=fct_relevel(income_tertile, "Lowest", "Middle", "Highest")) %>% 
-  select(-income_tertile) %>% 
-  #Provide some renames for pretty printing
-  rename(Vote=vote2, Redistribution=redistribution, Election=election) %>% 
-  #pivot_longer(., cols=c("Degree", "Income"), names_to=c("Variable"), values_to=c("Value")) %>% 
-  #Filter out some unnecessary rows
-  filter(!is.na(Vote)&Vote!="Green"& Vote!="BQ") %>% 
-  #filter(!is.na(Value)) %>% 
-  filter(!is.na(Income)) ->
-  income_election_vote_redistribution
-income_election_vote_redistribution
-
-#Calculate party means on redistribution
-income_election_vote_redistribution %>% 
-  filter(Income!="Middle") %>% 
-  #Nest by election and Party vote choice to run the model at that level
-  nest(-c(Election, Vote)) %>% 
-  #Provide new colum model which is the result of a t.test of redistribution on Degree for each
-  #Party in each election
-  mutate(model=map(data, function(x) t.test(Redistribution~Income, data=x))) %>% 
-  #Now tidy the results of each t.test
-  mutate(tidied=map(model, tidy)) %>% 
-  #Unnest to turn everything into a nice neat data frame
- #To inspect items model results individuall
-  #Comment out the following line 
-  unnest(tidied) %>% 
-  #and Uncomment these lines
-  # unnest(tidied) ->out
-#Conservatives 1993
-#out$model[[1]]
-#Liberals 1993
-  #out$model[[2]]
-  #NDP
-  #
-    #out$model[[3]]
-  #Now mutate a new variable called Sig
-  mutate(Sig=case_when(
-    #which is 1 when significant
-    p.value<0.05 ~ 1,
-    #and 0 otherwise
-    p.value>0.05 ~ 0
-    #feed to plot
-  )) %>% 
-  #
-  mutate(Measure=rep(c('Income gap'), nrow(.))) %>% 
-  #Set x to be estimate, y to be Elections, reordered in the right way
-  #1993 at the top
-  ggplot(., aes(x=estimate, y=fct_reorder(Election, desc(Election)), col=Vote, shape=Measure))+
-  #Add points, vary size with Significance
-  geom_point(position=position_dodge(0.5))+
-  #Set party colors
-  scale_color_manual(values=c("darkblue", "darkred", "orange"))+
-  #Add a dashed vertical line 
-  geom_vline(aes(xintercept=0), linetype=2)+
-  #add errorbars
-  #the variables are stored in the data frame that is created
-  #after unnesting the variable tidied (see above)
-  #Setting width=0 is necessary to remove the two crosshairs on the errorbar
-  #position_dodge is necessary to set the party bars off from each other because the overlop
-  geom_errorbar(aes(xmin=conf.low, xmax=conf.high), width=0,position=position_dodge(.5))+
-  #here guides turns off the legend for the size; I think we can add it in a caption 
-  guides(size = "none") +
-  theme(legend.position = "bottom")+
-  #Set labels
-  labs(x="Gap", y="Election")+
-  geom_pointrange(aes(x=Difference, y=Election, xmin=Difference-(1.96*se), xmax=Difference+(1.96*se), shape=Measure), data=election_vote_redistribution_difference, position=position_dodge(width=0.9))
-ggsave(filename=here("Plots", "means_income_party_gap.png"), width=8, height=6)
-# arrange(Election, Degree, Vote) %>% 
-# ggplot(. ,aes(x=avg, y=fct_reorder(Election, desc(Election)), col=Degree))+geom_point()+facet_grid(~Vote)+
-# scale_color_grey(start=0.8, end=0.2)+
-# geom_errorbar(aes(xmin=avg-(1.96*se), xmax=avg+(1.96*se), width=0))+geom_vline(xintercept=0.5, linetype=2)+
-# labs(y="Year") 
-
+#### Complicated Figure 3 ####
 # ces %>% 
-#   select(income_tertile, redistribution, vote2, election) %>% 
-#   filter(election>1988 & election<2020) %>%
-#   rename(Income=income_tertile, Vote=vote2, Redistribution=redistribution, Election=election) %>% 
-#   #pivot_longer(., cols=c("Degree", "Income"), names_to=c("Variable"), values_to=c("Value")) %>% 
-#   group_by(Election, Vote,Income) %>% 
+#   #Select necessary variables
+#   select(degree, redistribution, vote2, election) %>% 
+#   #Filter only post-1988 elections
+#   filter(election>1988 & election<2020) %>% 
+#   #Convert everything to factor
 #   as_factor() %>% 
+#   #Provide some renames for pretty printing
+#   rename(Degree=degree, Vote=vote2, Redistribution=redistribution, Election=election) %>% 
+#   #pivot_longer(., cols=c("Degree", "Income"), names_to=c("Variable"), values_to=c("Value")) %>% 
+# #Filter out some unnecessary rows
 #   filter(!is.na(Vote)&Vote!="Green"& Vote!="BQ") %>% 
 #   #filter(!is.na(Value)) %>% 
-#   filter(!is.na(Income)) %>% 
-#   summarize(avg=mean(Redistribution, na.rm=T), n=n(), sd=sd(Redistribution, na.rm=T), se=sd/sqrt(n)) %>% 
-#   ggplot(. ,aes(x=avg, y=fct_reorder(Election, desc(Election)), col=Income))+geom_point()+facet_grid(~Vote)+
-#   scale_color_grey(start=0.8, end=0.2)+
-#   geom_errorbar(aes(xmin=avg-(1.96*se), xmax=avg+(1.96*se), width=0))+geom_vline(xintercept=0.5, linetype=2)+
-#   labs(y="Year", x="Average")
-# ggsave(filename=here("Plots", "means_redistribution_income_party.png"), width=8, height=4)
+#   filter(!is.na(Degree)) ->
+#   degree_election_vote_redistribution
+# 
+# #Calculate full sample mean and merge bck in
+# degree_election_vote_redistribution %>% 
+#   group_by(Election) %>% 
+#   mutate(Total=mean(Redistribution, na.rm=T)) %>% 
+#   group_by(Election, Vote) %>% 
+#   summarise(Average=mean(Redistribution, na.rm=T), n=n(), sd=sd(Redistribution, na.rm=T),se=sd/sqrt(n), Total=first(Total)) %>% 
+#   mutate(Difference=Average-Total) %>% 
+#   mutate(Measure="Party Gap")->election_vote_redistribution_difference 
 
-  
+#Calculate Degree-Party Mean differences on redistribution
+# ces %>% 
+#   #Filter only post-1988 elections
+#   filter(election>1988 & election<2020) %>% 
+#   #Convert everything to factor
+#   as_factor() %>% 
+#   #mutate(Income=fct_relevel(income2, "Lowest", "Middle", "Highest")) %>% 
+#   #Provide some renames for pretty printing
+#   rename(Degree=degree, Vote=vote2, Redistribution=redistribution, Election=election) %>% 
+#   #Filter out some unnecessary rows
+#   filter(!is.na(Vote)&Vote!="Green"& Vote!="BQ") %>% 
+#   #filter(!is.na(Value)) %>% 
+#   filter(!is.na(Degree)) %>% 
+# #Nest by election and Party vote choice to run the model at that level
+# nest(-c(Election, Vote)) %>% 
+#   #Provide new colum model which is the result of a t.test of redistribution on Degree for each
+#   #Party in each election
+#   mutate(model=map(data, function(x) t.test(Redistribution~factor(Degree, levels=c("Degree", "No degree")), data=x))) %>% 
+#   #Now tidy the results of each t.test
+#   mutate(tidied=map(model, tidy)) %>% 
+#   #Unnest to turn everything into a nice neat data frame
+#   unnest(tidied) %>% 
+#   #Now mutate a new variable called Sig
+#   mutate(Sig=case_when(
+#     #which is 1 when significant
+#     p.value<0.05 ~ 1,
+#     #and 0 otherwise
+#     p.value>0.05 ~ 0
+#     #feed to plot
+#   )) %>% 
+#   #Set x to be estimate, y to be Elections, reordered in the right way
+#   #1993 at the top
+#   ggplot(., aes(x=estimate, y=fct_reorder(Election, desc(Election))))+
+#   #Add points, vary size with Significance
+#   geom_point(position=position_dodge(0.5))+
+#   #Add a dashed vertical line 
+#   geom_vline(aes(xintercept=0), linetype=2)+
+#   #add errorbars
+#   #the variables are stored in the data frame that is created
+#   #after unnesting the variable tidied (see above)
+#   #Setting width=0 is necessary to remove the two crosshairs on the errorbar
+#   #position_dodge is necessary to set the party bars off from each other because the overlop
+#   geom_pointrange(aes(xmin=conf.low, xmax=conf.high), width=0)+
+#   #here guides turns off the legend for the size; I think we can add it in a caption 
+#   guides(size = "none") +
+#   theme(legend.position = "bottom")+
+#   #Set labels
+#   labs(x="Gap", y="Election")+
+#   facet_grid(~Vote)
+
+
+#ggsave(filename=here("Plots", "means_degree_party_gap.png"), width=8, height=8)
+#### Complicated Figure 4 ####
+# 
+# ces %>% 
+#   #Select necessary variables
+#   select(election, redistribution, vote2, income_tertile) %>% 
+#   #Filter only post-1988 elections
+#   filter(election>1988 & election<2020) %>% 
+#   #Convert everything to factor
+#   as_factor() %>% 
+#   mutate(Income=fct_relevel(income_tertile, "Lowest", "Middle", "Highest")) %>% 
+#   select(-income_tertile) %>% 
+#   #Provide some renames for pretty printing
+#   rename(Vote=vote2, Redistribution=redistribution, Election=election) %>% 
+#   #pivot_longer(., cols=c("Degree", "Income"), names_to=c("Variable"), values_to=c("Value")) %>% 
+#   #Filter out some unnecessary rows
+#   filter(!is.na(Vote)&Vote!="Green"& Vote!="BQ") %>% 
+#   #filter(!is.na(Value)) %>% 
+#   filter(!is.na(Income)) ->
+#   income_election_vote_redistribution
+# income_election_vote_redistribution
+# 
+# #Calculate party means on redistribution
+# income_election_vote_redistribution %>% 
+#   filter(Income!="Middle") %>% 
+#   #Nest by election and Party vote choice to run the model at that level
+#   nest(-c(Election, Vote)) %>% 
+#   #Provide new colum model which is the result of a t.test of redistribution on Degree for each
+#   #Party in each election
+#   mutate(model=map(data, function(x) t.test(Redistribution~Income, data=x))) %>% 
+#   #Now tidy the results of each t.test
+#   mutate(tidied=map(model, tidy)) %>% 
+#   #Unnest to turn everything into a nice neat data frame
+#  #To inspect items model results individuall
+#   #Comment out the following line 
+#   unnest(tidied) %>% 
+#   #and Uncomment these lines
+#   # unnest(tidied) ->out
+# #Conservatives 1993
+# #out$model[[1]]
+# #Liberals 1993
+#   #out$model[[2]]
+#   #NDP
+#   #
+#     #out$model[[3]]
+#   #Now mutate a new variable called Sig
+#   mutate(Sig=case_when(
+#     #which is 1 when significant
+#     p.value<0.05 ~ 1,
+#     #and 0 otherwise
+#     p.value>0.05 ~ 0
+#     #feed to plot
+#   )) %>% 
+#   #
+#   mutate(Measure=rep(c('Income gap'), nrow(.))) %>% 
+#   #Set x to be estimate, y to be Elections, reordered in the right way
+#   #1993 at the top
+#   ggplot(., aes(x=estimate, y=fct_reorder(Election, desc(Election)), col=Vote, shape=Measure))+
+#   #Add points, vary size with Significance
+#   geom_point(position=position_dodge(0.5))+
+#   #Set party colors
+#   scale_color_manual(values=c("darkblue", "darkred", "orange"))+
+#   #Add a dashed vertical line 
+#   geom_vline(aes(xintercept=0), linetype=2)+
+#   #add errorbars
+#   #the variables are stored in the data frame that is created
+#   #after unnesting the variable tidied (see above)
+#   #Setting width=0 is necessary to remove the two crosshairs on the errorbar
+#   #position_dodge is necessary to set the party bars off from each other because the overlop
+#   geom_errorbar(aes(xmin=conf.low, xmax=conf.high), width=0,position=position_dodge(.5))+
+#   #here guides turns off the legend for the size; I think we can add it in a caption 
+#   guides(size = "none") +
+#   theme(legend.position = "bottom")+
+#   #Set labels
+#   labs(x="Gap", y="Election")+
+#   geom_pointrange(aes(x=Difference, y=Election, xmin=Difference-(1.96*se), xmax=Difference+(1.96*se), shape=Measure), data=election_vote_redistribution_difference, position=position_dodge(width=0.9))
+# ggsave(filename=here("Plots", "means_income_party_gap.png"), width=8, height=6)
+# names(ces)
+#### Figure 3 Simple ####
+names(ces)
+ces %>%
+  #Select necessary variables
+  select(Degree=degree, Redistribution=redistribution, Vote=vote2, Election=election) %>%
+  #Filter only post-1988 elections
+  filter(Election>1988 & Election<2020) %>%
+  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
+  #Convert everything to factor
+  as_factor() %>%
+#Party in each election
+group_by(Election, Vote, Degree) %>% 
+  summarize(Average=mean(Redistribution,na.rm=T), sd=sd(Redistribution, na.rm=T), n=n(), se=sd/sqrt(n)) ->
+degree_group_differences
+
+ces %>%
+  #Select necessary variables
+  select(Degree=degree, Redistribution=redistribution, Vote=vote2, Election=election) %>%
+  #Filter only post-1988 elections
+  filter(Election>1988 & Election<2020) %>%
+  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
+  #Convert everything to factor
+  as_factor() %>%
+   nest(-c(Election, Vote)) %>% 
+  mutate(model=map(data, function(x) t.test(Redistribution~factor(Degree, levels=c("Degree", "No degree")), data=x))) %>% 
+  mutate(tidied=map(model, tidy)) %>% 
+  unnest(tidied) %>% 
+  right_join(., degree_group_differences, by=c("Vote", "Election")) %>% 
+select(Election, Vote, p.value, Degree, se, Average) %>% 
+  filter(!is.na(Degree)) %>% 
+  mutate(Sig=case_when(
+    p.value<0.051~1,
+    p.value>0.05~0
+  )) %>% 
+ # pivot_longer(., cols=c("Degree", "No degree"), names_to=c("Degree"), values_to=c("Redistribution")) %>% 
+  ggplot(., aes(x=Average, y=fct_reorder(Election, desc(Election)), col=Degree))+
+  facet_grid(~Vote)+
+  geom_point(aes(size=as.factor(Sig)), position=position_dodge(width=0.5))+
+  geom_errorbar(size=0.5,aes(xmin=Average-(1.96*se), xmax=Average+(1.96*se)),width=0,position=position_dodge(width=0.5))+
+  scale_size_manual(values=c(2, 3))+
+  scale_color_grey()+
+guides(size=F)+
+  labs(y="Election")+
+  geom_vline(xintercept=0.5, linetype=2)
+ggsave(filename=here("Plots", "mean_degree_difference_significance.png"), height=8, width=13)
+ 
+
+#### Figure 4 Simple ####
+names(ces)
+ces %>%
+  #Select necessary variables
+  select(Income=income_tertile, Redistribution=redistribution, Vote=vote2, Election=election) %>%
+  #Filter only post-1988 elections
+  filter(Election>1988 & Election<2020) %>%
+  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
+  filter(Income!=2) %>% 
+  #Convert everything to factor
+  as_factor() %>%
+  #Party in each election
+  group_by(Election, Vote, Income) %>% 
+  summarize(Average=mean(Redistribution,na.rm=T), sd=sd(Redistribution, na.rm=T), n=n(), se=sd/sqrt(n)) ->
+  income_group_differences
+
+ces %>%
+  #Select necessary variables
+  select(Income=income_tertile, Redistribution=redistribution, Vote=vote2, Election=election) %>%
+  #Filter only post-1988 elections
+  filter(Election>1988 & Election<2020) %>%
+  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
+  filter(Income!=2) %>% 
+  #Convert everything to factor
+  as_factor() %>%
+  nest(-c(Election, Vote)) %>% 
+  mutate(model=map(data, function(x) t.test(Redistribution~factor(Income, levels=c("Lowest", "Highest")), data=x))) %>% 
+  mutate(tidied=map(model, tidy)) %>% 
+  unnest(tidied) %>% 
+  right_join(., income_group_differences, by=c("Vote", "Election")) %>% 
+  select(Election, Vote, p.value, Income, se, Average) %>% 
+  filter(!is.na(Income)) %>% 
+  mutate(Sig=case_when(
+    p.value<0.051~1,
+    p.value>0.05~0
+  )) %>% 
+  # pivot_longer(., cols=c("Degree", "No degree"), names_to=c("Degree"), values_to=c("Redistribution")) %>% 
+  ggplot(., aes(x=Average, y=fct_reorder(Election, desc(Election)), col=Income))+
+  facet_grid(~Vote)+
+  geom_point(aes(size=as.factor(Sig)), position=position_dodge(width=0.5))+
+  geom_errorbar(size=0.5,aes(xmin=Average-(1.96*se), xmax=Average+(1.96*se)),width=0,position=position_dodge(width=0.5))+
+  scale_size_manual(values=c(2, 3))+
+  scale_color_grey()+
+  guides(size=F)+
+  labs(y="Election")+
+  geom_vline(xintercept=0.5, linetype=2)
+# ces %>% 
+#   select(election, redistribution, degree) %>% 
+#   filter(election>2000) %>% 
+#   as_factor() %>% 
+#   group_by(degree, election) %>% 
+#   summarize(average=mean(redistribution, na.rm = T)) %>% 
+#   View()
+ggsave(filename=here("Plots", "mean_income_difference_significance.png"), height=8, width=12)
+
 # #### CMP ####
 #   #Download the data
 #   cmp<-read_sav(file="https://manifesto-project.wzb.eu/down/data/2021a/datasets/MPDataset_MPDS2021a.sav")
@@ -724,7 +905,8 @@ interaction.models %>%
   mutate(Period=c(rep("1990s", 19 ), rep("2000s", 19), rep("2010s", 19 ), rep("1990s", 19),
                   rep("2000s", 19 ), rep("2010s", 19), rep("1990s", 19 ), rep("2000s", 19), rep("2010s", 19))) %>% 
 filter(str_detect(term, ":")) %>% 
-  ggplot(., aes(x=Period, y=estimate, col=Period))+geom_point()+facet_grid(term~fct_relevel(Party, "NDP", "Liberal"), scales="free")+scale_color_grey(start=0.8, end=0.2) +geom_errorbar(width=0, aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+   geom_hline(yintercept=0,  linetype=2)+theme(strip.text.y.right = element_text(angle = 0))+labs(y="Coefficient")
+  ggplot(., aes(x=Period, y=estimate, col=Period))+geom_point()+facet_grid(term~fct_relevel(Party, "NDP", "Liberal"), scales="free")+scale_color_grey(start=0.8, end=0.2) +geom_errorbar(width=0, aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+   geom_hline(yintercept=0,  linetype=2)+
+  theme(strip.text.y.right = element_text(angle = 0))+labs(y="Coefficient")
 ggsave(filename=here("Plots", "degree_redistribution_interaction_terms.png"), width=8, height=4)
 
 interaction.models2 %>% 
@@ -756,12 +938,15 @@ ols_block_models2 %>%
   geom_line()+
   geom_errorbar(aes(ymin=estimate-(1.96*std.error), 
                     ymax=estimate+(1.96*std.error), width=0), position=position_dodge(.5))+
+
   #geom_smooth(se=F, method="lm")+
   labs(x="Election", y="Estimate")+
   scale_color_grey()+
-  geom_hline(yintercept=0, linetype=2)
+  geom_hline(yintercept=0, linetype=2)+
+  theme(legend.position="bottom")
 # geom_errorbar(width=0,aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))
 ggsave(here("Plots", "block_postgrad_income_with_error.png"), width=8, height=6)
+
 
 #### Decompose By Party
 #### Basic Party vote models 1965-2021 ####
