@@ -156,101 +156,6 @@ ndp_models_complete1 %>%
 
 ggsave(here("Plots", "ols_degree_party_income_shaded.png"), width=8, height=4)
 
-#### Repeat the same with multinomial
-
-
-library(nnet)
-table(ces$vote3)
-ces$degree
-ces$degree<-as_factor(ces$degree)
-ces$male<-as_factor(ces$male)
-ces %>%
-  nest(variables=-election) %>%
-  filter(election<2021) %>% 
-  mutate(model=map(variables, function(x) multinom(vote2~region2+
-                                                     male+
-                                                     age+
-                                                     income_tertile+
-                                                     degree+
-                                                     religion2, data=x)), 
-         tidied=map(model, tidy)) ->multinom_models
-names(multinom_models)
-multinom_models$tidied
-#Get predicted probabilities
-# Degree
-library(modelsummary)
-library(marginaleffects)
-#Assign names to the list of models
-names(multinom_models$model)<-multinom_models$election
-names(multinom_models$tidied)<-multinom_models$election
-# Comparison of Predicted Probabilities for Degree
-glimpse(multinom_models)
-multinom_models$model%>%
-  map_df(., function(x)
-    avg_comparisons(x, variables=list(degree="reference"), .id="Election")) %>% 
-  filter(group!="Green"&group!="BQ") %>% 
-  mutate(Election=as.Date(Election, "%Y")) %>% 
-  ggplot(., aes(x=Election,y=estimate, col=group))+
-  geom_pointrange(aes(ymin=conf.low, ymax=conf.high))+
-  facet_grid(~group)+
-  #geom_smooth(method="loess", se=F)+
- scale_color_manual(values=c("darkblue", "darkred", "orange"))+
-  theme(legend.position="none", strip.text.y = element_text(angle=0))+
-  labs(y="Delta Predicted Probability", caption="Change in Predicted Probability of Voting For Conservative, Liberal, NDP, degree holders compared to non-degree holders. , controlling for age, income, degree, region and religion")+
-  scale_x_date(date_labels="%Y")+
-  geom_smooth(method="loess", se=F, linewidth=0.5)
-ggsave(filename=here("Plots/comparison_predicted_probabilities_degree.png"), width=12, height=6)
-
-multinom_models$model%>%
-  map_df(., function(x)
-    avg_comparisons(x, variables=list(income_tertile=c(1,3))), .id="Election") %>% 
-  filter(group!="Green"&group!="BQ") %>% 
-  mutate(Election=as.Date(Election, "%Y")) %>% 
-  ggplot(., aes(x=Election,y=estimate, col=group))+
-  geom_pointrange(aes(ymin=conf.low, ymax=conf.high))+
-  facet_grid(~group)+
-  #geom_smooth(method="loess", se=F)+
-  scale_color_manual(values=c("darkblue", "darkred", "orange"))+
-  theme(legend.position="none")+
-  labs(y="Delta Predicted Probability", caption="Change in Predicted Probability of Voting For Conservative, Liberal, NDP, highest income tercile compared to the lowest, controlling for age, income, degree, region and religion")+
-  scale_x_date(date_labels="%Y")+
-  geom_smooth(method="loess", se=F, linewidth=0.5)
-ggsave(filename=here("Plots/comparison_predicted_probabilities_income.png"), width=12, height=6)
-
-
-
-#Coefficients for degree
-
-multinom_models$tidied %>% 
-  bind_rows(.id="Election") %>%
-  filter(term=="degreeDegree") %>% 
-  filter(y.level=="NDP"|y.level=="Liberal") %>% 
-  mutate(Election=as.Date(Election, format="%Y")) %>% 
-  ggplot(., aes(x=Election, y=estimate, group=y.level, col=y.level))+
-  geom_pointrange(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+
-  facet_grid(~y.level)+scale_x_date(date_labels="%Y")+
-  scale_color_manual(values=c("darkred", "orange"))+
-   geom_smooth(method="loess",se=F, linewidth=1)+
-  theme(legend.position="none")+
-  labs(y="Logit", caption="Effect of degree status on vote for Liberals / NDP v. Conservative\nControlling for age, gender, region, degree status,religion and income")
-ggsave(filename=here("Plots/coefficients_multinomial_degree.png"), width=8, height=6)
-
-# Coefficients for Income
-multinom_models$tidied %>% 
-  bind_rows(.id="Election") %>%
-  filter(term=="income_tertile") %>% 
-  filter(y.level=="NDP"|y.level=="Liberal") %>% 
-  mutate(Election=as.Date(Election, format="%Y")) %>% 
-  ggplot(., aes(x=Election, y=estimate, group=y.level, col=y.level))+
-  geom_pointrange(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+
-  facet_grid(~y.level)+scale_x_date(date_labels="%Y")+
-  geom_smooth(method="loess",se=F)+
-  scale_color_manual(values=c("darkred", "orange"))+
-  theme(legend.position="none")+
-  labs(y="Logit", caption="Effect of income on vote for Liberals / NDP v. Conservative\nControlling for age, gender, region, degree status,religion and income")
-ggsave(filename=here("Plots/coefficients_multinomial_income.png"), width=8, height=6)
-
-
   
 
 #### Figure 3 and 4
@@ -508,7 +413,7 @@ select(Election, Vote, p.value, Degree, se, Average) %>%
   geom_errorbar(size=0.5,aes(xmin=Average-(1.96*se), xmax=Average+(1.96*se)),width=0,position=position_dodge(width=0.5))+
   scale_size_manual(values=c(2, 3))+
   scale_color_grey()+
-guides(size=F)+
+guides(size="none")+
   labs(y="Election")+
   geom_vline(xintercept=0.5, linetype=2)
 ggsave(filename=here("Plots", "mean_degree_difference_significance.png"), height=8, width=13)
@@ -802,7 +707,9 @@ ggsave(filename=here("Plots", "mean_income_difference_significance.png"), height
 
 
 #### Pooled OLS Models by decade ####
+ces$region2<-relevel(ces$region2, "Atlantic")
 #What we need is by decade, minus the BQ and the Greens
+
 ces %>% 
   filter(election<1999 & election> 1989 )->ces.1
 ces %>% 
@@ -812,7 +719,7 @@ ces %>%
 names(ces)
 
 # NDP Models
-ces$region2<-relevel(ces$region2, "Atlantic")
+
 
 m1<-lm(ndp~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+`1993`+`1997`, data=ces.1)
 m2<-lm(ndp~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+`2000`+`2004`+`2006`+`2008`, data=ces.2)
@@ -867,7 +774,7 @@ names(interaction.models2)<-c(rep("NDP", 3), rep("Liberal", 3), rep("Conservativ
 library(stargazer)
 
 stargazer(ols.models, 
-          out=here("Tables", "ols_models.html"),type="html",
+          out=here("Tables", "table_1_ols_models_decade.html"),type="html",
           covariate.labels=c("Region (Quebec)",
                              "Region (Ontario)",
                              "Region (West)",
@@ -885,7 +792,7 @@ stargazer(ols.models,
                              ), 
           dep.var.labels=c("NDP", "Liberal", "Conservative"),
           omit=c(".[12][90]"), digits=2, column.labels=rep(c("1990s", "2000s", "2010s"), 3))
-ols.models
+
 stargazer(ols.models,
           out=here("Tables", "ols_models_presentation.html"),
           type="html",
@@ -918,10 +825,221 @@ interaction.models2 %>%
   ggplot(., aes(x=Period, y=estimate, col=Period))+geom_point()+facet_grid(term~fct_relevel(Party, "NDP", "Liberal"), scales="free")+scale_color_grey(start=0.8, end=0.2) +geom_errorbar(width=0, aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+   geom_hline(yintercept=0,  linetype=2)+theme(strip.text.y.right = element_text(angle = 0))+labs(y="Coefficient")
 ggsave(filename=here("Plots", "income_redistribution_interaction_terms.png"), width=8, height=4)
 
+#### Table 2 Degree. ####
+tab2_90_0_ndp<-lm(ndp~degree+`1993`+`1997`, data=ces.1)
+tab2_90_00_ndp<-lm(ndp~income_tertile+`1993`+`1997`, data=ces.1)
+tab2_90_1_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+`1993`+`1997`, data=ces.1)
+tab2_90_2_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+redistribution+`1993`+`1997`, data=ces.1)
+tab2_90_3_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+market_liberalism+`1993`+`1997`, data=ces.1)
+tab2_90_4_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+immigration_rates+`1993`+`1997`, data=ces.1)
+tab2_90_5_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+traditionalism2+`1993`+`1997`, data=ces.1)
+tab2_90_6_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`1993`+`1997`, data=ces.1)
+tab2_00_0_ndp<-lm(ndp~degree+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_00_ndp<-lm(ndp~income_tertile+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_1_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_2_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+redistribution+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_3_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+market_liberalism+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_4_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+immigration_rates+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_5_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+traditionalism2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_6_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_10_0_ndp<-lm(ndp~degree+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_00_ndp<-lm(ndp~income_tertile+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_1_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_2_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+redistribution+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_3_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+market_liberalism+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_4_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+immigration_rates+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_5_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+traditionalism2+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_6_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2011`+`2015`+`2019`, data=ces.3)
 
-#### Postgrad robustness check (postgrad substituted for degree 1988-2019)
+### Liberal OLS
+tab2_90_0_liberal<-lm(liberal~degree+`1993`+`1997`, data=ces.1)
+tab2_90_00_liberal<-lm(liberal~income_tertile+`1993`+`1997`, data=ces.1)
+tab2_90_1_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+`1993`+`1997`, data=ces.1)
+tab2_90_2_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+redistribution+`1993`+`1997`, data=ces.1)
+tab2_90_3_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+market_liberalism+`1993`+`1997`, data=ces.1)
+tab2_90_4_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+immigration_rates+`1993`+`1997`, data=ces.1)
+tab2_90_5_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+traditionalism+`1993`+`1997`, data=ces.1)
+tab2_90_6_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism+`1993`+`1997`, data=ces.1)
+tab2_00_0_liberal<-lm(liberal~degree+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_00_liberal<-lm(liberal~income_tertile+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_1_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_2_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+redistribution+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_3_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+market_liberalism+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_4_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+immigration_rates+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_5_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+traditionalism2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_6_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_10_0_liberal<-lm(liberal~degree+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_00_liberal<-lm(liberal~income_tertile+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_1_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_2_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+redistribution+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_3_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+market_liberalism+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_4_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+immigration_rates+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_5_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+traditionalism2+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_6_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2011`+`2015`+`2019`, data=ces.3)
 
-#### First cut Degree and Income gap for left-right block ####
+###
+### Conservative OLS
+tab2_90_0_conservative<-lm(conservative~degree+`1993`+`1997`, data=ces.1)
+tab2_90_00_conservative<-lm(conservative~income+`1993`+`1997`, data=ces.1)
+tab2_90_1_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+`1993`+`1997`, data=ces.1)
+tab2_90_2_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+redistribution+`1993`+`1997`, data=ces.1)
+tab2_90_3_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+market_liberalism+`1993`+`1997`, data=ces.1)
+tab2_90_4_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+immigration_rates+`1993`+`1997`, data=ces.1)
+tab2_90_5_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+traditionalism2+`1993`+`1997`, data=ces.1)
+tab2_90_6_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`1993`+`1997`, data=ces.1)
+tab2_00_0_conservative<-lm(conservative~degree+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_00_conservative<-lm(conservative~income_tertile+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_1_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_2_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+redistribution+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_3_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+market_liberalism+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_4_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+immigration_rates+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_5_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+traditionalism2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_00_6_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+tab2_10_0_conservative<-lm(conservative~degree+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_00_conservative<-lm(conservative~income_tertile+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_1_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_2_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+redistribution+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_3_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+market_liberalism+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_4_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+immigration_rates+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_5_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+traditionalism2+`2011`+`2015`+`2019`, data=ces.3)
+tab2_10_6_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2011`+`2015`+`2019`, data=ces.3)
+#Make the degree table
+tab2_90_ndp<-list(tab2_90_0_ndp,tab2_90_1_ndp, tab2_90_2_ndp, tab2_90_3_ndp, tab2_90_4_ndp, tab2_90_5_ndp, tab2_90_6_ndp)
+tab2_00_ndp<-list(tab2_00_0_ndp,tab2_00_1_ndp, tab2_00_2_ndp, tab2_00_3_ndp, tab2_00_4_ndp, tab2_00_5_ndp, tab2_00_6_ndp)
+tab2_10_ndp<-list(tab2_10_0_ndp,tab2_10_1_ndp, tab2_10_2_ndp, tab2_10_3_ndp, tab2_10_4_ndp, tab2_10_5_ndp, tab2_10_6_ndp)
+tab2_90_liberal<-list(tab2_90_0_liberal, tab2_90_1_liberal, tab2_90_2_liberal, tab2_90_3_liberal, tab2_90_4_liberal, tab2_90_5_liberal, tab2_90_6_liberal)
+tab2_00_liberal<-list(tab2_00_0_liberal,tab2_00_1_liberal, tab2_00_2_liberal, tab2_00_3_liberal, tab2_00_4_liberal, tab2_00_5_liberal, tab2_90_6_liberal)
+tab2_10_liberal<-list(tab2_10_0_liberal,tab2_10_1_liberal, tab2_10_2_liberal, tab2_10_3_liberal, tab2_10_4_liberal, tab2_10_5_liberal, tab2_90_6_liberal)
+tab2_90_conservative<-list(tab2_90_0_conservative,tab2_90_1_conservative, tab2_90_2_conservative, tab2_90_3_conservative, tab2_90_4_conservative, tab2_90_5_conservative, tab2_90_6_conservative)
+tab2_00_conservative<-list(tab2_00_0_conservative, tab2_00_1_conservative, tab2_00_2_conservative, tab2_00_3_conservative, tab2_00_4_conservative, tab2_00_5_conservative, tab2_00_6_conservative)
+tab2_10_conservative<-list(tab2_10_0_conservative, tab2_10_1_conservative, tab2_10_2_conservative, tab2_10_3_conservative, tab2_10_4_conservative, tab2_10_5_conservative, tab2_10_6_conservative)
+tab2_90_conservative
+
+tab2_90_ndp %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "degree"))->tab2_col1
+
+tab2_00_ndp %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "degree"))->tab2_col2
+tab2_10_ndp %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "degree"))->tab2_col3
+
+tab2_90_liberal %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "degree"))->tab2_col4
+tab2_00_liberal %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "degree"))->tab2_col5
+tab2_10_liberal %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "degree"))->tab2_col6
+tab2_90_conservative %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "degree"))->tab2_col7
+tab2_00_conservative %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "degree"))->tab2_col8
+tab2_10_conservative %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "degree"))->tab2_col9
+tab2_col9
+library(gt)
+cbind(tab2_col1, tab2_col2, tab2_col3, tab2_col4, tab2_col5, tab2_col6, tab2_col7, tab2_col8, tab2_col9) %>% 
+data.frame() %>% 
+  mutate(`Coefficients`=c("No Controls", 
+                          "Demographics", 
+                          "Demographics+Redistribution",
+                          "Demographics+Market Liberalism", 
+                          "Demographics+Immigration",
+                          "Demographics+Traditionalism", 
+                          "Full Model")) %>% 
+  select(`Coefficients`, matches("estimate|p.value")) %>% 
+  gt() %>% 
+  fmt_number(.,columns=2:19, decimals=3) %>% 
+  gtsave(., filename="Tables/table2_simon_degree.html")
+
+#### Make the Income table
+tab2a_90_ndp<-list(tab2_90_00_ndp,tab2_90_1_ndp, tab2_90_2_ndp, tab2_90_3_ndp, tab2_90_4_ndp, tab2_90_5_ndp, tab2_90_6_ndp)
+tab2a_00_ndp<-list(tab2_00_00_ndp,tab2_00_1_ndp, tab2_00_2_ndp, tab2_00_3_ndp, tab2_00_4_ndp, tab2_00_5_ndp, tab2_00_6_ndp)
+tab2a_10_ndp<-list(tab2_10_00_ndp,tab2_10_1_ndp, tab2_10_2_ndp, tab2_10_3_ndp, tab2_10_4_ndp, tab2_10_5_ndp, tab2_10_6_ndp)
+tab2a_90_liberal<-list(tab2_90_00_liberal, tab2_90_1_liberal, tab2_90_2_liberal, tab2_90_3_liberal, tab2_90_4_liberal, tab2_90_5_liberal, tab2_90_6_liberal)
+tab2a_00_liberal<-list(tab2_00_00_liberal,tab2_00_1_liberal, tab2_00_2_liberal, tab2_00_3_liberal, tab2_00_4_liberal, tab2_00_5_liberal, tab2_90_6_liberal)
+tab2a_10_liberal<-list(tab2_10_00_liberal,tab2_10_1_liberal, tab2_10_2_liberal, tab2_10_3_liberal, tab2_10_4_liberal, tab2_10_5_liberal, tab2_90_6_liberal)
+tab2a_90_conservative<-list(tab2_90_00_conservative,tab2_90_1_conservative, tab2_90_2_conservative, tab2_90_3_conservative, tab2_90_4_conservative, tab2_90_5_conservative, tab2_90_6_conservative)
+tab2a_00_conservative<-list(tab2_00_00_conservative, tab2_00_1_conservative, tab2_00_2_conservative, tab2_00_3_conservative, tab2_00_4_conservative, tab2_00_5_conservative, tab2_00_6_conservative)
+tab2a_10_conservative<-list(tab2_10_00_conservative, tab2_10_1_conservative, tab2_10_2_conservative, tab2_10_3_conservative, tab2_10_4_conservative, tab2_10_5_conservative, tab2_10_6_conservative)
+
+tab2a_90_ndp %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "income"))->tab2a_col1
+
+tab2a_00_ndp %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "income"))->tab2a_col2
+tab2a_10_ndp %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "income"))->tab2a_col3
+
+tab2a_90_liberal %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "income"))->tab2a_col4
+tab2a_00_liberal %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "income"))->tab2a_col5
+tab2a_10_liberal %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "income"))->tab2a_col6
+tab2a_90_conservative %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "income"))->tab2a_col7
+tab2a_00_conservative %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "income"))->tab2a_col8
+tab2a_10_conservative %>% 
+  map(., tidy) %>% 
+  bind_rows() %>% 
+  filter(str_detect(term, "income"))->tab2a_col9
+tab2a_col9
+library(gt)
+cbind(tab2a_col1, tab2a_col2, tab2a_col3, tab2a_col4, tab2a_col5, tab2a_col6, tab2a_col7, tab2a_col8, tab2a_col9) %>% 
+  data.frame() %>% 
+  mutate(`Coefficients`=c("No Controls", 
+                          "Demographics", 
+                          "Demographics+Redistribution",
+                          "Demographics+Market Liberalism", 
+                          "Demographics+Immigration",
+                          "Demographics+Traditionalism", 
+                          "Full Model")) %>% 
+  select(`Coefficients`, matches("estimate|p.value")) %>% 
+  gt() %>% 
+  fmt_number(.,columns=2:19, decimals=3) %>% 
+  gtsave(., filename="Tables/table2_simon_income.html")
+  
+  
+
+#### Postgrad robustness check (postgrad substituted for degree 1988-2019)#### 
+
+
+#### Postgrad robustness check  Degree and Income gap for left-right block ####
 ces %>% 
   nest(variables=-election) %>%
   filter(election>1984 & election<2021) %>% 
@@ -949,7 +1067,7 @@ ggsave(here("Plots", "block_postgrad_income_with_error.png"), width=8, height=6)
 
 
 #### Decompose By Party
-#### Basic Party vote models 1965-2021 ####
+#### Postgrad robustness check Basic Party vote models 1965-2021 ####
 ces %>%
   nest(variables=-election) %>%
   filter(election>1984 & election<2021) %>%
@@ -1004,7 +1122,7 @@ ndp_models_complete1 %>%
   theme(axis.text.x=element_text(angle=90))
 ggsave(here("Plots", "ols_postgrad_party_income.png"), width=8, height=4)
 
-#### Average Scores For Degree Versus Average ####
+#### Postgrad robustness check Average Scores For Degree Versus Average ####
 
 ces %>% 
   select(election, postgrad, redistribution_reversed, immigration_rates, market_liberalism, traditionalism2) %>%
@@ -1055,8 +1173,8 @@ ces %>%
   labs(y="Year") 
 ggsave(filename=here("Plots", "means_postgrad_redistribution_party.png"), width=8, height=8)
 
-#### Pooled OLS Models by decade  - Postgrad substituted for degree####
 #What we need is by decade, minus the BQ and the Greens
+ces$region2<-relevel(ces$region2, "Atlantic")
 ces %>% 
   filter(election<1999 & election> 1989 )->ces.1
 ces %>% 
@@ -1065,9 +1183,10 @@ ces %>%
   filter(election<2020 & election> 2009 )->ces.3
 names(ces)
 
-# NDP Models
-ces$region2<-relevel(ces$region2, "Atlantic")
+#### Pooled OLS Models by decade  - Postgrad substituted for degree####
 
+
+# NDP Models
 m31<-lm(ndp~region2+age+male+postgrad+income_tertile+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+`1993`+`1997`, data=ces.1)
 m32<-lm(ndp~region2+age+male+postgrad+income_tertile+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+`2000`+`2004`+`2006`+`2008`, data=ces.2)
 m33<-lm(ndp~region2+age+male+postgrad+income_tertile+religion2+redistribution+market_liberalism+traditionalism2+immigration_rates+`2011`+`2015`+`2019`, data=ces.3)
@@ -1105,15 +1224,17 @@ interaction.models<-list(m40, m41, m42, m43, m44, m45, m46, m47, m48)
 interaction.models2<-list(m49, m50, m51, m52, m53, m54, m55, m56, m57)
 interaction.models
 #### Stargazer Interaction models
+# 
+# stargazer(interaction.models, 
+#           out=here("Tables", "interaction_models_degree_redistribution.html"),
+#           ep.var.labels=c("NDP", "Liberal", "Conservative"),
+#           omit=c(".[12][90]"), digits=2, column.labels=rep(c("1990s", "2000s", "2010s"), 3))
+# stargazer(interaction.models2, 
+#           out=here("Tables", "interaction_models_income_redistribution.html"),
+#           ep.var.labels=c("NDP", "Liberal", "Conservative"),
 
-stargazer(interaction.models, 
-          out=here("Tables", "interaction_models_degree_redistribution.html"),
-          ep.var.labels=c("NDP", "Liberal", "Conservative"),
-          omit=c(".[12][90]"), digits=2, column.labels=rep(c("1990s", "2000s", "2010s"), 3))
-stargazer(interaction.models2, 
-          out=here("Tables", "interaction_models_income_redistribution.html"),
-          ep.var.labels=c("NDP", "Liberal", "Conservative"),
-          omit=c(".[12][90]"), digits=2, column.labels=rep(c("1990s", "2000s", "2010s"), 3))
+
+
 #### Graph Degree & Income x Redistribution interactions ####
 
 names(interaction.models)<-c(rep("NDP", 3), rep("Liberal", 3), rep("Conservative", 3))
@@ -1161,4 +1282,104 @@ interaction.models2 %>%
   filter(str_detect(term, ":")) %>% 
   ggplot(., aes(x=Period, y=estimate, col=Period))+geom_point()+facet_grid(term~fct_relevel(Party, "NDP", "Liberal"), scales="free")+scale_color_grey(start=0.8, end=0.2) +geom_errorbar(width=0, aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+   geom_hline(yintercept=0,  linetype=2)+theme(strip.text.y.right = element_text(angle = 0))+labs(y="Coefficient")
 ggsave(filename=here("Plots", "postgrad_redistribution_interaction_terms.png"), width=8, height=4)
+
+#### Multinomial Robustness Check
+
+#### Repeat the same with multinomial
+
+
+library(nnet)
+table(ces$vote3)
+ces$degree
+ces$degree<-as_factor(ces$degree)
+ces$male<-as_factor(ces$male)
+ces %>%
+  nest(variables=-election) %>%
+  filter(election<2021) %>% 
+  mutate(model=map(variables, function(x) multinom(vote2~region2+
+                                                     male+
+                                                     age+
+                                                     income_tertile+
+                                                     degree+
+                                                     religion2, data=x)), 
+         tidied=map(model, tidy)) ->multinom_models
+names(multinom_models)
+multinom_models$tidied
+#Get predicted probabilities
+# Degree
+library(modelsummary)
+library(marginaleffects)
+#Assign names to the list of models
+names(multinom_models$model)<-multinom_models$election
+names(multinom_models$tidied)<-multinom_models$election
+# Comparison of Predicted Probabilities for Degree
+glimpse(multinom_models)
+multinom_models$model%>%
+  map_df(., function(x)
+    avg_comparisons(x, variables=list(degree="reference")), .id="Election" )%>% 
+  filter(group!="Green"&group!="BQ") %>% 
+  mutate(Election=as.Date(Election, "%Y")) %>% 
+  ggplot(., aes(x=Election,y=estimate, col=group))+
+  geom_pointrange(aes(ymin=conf.low, ymax=conf.high))+
+  facet_grid(~group)+
+  #geom_smooth(method="loess", se=F)+
+  scale_color_manual(values=c("darkblue", "darkred", "orange"))+
+  theme(legend.position="none", strip.text.y = element_text(angle=0))+
+  labs(y="Delta Predicted Probability", caption="Change in Predicted Probability of Voting For Conservative, Liberal, NDP, degree holders compared to non-degree holders. , controlling for age, income, degree, region and religion")+
+  scale_x_date(date_labels="%Y")+
+  geom_smooth(method="loess", se=F, linewidth=0.5)
+ggsave(filename=here("Plots/comparison_predicted_probabilities_degree.png"), width=12, height=6)
+
+multinom_models$model%>%
+  map_df(., function(x)
+    avg_comparisons(x, variables=list(income_tertile=c(1,3))), .id="Election") %>% 
+  filter(group!="Green"&group!="BQ") %>% 
+  mutate(Election=as.Date(Election, "%Y")) %>% 
+  ggplot(., aes(x=Election,y=estimate, col=group))+
+  geom_pointrange(aes(ymin=conf.low, ymax=conf.high))+
+  facet_grid(~group)+
+  #geom_smooth(method="loess", se=F)+
+  scale_color_manual(values=c("darkblue", "darkred", "orange"))+
+  theme(legend.position="none")+
+  labs(y="Delta Predicted Probability", caption="Change in Predicted Probability of Voting For Conservative, Liberal, NDP, highest income tercile compared to the lowest, controlling for age, income, degree, region and religion")+
+  scale_x_date(date_labels="%Y")+
+  geom_smooth(method="loess", se=F, linewidth=0.5)
+ggsave(filename=here("Plots/comparison_predicted_probabilities_income.png"), width=12, height=6)
+
+
+
+#Coefficients for degree
+
+multinom_models$tidied %>% 
+  bind_rows(.id="Election") %>%
+  filter(term=="degreeDegree") %>% 
+  filter(y.level=="NDP"|y.level=="Liberal") %>% 
+  mutate(Election=as.Date(Election, format="%Y")) %>% 
+  ggplot(., aes(x=Election, y=estimate, group=y.level, col=y.level))+
+  geom_pointrange(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+
+  facet_grid(~y.level)+scale_x_date(date_labels="%Y")+
+  scale_color_manual(values=c("darkred", "orange"))+
+  geom_smooth(method="loess",se=F, linewidth=1)+
+  theme(legend.position="none")+
+  labs(y="Logit", caption="Effect of degree status on vote for Liberals / NDP v. Conservative\nControlling for age, gender, region, degree status,religion and income")
+ggsave(filename=here("Plots/coefficients_multinomial_degree.png"), width=8, height=6)
+
+# Coefficients for Income
+multinom_models$tidied %>% 
+  bind_rows(.id="Election") %>%
+  filter(term=="income_tertile") %>% 
+  filter(y.level=="NDP"|y.level=="Liberal") %>% 
+  mutate(Election=as.Date(Election, format="%Y")) %>% 
+  ggplot(., aes(x=Election, y=estimate, group=y.level, col=y.level))+
+  geom_pointrange(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+
+  facet_grid(~y.level)+scale_x_date(date_labels="%Y")+
+  geom_smooth(method="loess",se=F)+
+  scale_color_manual(values=c("darkred", "orange"))+
+  theme(legend.position="none")+
+  labs(y="Logit", caption="Effect of income on vote for Liberals / NDP v. Conservative\nControlling for age, gender, region, degree status,religion and income")
+ggsave(filename=here("Plots/coefficients_multinomial_income.png"), width=8, height=6)
+
+
+
+
 
