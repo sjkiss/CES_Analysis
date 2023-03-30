@@ -138,6 +138,14 @@ val_labels(ces72_nov$income_tertile)<-c(Lowest=1, Middle=2,Highest=3)
 val_labels(ces72_nov$income)
 table(ces72_nov$income)
 
+#recode foreign born (qx) - CES seems mis-coded as no foreign respondents
+look_for(ces72_nov, "born")
+ces72_nov$foreign<-Recode(ces72_nov$qx, "3=1; 1:2=0; 4=0; else=NA")
+val_labels(ces72_nov$foreign)<-c(No=0, Yes=1)
+#checks
+val_labels(ces72_nov$foreign)
+table(ces72_nov$foreign, ces72_nov$qx, useNA="ifany")
+table(ces72_nov$foreign)
 
 #Empty variables that are not available pre-88
 ces72_nov$redistribution<-rep(NA, nrow(ces72_nov))

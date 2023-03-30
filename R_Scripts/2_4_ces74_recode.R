@@ -266,6 +266,13 @@ ces74 %>%
   select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
   cor(., use="complete.obs")
 
+#recode foreign born (V456)
+look_for(ces74, "birth")
+ces74$foreign<-Recode(ces74$V456, "1=0; 2:12=1; else=NA")
+val_labels(ces74$foreign)<-c(No=0, Yes=1)
+#checks
+val_labels(ces74$foreign)
+table(ces74$foreign, ces74$V456, useNA="ifany")
 
 names(ces74)
 ces74$V92

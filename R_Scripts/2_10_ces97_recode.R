@@ -213,6 +213,13 @@ val_labels(ces97$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
 #checks
 val_labels(ces97$income_tertile)
 table(ces97$income_tertile)
+
+#####recode Household size (cpshhwgt)####
+look_for(ces97, "house")
+ces97$household<-Recode(ces97$cpshhwgt, "0.5056=0.5; 1.0111=1; 1.5167=1.5; 2.0223=2; 2.5278=2.5; 3.0334=3; 3.539=3.5; 4.5501=4.5")
+#checks
+table(ces97$household)
+
 ####recode Religiosity (pesm10b)####
 look_for(ces97, "relig")
 ces97$religiosity<-Recode(ces97$pesm10b, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
@@ -634,11 +641,15 @@ val_labels(ces97$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4,
                          Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17)
 table(ces97$mip)
 
-# recode satisfaction with democracy (cpsb9)
+# recode satisfaction with democracy (cpsb9, pesa5b)
 look_for(ces97, "dem")
-ces97$satdem<-Recode(ces97$cpsb9, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+ces97$satdem<-Recode(ces97$pesa5b, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
-table(ces97$satdem, ces97$cpsb9, useNA = "ifany" )
+table(ces97$satdem, ces97$pesa5b, useNA = "ifany" )
+
+ces97$satdem2<-Recode(ces97$cpsb9, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces97$satdem2, ces97$cpsb9, useNA = "ifany" )
 
 #recode Quebec Sovereignty (pese10) (Quebec only & Right=more sovereignty)
 look_for(ces97, "sovereignty")
@@ -682,3 +693,16 @@ table(ces97$promise, ces97$cpsj13 , useNA = "ifany" )
 
 #recode Trust - not available
 
+# recode political interest (cpsb5)
+look_for(ces97, "interest")
+ces97$pol_interest<-Recode(ces97$cpsb5, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
+#checks
+table(ces97$pol_interest, ces97$cpsb5, useNA = "ifany" )
+
+#recode foreign born (cpsm11)
+look_for(ces97, "birth")
+ces97$foreign<-Recode(ces97$cpsm11, "1=0; 2:97=1; 0=1; else=NA")
+val_labels(ces97$foreign)<-c(No=0, Yes=1)
+#checks
+val_labels(ces97$foreign)
+table(ces97$foreign, ces97$cpsm11, useNA="ifany")

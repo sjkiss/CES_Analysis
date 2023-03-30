@@ -231,7 +231,6 @@ ces15phone$income_cat_missing<-Recode(as.numeric(ces15phone$CPS15_93), "1:5='val
 table(ces15phone$income_number_missing)
 table(ces15phone$income_cat_missing) #People are much more likely to report with the numberl
 
-
 #Income Tertile
 ces15phone %>% 
   mutate(income_tertile=case_when(
@@ -248,6 +247,13 @@ ces15phone %>%
     CPS15_93 ==5 ~3
   ))->ces15phone
 val_labels(ces15phone$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
+
+#### recode Household size (NADULTS)####
+look_for(ces15phone, "household")
+ces15phone$household<-Recode(ces15phone$NADULTS, "1=0.5; 2=1; 3=1.5; 4=2; 5=2.5; 6=3; 7=3.5")
+#checks
+table(ces15phone$household, useNA = "ifany" )
+
 #recode Religiosity (CPS15_82)
 look_for(ces15phone, "relig")
 ces15phone$religiosity<-Recode(ces15phone$CPS15_82, "7=1; 5=2; 98=3; 3=4; 1=5; else=NA")
@@ -925,6 +931,10 @@ ces15phone$satdem<-Recode(ces15phone$CPS15_0, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; 
 #checks
 table(ces15phone$satdem, ces15phone$CPS15_0, useNA = "ifany" )
 
+ces15phone$satdem2<-Recode(ces15phone$CPS15_0, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces15phone$satdem2, ces15phone$CPS15_0, useNA = "ifany" )
+
 # recode Quebec Sovereignty (CPS15_75) (Right=more sovereignty)
 look_for(ces15phone, "sovereignty")
 ces15phone$quebec_sov<-Recode(ces15phone$CPS15_75, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
@@ -980,3 +990,17 @@ val_labels(ces15phone$trust)<-c(no=0, yes=1)
 val_labels(ces15phone$trust)
 table(ces15phone$trust)
 table(ces15phone$trust, ces15phone$PES15_89 , useNA = "ifany" )
+
+# recode political interest (PES15_60)
+look_for(ces15phone, "interest")
+ces15phone$pol_interest<-Recode(ces15phone$PES15_60, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
+#checks
+table(ces15phone$pol_interest, ces15phone$PES15_60, useNA = "ifany" )
+
+#recode foreign born (CPS15_83)
+look_for(ces15phone, "born")
+ces15phone$foreign<-Recode(ces15phone$CPS15_83, "1=0; 2:97=1; 0=0; else=NA")
+val_labels(ces15phone$foreign)<-c(No=0, Yes=1)
+#checks
+val_labels(ces15phone$foreign)
+table(ces15phone$foreign, ces15phone$CPS15_83, useNA="ifany")

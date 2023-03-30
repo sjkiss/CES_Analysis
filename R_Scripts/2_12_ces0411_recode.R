@@ -340,6 +340,13 @@ ces0411 %>%
   filter(income042==3&income_tertile04==3) %>% 
   select(ces04_CPS_S18, income042, income_tertile04) %>% 
   View()
+
+#### recode Household size (ces04_CESHHWGT)####
+look_for(ces0411, "household")
+ces0411$household04<-Recode(ces0411$ces04_CESHHWGT, "0.5078=0.5; 1.0156=1; 1.5234=1.5; 2.0312=2; 2.5391=2.5; 3.0469=3; 3.5547=3.5")
+#checks
+table(ces0411$household04)
+
 #### recode Religiosity (ces04_CPS_S11)#### 
 look_for(ces0411, "relig")
 ces0411$religiosity04<-Recode(ces0411$ces04_CPS_S11, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
@@ -726,11 +733,15 @@ val_labels(ces0411$mip04)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Educatio
                          Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17)
 table(ces0411$mip04)
 
-#### recode satisfaction with democracy (ces04_CPS_B10) ####
+#### recode satisfaction with democracy (ces04_CPS_B10, ces04_PES_A8) ####
 look_for(ces0411, "dem")
-ces0411$satdem04<-Recode(ces0411$ces04_CPS_B10, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+ces0411$satdem04<-Recode(ces0411$ces04_PES_A8, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
-table(ces0411$satdem04, ces0411$ces04_CPS_B10, useNA = "ifany" )
+table(ces0411$satdem04, ces0411$ces04_PES_A8, useNA = "ifany" )
+
+ces0411$satdem204<-Recode(ces0411$ces04_CPS_B10, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$satdem204, ces0411$ces04_CPS_B10, useNA = "ifany" )
 
 #### recode Quebec Sovereignty (ces04_PES_C10) (Quebec only & Right=more sovereignty) ####
 look_for(ces0411, "quebec")
@@ -779,6 +790,20 @@ val_labels(ces0411$trust04)<-c(no=0, yes=1)
 val_labels(ces0411$trust04)
 table(ces0411$trust04)
 table(ces0411$trust04, ces0411$ces04_PES_D7 , useNA = "ifany" )
+
+#### recode political interest (ces04_CPS_A6) ####
+look_for(ces0411, "interest")
+ces0411$pol_interest04<-Recode(ces0411$ces04_CPS_A6, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
+#checkst
+table(ces0411$pol_interest04, ces0411$ces04_CPS_A6, useNA = "ifany" )
+
+#### recode foreign born (ces04_CPS_S12) #### 
+look_for(ces0411, "born")
+ces0411$foreign04<-Recode(ces0411$ces04_CPS_S12, "1=0; 2:97=1; else=NA")
+val_labels(ces0411$foreign04)<-c(No=0, Yes=1)
+#checks
+val_labels(ces0411$foreign04)
+table(ces0411$foreign04, ces0411$ces04_CPS_S12, useNA="ifany")
 
 ###Recode 2006 2nd ####
 
@@ -1189,6 +1214,12 @@ ces0411 %>%
 val_labels(ces0411$income06)
 table(ces0411$income06)
 
+#### recode Household size (ces06_CESHHWGT)####
+look_for(ces0411, "household")
+ces0411$household06<-Recode(ces0411$ces06_CESHHWGT, "0.542586=0.5; 1.085172=1; 1.627758=1.5; 2.170344=2; 2.71293=2.5; 3.255515=3; 3.798101=3.5; 5.968445=5.5")
+#checks
+table(ces0411$household06)
+
 #### recode Religiosity (ces06_CPS_S11)#### 
 look_for(ces0411, "relig")
 ces0411$religiosity06<-Recode(ces0411$ces06_CPS_S11, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
@@ -1545,11 +1576,15 @@ val_labels(ces0411$mip06)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Educatio
                              Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17)
 table(ces0411$mip06)
 
-#### recode satisfaction with democracy (ces06_CPS_A1) ####
+#### recode satisfaction with democracy (ces06_CPS_A1, ces06_PES_B10) ####
 look_for(ces0411, "dem")
-ces0411$satdem06<-Recode(ces0411$ces06_CPS_A1, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+ces0411$satdem06<-Recode(ces0411$ces06_PES_B10, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
-table(ces0411$satdem06, ces0411$ces06_CPS_A1, useNA = "ifany" )
+table(ces0411$satdem06, ces0411$ces06_PES_B10, useNA = "ifany" )
+
+ces0411$satdem206<-Recode(ces0411$ces06_CPS_A1, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$satdem206, ces0411$ces06_CPS_A1, useNA = "ifany" )
 
 #### recode Quebec Sovereignty (ces06_CPS_I8) (Quebec only & Right=more sovereignty) ####
 look_for(ces0411, "quebec")
@@ -1593,6 +1628,19 @@ table(ces0411$promise06, ces0411$ces06_CPS_P9 , useNA = "ifany" )
 
 #### recode Trust (not available in 2006) ####
 
+#### recode political interest (ces06_CPS_A8) ####
+look_for(ces0411, "interest")
+ces0411$pol_interest06<-Recode(ces0411$ces06_CPS_A8, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
+#checkst
+table(ces0411$pol_interest06, ces0411$ces06_CPS_A8, useNA = "ifany" )
+
+#### recode foreign born (ces06_CPS_S12) #### 
+look_for(ces0411, "born")
+ces0411$foreign06<-Recode(ces0411$ces06_CPS_S12, "1=0; 2:97=1; 0=0; else=NA")
+val_labels(ces0411$foreign06)<-c(No=0, Yes=1)
+#checks
+val_labels(ces0411$foreign06)
+table(ces0411$foreign06, ces0411$ces06_CPS_S12, useNA="ifany")
 
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
@@ -2110,7 +2158,22 @@ val_labels(ces0411$income_tertile08)<-c(Lowest=1, Middle=2, Highest=3)
    table( ces0411$ces08_CPS_S18A,ces0411$income_tertile08, useNA="ifany")
    table( ces0411$ces08_PES_S9A,ces0411$income_tertile08, useNA="ifany")
    
-
+#### recode Household size (ces08_HHWGT)####
+look_for(ces0411, "household")
+#ces0411$household08<-Recode(ces0411$ces08_HHWGT, "0.518795794839121=0.5; 1.03759158967824=1; 1.55638738451736=1.5; 2.07518317935648=2; 2.5939789741956=2.5; 3.11277476903472=3; 5.18795794839121=5")
+ces0411 %>% 
+  mutate(household08=case_when(
+    ces08_HHWGT> 0 & ces08_HHWGT< 1 ~ 0.5,
+    ces08_HHWGT> 1 & ces08_HHWGT< 1.5 ~ 1,
+    ces08_HHWGT> 1.5 & ces08_HHWGT< 2 ~ 1.5,
+    ces08_HHWGT> 2 & ces08_HHWGT< 2.5 ~ 2,
+    ces08_HHWGT> 2.5 & ces08_HHWGT< 3 ~ 2.5,
+    ces08_HHWGT> 3 & ces08_HHWGT< 3.5 ~ 3,
+    ces08_HHWGT> 5 & ces08_HHWGT< 5.5 ~ 5,
+  ))->ces0411
+#checks
+table(ces0411$household08)
+   
 #### recode Religiosity (ces08_CPS_S11)#### 
 look_for(ces0411, "relig")
 ces0411$religiosity08<-Recode(ces0411$ces08_CPS_S11, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
@@ -2517,6 +2580,10 @@ ces0411$satdem08<-Recode(ces0411$ces08_CPS_A1, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5;
 #checks
 table(ces0411$satdem08, ces0411$ces08_CPS_A1, useNA = "ifany" )
 
+ces0411$satdem208<-Recode(ces0411$ces08_CPS_A1, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$satdem208, ces0411$ces08_CPS_A1, useNA = "ifany" )
+
 #### recode Quebec Sovereignty (ces08_CPS_Q9) (Quebec only & Right=more sovereignty) ####
 look_for(ces0411, "quebec")
 ces0411$quebec_sov08<-Recode(ces0411$ces08_CPS_Q9, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
@@ -2570,6 +2637,20 @@ val_labels(ces0411$trust08)<-c(no=0, yes=1)
 val_labels(ces0411$trust08)
 table(ces0411$trust08)
 table(ces0411$trust08, ces0411$ces08_PES_TRUST_1 , useNA = "ifany" )
+
+#### recode political interest (ces08_CPS_A4) ####
+look_for(ces0411, "interest")
+ces0411$pol_interest08<-Recode(ces0411$ces08_CPS_A4, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
+#checkst
+table(ces0411$pol_interest08, ces0411$ces08_CPS_A4, useNA = "ifany" )
+
+#### recode foreign born (ces08_CPS_S12) #### 
+look_for(ces0411, "born")
+ces0411$foreign08<-Recode(ces0411$ces08_CPS_S12, "1=0; 2:97=1; 0=0; else=NA")
+val_labels(ces0411$foreign08)<-c(No=0, Yes=1)
+#checks
+val_labels(ces0411$foreign08)
+table(ces0411$foreign08, ces0411$ces08_CPS_S12, useNA="ifany")
 
 ####Recode 2011 4th ####
 
@@ -2798,6 +2879,12 @@ ces0411 %>%
 #checks
 val_labels(ces0411$income_tertile11)<-c(Lowest=1,  Middle=2, Highest=3)
 table(ces0411$income11, useNA = "ifany" )
+
+#### recode Household size (NADULTS11)####
+look_for(ces0411, "household")
+ces0411$household11<-Recode(ces0411$NADULTS11, "1=0.5; 2=1; 3=1.5; 4=2; 5=2.5; 6=3; 7=3.5; 8=4")
+#checks
+table(ces0411$household11, useNA = "ifany" )
 
 #### recode Religiosity (CPS11_82)#### 
 look_for(ces0411, "relig")
@@ -3192,6 +3279,10 @@ ces0411$satdem11<-Recode(ces0411$CPS11_0, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else
 #checks
 table(ces0411$satdem11, ces0411$CPS11_0, useNA = "ifany" )
 
+ces0411$satdem211<-Recode(ces0411$CPS11_0, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces0411$satdem211, ces0411$CPS11_0, useNA = "ifany" )
+
 #### recode Quebec Sovereignty (CPS11_75) (Quebec only & Right=more sovereignty) ####
 look_for(ces0411, "sovereignty")
 ces0411$quebec_sov11<-Recode(ces0411$CPS11_75, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
@@ -3239,3 +3330,17 @@ val_labels(ces0411$trust11)<-c(no=0, yes=1)
 val_labels(ces0411$trust11)
 table(ces0411$trust11)
 table(ces0411$trust11, ces0411$PES11_89 , useNA = "ifany" )
+
+#### recode political interest (PES11_60) ####
+look_for(ces0411, "interest")
+ces0411$pol_interest11<-Recode(ces0411$PES11_60, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
+#checkst
+table(ces0411$pol_interest11, ces0411$PES11_60, useNA = "ifany" )
+
+#### recode foreign born (CPS11_83) #### 
+look_for(ces0411, "born")
+ces0411$foreign11<-Recode(ces0411$CPS11_83, "1=0; 2:97=1; 0=0; else=NA")
+val_labels(ces0411$foreign11)<-c(No=0, Yes=1)
+#checks
+val_labels(ces0411$foreign11)
+table(ces0411$foreign11, ces0411$CPS11_83, useNA="ifany")

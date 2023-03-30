@@ -121,7 +121,7 @@ table(ces80$vote, ces80$vote80)
 ##We just need to turn the variables that end with 80 into regularly named variables.
 
 ces80 %>% 
-  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income,income_tertile, income2, occupation, occupation3, religion, non_charter_language, size, ideology, turnout, redistribution, market_liberalism, immigration_rates, traditionalism2, mip=mip80)->ces80
+  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income,income_tertile, income2, occupation, occupation3, religion, non_charter_language, size, ideology, turnout, redistribution, market_liberalism, immigration_rates, traditionalism2, mip=mip80, foreign=foreign80)->ces80
 
 ### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
   ces93[!is.na(ces93$RTYPE4), ] -> ces93
@@ -326,6 +326,8 @@ ces04 %>%
 ces04 %>% 
   rename(satdem=satdem04)->ces04
 ces04 %>% 
+  rename(satdem2=satdem204)->ces04
+ces04 %>% 
   rename(postgrad=postgrad04)->ces04
 ces04 %>% 
   rename(market1=market041)->ces04
@@ -350,6 +352,12 @@ ces04 %>%
   rename(promise=promise04)->ces04
 ces04 %>% 
   rename(trust=trust04)->ces04
+ces04 %>% 
+  rename(household=household04)->ces04
+ces04 %>% 
+  rename(pol_interest=pol_interest04)->ces04
+ces04 %>% 
+  rename(foreign=foreign04)->ces04
 
 #### Rename CES06 ####
 ces06 %>% 
@@ -451,6 +459,8 @@ ces06 %>%
 ces06 %>% 
   rename(satdem=satdem06)->ces06
 ces06 %>% 
+  rename(satdem2=satdem206)->ces06
+ces06 %>% 
   rename(postgrad=postgrad06)->ces06
 ces06 %>% 
   rename(market1=market061)->ces06
@@ -471,6 +481,12 @@ ces06 %>%
 #ces06 %>% 
 #  rename(trust=trust06)->ces06
 table(ces06$survey, ces06$non_charter_language)
+ces06 %>% 
+  rename(household=household06)->ces06
+ces06 %>% 
+  rename(pol_interest=pol_interest06)->ces06
+ces06 %>% 
+  rename(foreign=foreign06)->ces06
 
 #### Rename CES08 ####
 ces08 %>% 
@@ -574,6 +590,8 @@ ces08 %>%
 ces08 %>% 
   rename(satdem=satdem08)->ces08
 ces08 %>% 
+  rename(satdem2=satdem208)->ces08
+ces08 %>% 
   rename(postgrad=postgrad08)->ces08
 ces08 %>% 
   rename(market1=market081)->ces08
@@ -594,6 +612,12 @@ ces08 %>%
 ces08 %>% 
   rename(trust=trust08)->ces08
 table(ces08$survey, ces08$non_charter_language)
+ces08 %>% 
+  rename(household=household08)->ces08
+ces08 %>% 
+  rename(pol_interest=pol_interest08)->ces08
+ces08 %>% 
+  rename(foreign=foreign08)->ces08
 
 #### Rename CES11 ####
 ces11 %>% 
@@ -695,6 +719,8 @@ ces11 %>%
 ces11 %>% 
   rename(satdem=satdem11)->ces11
 ces11 %>% 
+  rename(satdem2=satdem211)->ces11
+ces11 %>% 
   rename(postgrad=postgrad11)->ces11
 ces11 %>% 
   rename(market1=market111)->ces11
@@ -716,6 +742,12 @@ ces11 %>%
   rename(promise=promise11)->ces11
 ces11 %>% 
   rename(trust=trust11)->ces11
+ces11 %>% 
+  rename(household=household11)->ces11
+ces11 %>% 
+  rename(pol_interest=pol_interest11)->ces11
+ces11 %>% 
+  rename(foreign=foreign11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -729,7 +761,7 @@ ces11 %>%
 ##We are going to make a list of each survey
 ces.list<-list(ces65, ces68, ces72_nov, ces74, ces79, ces80, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone, ces19phone, ces21)
 #WE are going to name each item in the list
-names(ces.list)<-c(1965, 1968, 1972,1974, 1979,1980, 1984, 1988, 1993, 1997, 2000, 2004, 2006, 2008, 2011, 2015, 2019, 2021)
+names(ces.list)<-c(1965, 1968, 1972, 1974, 1979, 1980, 1984, 1988, 1993, 1997, 2000, 2004, 2006, 2008, 2011, 2015, 2019, 2021)
 
 ces.list %>% 
   map(., names)
@@ -756,8 +788,8 @@ common_vars<-c('male',
                'trad1', 'trad2', 'immigration_rates',
                'market1','market2',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 'vote3',
-               'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich', 'promise', 'trust',
-               'non_charter_language', 'language', 'employment', 'satdem', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'enviro', 'ideology')
+               'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich', 'promise', 'trust', 'pol_interest', 'foreign',
+               'non_charter_language', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology')
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
@@ -1029,6 +1061,11 @@ table(ces$inequality, ces$election)
 table(ces$turnout, ces$election)
 table(ces$promise, ces$election)
 table(ces$trust, ces$election)
+table(ces$satdem, ces$election)
+table(ces$satdem2, ces$election)
+table(ces$pol_interest, ces$election)
+table(ces$foreign, ces$election)
+table(ces$household, ces$election)
 
 table(ces$vote3, ces$election)
 

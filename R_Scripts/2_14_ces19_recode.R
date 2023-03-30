@@ -188,6 +188,12 @@ val_labels(ces19phone$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_
 val_labels(ces19phone$religiosity)
 table(ces19phone$religiosity)
 
+#### recode Household size (q71)####
+look_for(ces19phone, "household")
+ces19phone$household<-Recode(ces19phone$q71, "1=0.5; 2=1; 3=1.5; 4=2; 5=2.5; 6=3; 7=3.5; 8=4; 9=4.5; 10=5; 12=6; 13=6.5; 15=7.5; else=NA")
+#checks
+table(ces19phone$household, useNA = "ifany" )
+
 #recode Community Size (p57)
 look_for(ces19phone, "live")
 ces19phone$size<-Recode(ces19phone$p57, "1=1; 2=2; 3=3; 4=4; 5=5; else=NA")
@@ -767,11 +773,15 @@ val_labels(ces19phone$turnout)
 table(ces19phone$turnout)
 table(ces19phone$turnout, ces19phone$vote)
 
-# recode satisfaction with democracy (q6)
+# recode satisfaction with democracy (q6, p4)
 look_for(ces19phone, "dem")
-ces19phone$satdem<-Recode(ces19phone$q6, "1=1; 2=0.75; 3=0.25; 4=0; -9=0.5; else=NA", as.numeric=T)
+ces19phone$satdem<-Recode(ces19phone$p4, "1=1; 2=0.75; 3=0.25; 4=0; -9=0.5; else=NA", as.numeric=T)
 #checks
-table(ces19phone$satdem, ces19phone$q6, useNA = "ifany" )
+table(ces19phone$satdem, ces19phone$p4, useNA = "ifany" )
+
+ces19phone$satdem2<-Recode(ces19phone$q6, "1=1; 2=0.75; 3=0.25; 4=0; -9=0.5; else=NA", as.numeric=T)
+#checks
+table(ces19phone$satdem2, ces19phone$q6, useNA = "ifany" )
 
 # recode immigration society (p22_b)
 look_for(ces19phone, "culture")
@@ -791,3 +801,17 @@ ces19phone$efficacy_rich<-Recode(ces19phone$p20_n, "1=0; 2=0.25; 3=0.5; 4=0.75; 
 #checks
 table(ces19phone$efficacy_rich)
 table(ces19phone$efficacy_rich, ces19phone$p20_n)
+
+# recode political interest (p27)
+look_for(ces19phone, "interest")
+ces19phone$pol_interest<-Recode(ces19phone$p27, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
+#checks
+table(ces19phone$pol_interest, ces19phone$p27, useNA = "ifany" )
+
+#recode foreign born (q64)
+look_for(ces19phone, "born")
+ces19phone$foreign<-Recode(ces19phone$q64, "1:2=0; 3:13=1; else=NA")
+val_labels(ces19phone$foreign)<-c(No=0, Yes=1)
+#checks
+val_labels(ces19phone$foreign)
+table(ces19phone$foreign, ces19phone$q64, useNA="ifany")

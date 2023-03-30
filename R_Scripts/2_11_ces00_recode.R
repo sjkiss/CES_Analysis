@@ -236,6 +236,12 @@ look_for(ces00, "employment")
 look_for(ces00, "career")
 ces00$bycat_15
 
+#####recode Household size (ceshhwgt)####
+look_for(ces00, "house")
+ces00$household<-Recode(ces00$ceshhwgt, "0.5174=0.5; 1.0347=1; 1.5521=1.5; 2.0694=2; 2.5868=2.5; 3.1042=3; 3.6215=3.5; 4.6562=4.5; 5.1736=5")
+#checks
+table(ces00$household)
+
 ####recode Religiosity (cpsm10b)####
 look_for(ces00, "relig")
 ces00$religiosity<-Recode(ces00$cpsm10b, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
@@ -644,11 +650,15 @@ val_labels(ces00$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4,
                          Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17)
 table(ces00$mip)
 
-# recode satisfaction with democracy (cpsa8)
+# recode satisfaction with democracy (cpsa8, pesa6)
 look_for(ces00, "dem")
-ces00$satdem<-Recode(ces00$cpsa8, "1=1; 3=0.75; 5=0.25; 7=0; 98=0.5; else=NA", as.numeric=T)
+ces00$satdem<-Recode(ces00$pesa6, "1=1; 3=0.75; 5=0.25; 7=0; 98=0.5; else=NA", as.numeric=T)
 #checks
-table(ces00$satdem, ces00$cpsa8, useNA = "ifany" )
+table(ces00$satdem, ces00$pesa6, useNA = "ifany" )
+
+ces00$satdem2<-Recode(ces00$cpsa8, "1=1; 3=0.75; 5=0.25; 7=0; 98=0.5; else=NA", as.numeric=T)
+#checks
+table(ces00$satdem2, ces00$cpsa8, useNA = "ifany" )
 
 #recode Quebec Sovereignty (pesc6) (Quebec only & Right=more sovereignty)
 look_for(ces00, "sovereignty")
@@ -698,3 +708,17 @@ val_labels(ces00$trust)<-c(no=0, yes=1)
 val_labels(ces00$trust)
 table(ces00$trust)
 table(ces00$trust, ces00$cpsj13 , useNA = "ifany" )
+
+# recode political interest (cpsb5)
+look_for(ces00, "interest")
+ces00$pol_interest<-Recode(ces00$cpsb5, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
+#checks
+table(ces00$pol_interest, ces00$cpsb5, useNA = "ifany" )
+
+#recode foreign born (cpsm11)
+look_for(ces00, "born")
+ces00$foreign<-Recode(ces00$cpsm11, "1=0; 2:97=1; 0=1; else=NA")
+val_labels(ces00$foreign)<-c(No=0, Yes=1)
+#checks
+val_labels(ces00$foreign)
+table(ces00$foreign, ces00$cpsm11, useNA="ifany")

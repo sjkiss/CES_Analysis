@@ -521,6 +521,10 @@ ces21$satdem<-Recode(ces21$pes21_dem_sat, "1=1; 2=0.75; 3=0.25; 4=0; 5=0.5; else
 #checks
 table(ces21$satdem, ces21$pes21_dem_sat, useNA = "ifany" )
 
+ces21$satdem2<-Recode(ces21$cps21_demsat, "1=1; 2=0.75; 3=0.25; 4=0; 5=0.5; else=NA", as.numeric=T)
+#checks
+table(ces21$satdem2, ces21$cps21_demsat, useNA = "ifany" )
+
 # Add mip as missing variable. 
 ces21$mip<-rep(NA, nrow(ces21))
 ces21$sector<-rep(NA, nrow(ces21))
@@ -544,3 +548,17 @@ ces21$efficacy_rich<-Recode(ces21$pes21_populism_8, "1=1; 2=0.75; 3=0.5; 4=0.25;
 #checks
 table(ces21$efficacy_rich)
 table(ces21$efficacy_rich, ces21$pes21_populism_8)
+
+# recode political interest (cps21_interest_gen_1)
+look_for(ces21, "interest")
+ces21$pol_interest<-Recode(ces21$cps21_interest_gen_1, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
+#checks
+table(ces21$pol_interest, ces21$cps21_interest_gen_1, useNA = "ifany" )
+
+#recode foreign born (cps21_bornin_canada)
+look_for(ces21, "born")
+ces21$foreign<-Recode(ces21$cps21_bornin_canada, "1=0; 2=1; else=NA")
+val_labels(ces21$foreign)<-c(No=0, Yes=1)
+#checks
+val_labels(ces21$foreign)
+table(ces21$foreign, ces21$cps21_bornin_canada, useNA="ifany")

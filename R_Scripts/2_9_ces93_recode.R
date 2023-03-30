@@ -209,7 +209,6 @@ ces93 %>%
 
 val_labels(ces93$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 
-
 #checks
 val_labels(ces93$income)
 table(ces93$income)
@@ -230,6 +229,7 @@ ces93 %>%
   ))->ces93
 
 val_labels(ces93$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+
 ### Tertiles
 look_for(ces93, "income")
 table(ces93$CPSO18A, ces93$CPSO18)
@@ -242,7 +242,6 @@ ces93 %>%
     (as.numeric(CPSO18A)>4 & as.numeric(CPSO18A)<98) | as.numeric(CPSO18)> 52 & as.numeric(CPSO18) <998 ~ 3
   ))->ces93
 
-
 val_labels(ces93$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
 table(ces93$income_tertile, ces93$CPSO18)
 table(ces93$income_tertile, ces93$CPSO18A)
@@ -252,6 +251,12 @@ table(ces93$income, ces93$CPSO18)
 #checks
 val_labels(ces93$income)
 table(ces93$income)
+
+#####recode Household size (cpshhwgt)####
+look_for(ces93, "house")
+ces93$household<-Recode(ces93$CPSHHWGT, "0.506=0.5; 1.012=1; 1.517=1.5; 2.023=2; 2.529=2.5; 3.035=3; 3.541=3.5; 4.047=4; 5.058=5")
+#checks
+table(ces93$household)
 
 #####recode Religiosity (CPSO10 & REFN10)####
 look_for(ces93, "god")
@@ -706,6 +711,10 @@ ces93$satdem<-Recode(ces93$PESL5, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as
 #checks
 table(ces93$satdem, ces93$PESL5, useNA = "ifany" )
 
+ces93$satdem2<-Recode(ces93$PESL5, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces93$satdem2, ces93$PESL5, useNA = "ifany" )
+
 #recode Quebec Sovereignty (CPSG11) (Quebec only & Right=more sovereignty)
 look_for(ces93, "sovereignty")
 ces93$quebec_sov<-Recode(ces93$CPSG11, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
@@ -743,3 +752,17 @@ ces93 %>%
   ))->ces93
 #checks
 table(ces93$postgrad)
+
+# recode political interest (CPSB1)
+look_for(ces93, "interest")
+ces93$pol_interest<-Recode(ces93$CPSB1, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#checks
+table(ces93$pol_interest, ces93$CPSB1, useNA = "ifany" )
+
+#recode foreign born (CPSO11)
+look_for(ces93, "birth")
+ces93$foreign<-Recode(ces93$CPSO11, "1=0; 2:22=1; 0=1; else=NA")
+val_labels(ces93$foreign)<-c(No=0, Yes=1)
+#checks
+val_labels(ces93$foreign)
+table(ces93$foreign, ces93$CPSO11, useNA="ifany")

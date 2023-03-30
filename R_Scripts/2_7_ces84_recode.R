@@ -324,6 +324,14 @@ ces84 %>%
   select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
   cor(., use="complete.obs")
 
+#recode foreign born (VAR400)
+look_for(ces84, "birth")
+ces84$foreign<-Recode(ces84$VAR400, "1=0; 2:17=1; else=NA")
+val_labels(ces84$foreign)<-c(No=0, Yes=1)
+#checks
+val_labels(ces84$foreign)
+table(ces84$foreign, ces84$VAR400, useNA="ifany")
+
 #recode Most Important Question (VAR065)
 look_for(ces84, "issue")
 ces84$mip<-Recode(ces84$VAR065, "1:7=7; 8:9=10; 10=3; 11:12=9; 13=7; 14=10; 15:16=6; 17=8; 18:19=15; 20:22=12; 23=0; 

@@ -206,6 +206,14 @@ ces65 %>%
   select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
   cor(., use="complete.obs")
 
+#recode foreign born (v312)
+look_for(ces65, "birth")
+ces65$foreign<-Recode(ces65$v312, "209=0; 199=1; 300:999=0; else=NA")
+val_labels(ces65$foreign)<-c(No=0, Yes=1)
+#checks
+val_labels(ces65$foreign)
+table(ces65$foreign, ces65$v312, useNA="ifany")
+
 #recode Most Important Question (v8a)
 look_for(ces65, "most")
 ces65$mip<-Recode(ces65$v8a, "11=9; 12:13=7; 14=6; 15=0; 16:17=15; 18=8; 19=0; 20=4; 21:22=14; 23:26=12; 

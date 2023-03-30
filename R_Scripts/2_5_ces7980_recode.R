@@ -298,6 +298,14 @@ ces7980 %>%
   select(efficacy_external, efficacy_external2, efficacy_internal) %>% 
   cor(., use="complete.obs")
 
+#recode foreign born (V455)
+look_for(ces7980, "birth")
+ces7980$foreign<-Recode(ces7980$V455, "1=0; 2:12=1; else=NA")
+val_labels(ces7980$foreign)<-c(No=0, Yes=1)
+#checks
+val_labels(ces7980$foreign)
+table(ces7980$foreign, ces7980$V455, useNA="ifany")
+
 #recode Most Important Question (V1154)
 look_for(ces7980, "MOST IMPORTANT ISSUE")
 ces7980$mip<-Recode(ces7980$V1154, "1:7=7; 8=3; 9:10=9; 11:12=7; 13=6; 14=8; 15:16=15; 17=12; 18=0; 19:20=5;
@@ -441,6 +449,14 @@ table(ces7980$turnout80, ces7980$vote80)
 # No Income variable
 
 # No Religiosity variable
+
+#recode foreign born (V1517)
+look_for(ces7980, "birth")
+ces7980$foreign80<-Recode(ces7980$V1517, "1=0; 2:12=1; else=NA")
+val_labels(ces7980$foreign80)<-c(No=0, Yes=1)
+#checks
+val_labels(ces7980$foreign80)
+table(ces7980$foreign80, ces7980$V1517, useNA="ifany")
 
 #recode Most Important Question (V2021)
 look_for(ces7980, "MOST IMPORTANT ISSUE")

@@ -603,3 +603,11 @@ ces88$postgrad<-Recode(ces88$n3, "10:11=1; 1:9=0; else=NA")
 table(ces88$postgrad)
 ces88$authoritarianism
 
+#recode foreign born (n13)
+look_for(ces88, "birth")
+ces88$foreign<-Recode(ces88$n13, "1=0; 2:21=1; 0=1; else=NA")
+val_labels(ces88$foreign)<-c(No=0, Yes=1)
+#checks
+val_labels(ces88$foreign)
+table(ces88$foreign, ces88$n13, useNA="ifany")
+
