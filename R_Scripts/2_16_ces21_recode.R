@@ -287,7 +287,7 @@ table(ces21$quebec_accom)
 
 #recode Personal Retrospective (cps21_own_fin_retro)
 look_for(ces21, "situation")
-ces21$personal_retrospective<-Recode(ces21$cps21_own_fin_retro, "1=1; 2=0; 3=0.5; else=NA", as.numeric=T)
+ces21$personal_retrospective<-Recode(ces21$cps21_own_fin_retro, "1=1; 2=0.5; 3=0; 4=0.5; else=NA", as.numeric=T)
 val_labels(ces21$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 #checks
 val_labels(ces21$personal_retrospective)
@@ -295,7 +295,7 @@ table(ces21$personal_retrospective , ces21$cps21_own_fin_retro, useNA = "ifany" 
 
 #recode National Retrospective (cps21_econ_retro)
 look_for(ces21, "economy")
-ces21$national_retrospective<-Recode(ces21$cps21_econ_retro, "1=1; 2=0; 3:4=0.5; else=NA", as.numeric=T)
+ces21$national_retrospective<-Recode(ces21$cps21_econ_retro, "1=1; 2=0.5; 3=0; 4=0.5; else=NA", as.numeric=T)
 val_labels(ces21$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 #checks
 val_labels(ces21$national_retrospective)
