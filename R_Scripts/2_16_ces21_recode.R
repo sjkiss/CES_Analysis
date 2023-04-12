@@ -33,7 +33,7 @@ table(ces21$degree ,ces21$cps21_education , useNA = "ifany" )
 
 #recode Region (cps21_province)
 look_for(ces21, "province")
-ces21$region<-Recode(ces21$cps21_province, "1:3=3; 4:5=2; 7=2; 9=2; 10=1; 12=3; else=NA")
+ces21$region<-Recode(ces21$cps21_province, "1:3=3; 4:5=1; 7=1; 9=2; 10=1; 12=3; else=NA")
 val_labels(ces21$region)<-c(Atlantic=1, Ontario=2, West=3)
 #checks
 val_labels(ces21$region)
