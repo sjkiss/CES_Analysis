@@ -254,6 +254,26 @@ ces15phone$household<-Recode(ces15phone$NADULTS, "1=0.5; 2=1; 3=1.5; 4=2; 5=2.5;
 #checks
 table(ces15phone$household, useNA = "ifany" )
 
+#### recode income / household size ####
+ces15phone$inc<-Recode(ces15phone$CPS15_92, "998:999=NA")
+table(ces15phone$inc)
+ces15phone$inc2<-ces15phone$inc/ces15phone$household
+table(ces15phone$inc2)
+ces15phone$inc3<-Recode(ces15phone$CPS15_93, "8:9=NA")
+table(ces15phone$inc3)
+ces15phone$inc4<-ces15phone$inc3/ces15phone$household
+table(ces15phone$inc4)
+
+ces15phone %>% 
+  mutate(income_house=case_when(
+    as.numeric(inc4)<5 |(as.numeric(inc2)> -1 & as.numeric(inc2) < 32) ~ 1,
+    (as.numeric(inc4)>4 &as.numeric(inc4) <7 )| as.numeric(inc2)> 53 & as.numeric(inc2) < 110 ~ 2,
+    (as.numeric(inc4)>6 & as.numeric(inc4)<54) | as.numeric(inc2)> 109 & as.numeric(inc2) <1501 ~ 3
+  ))->ces15phone
+table(ces15phone$income_house)
+table(ces15phone$income_tertile)
+table(ces15phone$income_tertile, ces15phone$income_house)
+
 #recode Religiosity (CPS15_82)
 look_for(ces15phone, "relig")
 ces15phone$religiosity<-Recode(ces15phone$CPS15_82, "7=1; 5=2; 98=3; 3=4; 1=5; else=NA")

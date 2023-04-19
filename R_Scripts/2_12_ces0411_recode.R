@@ -347,6 +347,26 @@ ces0411$household04<-Recode(ces0411$ces04_CESHHWGT, "0.5078=0.5; 1.0156=1; 1.523
 #checks
 table(ces0411$household04)
 
+#### recode income / household size ####
+ces0411$inc043<-Recode(ces0411$ces04_CPS_S18, "98:999=NA")
+table(ces0411$inc043)
+ces0411$inc044<-ces0411$inc043/ces0411$household04
+table(ces0411$inc044)
+
+ces0411 %>% 
+  mutate(income_house04=case_when(
+    #First Tertile
+    inc044<3 ~ 1,
+    #Secon Tertiile
+    inc044>2.99 & inc044 <6  ~ 2,
+    #Third Tertile
+    inc044>5.99 & inc044 <98  ~ 3,
+  ))->ces0411
+
+table(ces0411$income_house04)
+table(ces0411$income_tertile04)
+table(ces0411$income_tertile04, ces0411$income_house04)
+
 #### recode Religiosity (ces04_CPS_S11)#### 
 look_for(ces0411, "relig")
 ces0411$religiosity04<-Recode(ces0411$ces04_CPS_S11, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
@@ -1219,6 +1239,32 @@ look_for(ces0411, "household")
 ces0411$household06<-Recode(ces0411$ces06_CESHHWGT, "0.542586=0.5; 1.085172=1; 1.627758=1.5; 2.170344=2; 2.71293=2.5; 3.255515=3; 3.798101=3.5; 5.968445=5.5")
 #checks
 table(ces0411$household06)
+
+#### recode income / household size ####
+ces0411$inc063<-Recode(ces0411$ces06_CPS_S18, "98:999=NA")
+table(ces0411$inc063)
+ces0411$inc064<-ces0411$inc063/ces0411$household06
+table(ces0411$inc064)
+
+ces0411 %>% 
+  mutate(income_house06=case_when(
+    #First Tertile
+    inc064<3  ~ 1,
+    #Secon Tertiile
+    inc064>2.99 & inc064 <7 ~ 2,
+    #Third Tertile
+    inc064>6.99 & inc064 <98 ~ 3,
+    #First Tertile
+    inc064<3 & ces06_RECALL==1 ~ 1,
+    #Secon Tertiile
+    inc064>2.99 & inc064 <7 & ces06_RECALL==1 ~ 2,
+    #Third Tertile
+    inc064>6.99 & inc064 <98 & ces06_RECALL==1 ~ 3,
+  ))->ces0411
+
+table(ces0411$income_house06)
+table(ces0411$income_tertile06)
+table(ces0411$income_tertile06, ces0411$income_house06)
 
 #### recode Religiosity (ces06_CPS_S11)#### 
 look_for(ces0411, "relig")
@@ -2173,6 +2219,81 @@ ces0411 %>%
   ))->ces0411
 #checks
 table(ces0411$household08)
+
+#### recode income / household size ####
+ces0411$inc081<-Recode(ces0411$ces08_CPS_S18A, "998:999=NA")
+table(ces0411$inc081)
+ces0411$inc082<-ces0411$inc081/ces0411$household08
+table(ces0411$inc082)
+# household weights not available for ces08_PES_S9A & ces08_PES_S9B
+ces0411$inc083<-Recode(ces0411$ces08_CPS_S18B_ISR, "98:99=NA")
+table(ces0411$inc083)
+ces0411$inc084<-ces0411$inc083/ces0411$household08
+table(ces0411$inc084)
+ces0411$inc085<-Recode(ces0411$ces08_CPS_S18B_Joli, "1=1; 2=2; 3=4; 4=6; 5=8; 6=10; 7=12; 8:9=NA")
+table(ces0411$inc085)
+ces0411$inc086<-ces0411$inc085/ces0411$household08
+table(ces0411$inc086)
+ces0411 %>% 
+  mutate(inc087=case_when(
+    ces08_CPS_S18B==98  ~ NA_real_,
+    ces08_CPS_S18B==99  ~ NA_real_,
+    ces08_CPS_S18B==1  ~ 1,
+    ces08_CPS_S18B==2  ~ 2,
+    ces08_CPS_S18B==3  ~ 3,
+    ces08_CPS_S18B==4  ~ 4,
+    ces08_CPS_S18B==5  ~ 5,
+    ces08_CPS_S18B==6  ~ 6,
+    ces08_CPS_S18B==7  ~ 7,
+    ces08_CPS_S18B==8  ~ 8,
+    ces08_CPS_S18B==9  ~ 9,
+    ces08_CPS_S18B==10  ~ 10,
+    ces08_CPS_S18B==11  ~ 11,
+    ces08_CPS_S18B==12  ~ 12,
+    ces08_CPS_S18B>0 & ces08_CPS_S18B_Joli>0 ~ NA_real_,
+  ))->ces0411
+table(ces0411$inc087)
+ces0411$inc088<-ces0411$inc087/ces0411$household08
+table(ces0411$inc088)
+
+ces0411 %>% 
+  mutate(income_house08=case_when(
+    #first Tertile
+    inc082 < 32 ~1,
+    ces08_PES_S9A < 32  ~1,
+    ces08_PES_S9B < 32  ~1,
+    #Second Tertile
+    inc082 > 31 & inc082 <69~2,
+    ces08_PES_S9A > 31 & ces08_PES_S9A <69~2,
+    ces08_PES_S9B > 31 & ces08_PES_S9B <69~2,
+    #Third Tertile
+    inc082 > 68 & inc082 <997~3,
+    ces08_PES_S9A > 68 & ces08_PES_S9A <997~3,
+    ces08_PES_S9B > 68 & ces08_PES_S9B <997~3,
+    
+    #First Tercile ISR
+    inc084 <3 ~1,
+    #Second Tercile ISR
+    inc084 >2 & inc088<7  ~2,
+    #Third Tercile ISR
+    inc084 >6 & inc088<13  ~3,
+    #First Tercile ISR
+    inc086 <3 ~1,
+    #Second Tercile ISR
+    inc086 >2 & inc088<7  ~2,
+    #Third Tercile ISR
+    inc086 >6 & inc088<13  ~3,
+    #First Tercile Joli
+    inc088 < 3 ~ 1, 
+    #Second Tercile Joli
+    inc088 >2 & inc088<7 ~ 2,
+    #Third Quintile Joli
+    inc088 >6 & inc088<13 ~ 3,
+    
+  ))->ces0411
+table(ces0411$income_house08)
+table(ces0411$income_tertile08)
+table(ces0411$income_tertile08, ces0411$income_house08)
    
 #### recode Religiosity (ces08_CPS_S11)#### 
 look_for(ces0411, "relig")
@@ -2885,6 +3006,26 @@ look_for(ces0411, "household")
 ces0411$household11<-Recode(ces0411$NADULTS11, "1=0.5; 2=1; 3=1.5; 4=2; 5=2.5; 6=3; 7=3.5; 8=4")
 #checks
 table(ces0411$household11, useNA = "ifany" )
+
+#### recode income / household size ####
+ces0411$inc111<-Recode(ces0411$CPS11_92, "998:999=NA")
+table(ces0411$inc111)
+ces0411$inc112<-ces0411$inc111/ces0411$household11
+table(ces0411$inc112)
+ces0411$inc113<-Recode(ces0411$CPS11_93, "98:99=NA")
+table(ces0411$inc113)
+ces0411$inc114<-ces0411$inc113/ces0411$household11
+table(ces0411$inc114)
+
+ces0411 %>% 
+  mutate(income_house11=case_when(
+    as.numeric(inc114)<3 |(as.numeric(inc112)> -1 & as.numeric(inc112) < 36) ~ 1,
+    (as.numeric(inc114)>2.99 &as.numeric(inc114) <8 )| as.numeric(inc112)> 35 & as.numeric(inc112) < 77 ~ 2,
+    (as.numeric(inc114)>7.99 & as.numeric(inc114)<97) | as.numeric(inc112)> 76 & as.numeric(inc112) <1101 ~ 3
+  ))->ces0411
+table(ces0411$income_house11)
+table(ces0411$income_tertile11)
+table(ces0411$income_tertile11, ces0411$income_house11)
 
 #### recode Religiosity (CPS11_82)#### 
 look_for(ces0411, "relig")

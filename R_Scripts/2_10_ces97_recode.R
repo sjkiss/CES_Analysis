@@ -220,6 +220,26 @@ ces97$household<-Recode(ces97$cpshhwgt, "0.5056=0.5; 1.0111=1; 1.5167=1.5; 2.022
 #checks
 table(ces97$household)
 
+#### recode income / household size ####
+ces97$inc<-Recode(ces97$cpsm16, "998:999=NA")
+table(ces97$inc)
+ces97$inc2<-ces97$inc/ces97$household
+table(ces97$inc2)
+ces97$inc3<-Recode(ces97$cpsm16a, "98:99=NA")
+table(ces97$inc3)
+ces97$inc4<-ces97$inc3/ces97$household
+table(ces97$inc4)
+
+ces97 %>% 
+  mutate(income_house=case_when(
+    as.numeric(inc4)<2.7 |(as.numeric(inc2)> 0 & as.numeric(inc2) < 27) ~ 1,
+    (as.numeric(inc4)>2.6 &as.numeric(inc4) <5.3 )| as.numeric(inc2)> 26 & as.numeric(inc2) < 53 ~ 2,
+    (as.numeric(inc4)>5.2 & as.numeric(inc4)<31) | as.numeric(inc2)> 52 & as.numeric(inc2) <998 ~ 3
+  ))->ces97
+table(ces97$income_house)
+table(ces97$income_tertile)
+table(ces97$income_tertile, ces97$income_house)
+
 ####recode Religiosity (pesm10b)####
 look_for(ces97, "relig")
 ces97$religiosity<-Recode(ces97$pesm10b, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")

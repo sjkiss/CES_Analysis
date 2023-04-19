@@ -355,6 +355,8 @@ ces04 %>%
 ces04 %>% 
   rename(household=household04)->ces04
 ces04 %>% 
+  rename(income_house=income_house04)->ces04
+ces04 %>% 
   rename(pol_interest=pol_interest04)->ces04
 ces04 %>% 
   rename(foreign=foreign04)->ces04
@@ -483,6 +485,8 @@ ces06 %>%
 table(ces06$survey, ces06$non_charter_language)
 ces06 %>% 
   rename(household=household06)->ces06
+ces06 %>% 
+  rename(income_house=income_house06)->ces06
 ces06 %>% 
   rename(pol_interest=pol_interest06)->ces06
 ces06 %>% 
@@ -615,6 +619,8 @@ table(ces08$survey, ces08$non_charter_language)
 ces08 %>% 
   rename(household=household08)->ces08
 ces08 %>% 
+  rename(income_house=income_house08)->ces08
+ces08 %>% 
   rename(pol_interest=pol_interest08)->ces08
 ces08 %>% 
   rename(foreign=foreign08)->ces08
@@ -745,6 +751,8 @@ ces11 %>%
 ces11 %>% 
   rename(household=household11)->ces11
 ces11 %>% 
+  rename(income_house=income_house11)->ces11
+ces11 %>% 
   rename(pol_interest=pol_interest11)->ces11
 ces11 %>% 
   rename(foreign=foreign11)->ces11
@@ -789,7 +797,7 @@ common_vars<-c('male',
                'market1','market2',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 'vote3',
                'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich', 'promise', 'trust', 'pol_interest', 'foreign',
-               'non_charter_language', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology')
+               'non_charter_language', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology', 'income_house')
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
@@ -1066,6 +1074,7 @@ table(ces$satdem2, ces$election)
 table(ces$pol_interest, ces$election)
 table(ces$foreign, ces$election)
 table(ces$household, ces$election)
+table(ces$income_house, ces$election)
 
 table(ces$vote3, ces$election)
 

@@ -34,6 +34,7 @@ val_labels(ces00$degree)<-c(nodegree=0, degree=1)
 #checks
 val_labels(ces00$degree)
 table(ces00$degree)
+
 ####region #### 
 #recode Region (province)
 look_for(ces00, "province")
@@ -42,6 +43,7 @@ val_labels(ces00$region)<-c(Atlantic=1, Ontario=2, West=3)
 #checks
 val_labels(ces00$region)
 table(ces00$region)
+
 #### quebec#### 
 #recode Quebec (province)
 look_for(ces00, "province")
@@ -50,13 +52,15 @@ val_labels(ces00$quebec)<-c(Other=0, Quebec=1)
 #checks
 val_labels(ces00$quebec)
 table(ces00$quebec)
-#### quebec#### 
+
+#### age #### 
 #recode Age (cpsage)
 look_for(ces00, "age")
 ces00$yob<-Recode(ces00$cpsage, "9999=NA")
 ces00$age<-2000-ces00$yob
 #check
 table(ces00$age)
+
 ####religion #### 
 #recode Religion (cpsm10)
 look_for(ces00, "relig")
@@ -65,6 +69,7 @@ val_labels(ces00$religion)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 #checks
 val_labels(ces00$religion)
 table(ces00$religion)
+
 ####language #### 
 #recode Language (cpslang)
 look_for(ces00, "language")
@@ -73,6 +78,7 @@ val_labels(ces00$language)<-c(French=0, English=1)
 #checks
 val_labels(ces00$language)
 table(ces00$language)
+
 ####non-charter language #### 
 #recode Non-charter Language (cpsm15)
 look_for(ces00, "language")
@@ -81,6 +87,7 @@ val_labels(ces00$non_charter_language)<-c(Charter=0, Non_Charter=1)
 #checks
 val_labels(ces00$non_charter_language)
 table(ces00$non_charter_language)
+
 ####employment #### 
 #recode Employment (cpsm4)
 look_for(ces00, "employ")
@@ -89,7 +96,8 @@ val_labels(ces00$employment)<-c(Unemployed=0, Employed=1)
 #checks
 val_labels(ces00$employment)
 table(ces00$employment)
-####ector #### 
+
+####Sector #### 
 #recode Sector (cpsm7 & cpsm4)
 look_for(ces00, "company")
 ces00 %>% 
@@ -111,6 +119,7 @@ val_labels(ces00$sector)<-c(Private=0, Public=1)
 #checks
 val_labels(ces00$sector)
 table(ces00$sector)
+
 ####party id #### 
 #recode Party ID (pesk1a and pesk1ab)
 look_for(ces00, "yourself")
@@ -128,6 +137,7 @@ val_labels(ces00$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces00$party_id)
 table(ces00$party_id)
+
 ####vote #### 
 #recode Vote (pesa3a and pesa3b)
 look_for(ces00, "vote")
@@ -207,7 +217,6 @@ table(ces00$income)
 table(ces00$income, ces00$cpsm16)
 table(ces00$income, ces00$cpsm16a)
 
-
 #income_tertiles
 
 look_for(ces00, "income")
@@ -241,6 +250,26 @@ look_for(ces00, "house")
 ces00$household<-Recode(ces00$ceshhwgt, "0.5174=0.5; 1.0347=1; 1.5521=1.5; 2.0694=2; 2.5868=2.5; 3.1042=3; 3.6215=3.5; 4.6562=4.5; 5.1736=5")
 #checks
 table(ces00$household)
+
+#### recode income / household size ####
+ces00$inc<-Recode(ces00$cpsm16, "998:999=NA")
+table(ces00$inc)
+ces00$inc2<-ces00$inc/ces00$household
+table(ces00$inc2)
+ces00$inc3<-Recode(ces00$cpsm16a, "98:999=NA")
+table(ces00$inc3)
+ces00$inc4<-ces00$inc3/ces00$household
+table(ces00$inc4)
+
+ces00 %>% 
+  mutate(income_house=case_when(
+    as.numeric(inc4)<3.2 |(as.numeric(inc2)> 0 & as.numeric(inc2) < 32) ~ 1,
+    (as.numeric(inc4)>3.1 &as.numeric(inc4) <6.5 )| as.numeric(inc2)> 31 & as.numeric(inc2) < 65 ~ 2,
+    (as.numeric(inc4)>6.4 & as.numeric(inc4)<31) | as.numeric(inc2)> 64 & as.numeric(inc2) <1501 ~ 3
+  ))->ces00
+table(ces00$income_house)
+table(ces00$income_tertile)
+table(ces00$income_tertile, ces00$income_house)
 
 ####recode Religiosity (cpsm10b)####
 look_for(ces00, "relig")

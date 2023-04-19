@@ -180,6 +180,7 @@ val_labels(ces19phone$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
 val_labels(ces19phone$income)
 table(ces19phone$income_tertile, ces19phone$q70r , useNA = "ifany" )
 val_labels(ces19phone$q70r)
+
 #recode Religiosity (q63)
 look_for(ces19phone, "relig")
 ces19phone$religiosity<-Recode(ces19phone$q63, "4=1; 3=2; -9=3; 2=4; 1=5; else=NA")
@@ -193,6 +194,23 @@ look_for(ces19phone, "household")
 ces19phone$household<-Recode(ces19phone$q71, "1=0.5; 2=1; 3=1.5; 4=2; 5=2.5; 6=3; 7=3.5; 8=4; 9=4.5; 10=5; 12=6; 13=6.5; 15=7.5; else=NA")
 #checks
 table(ces19phone$household, useNA = "ifany" )
+
+#### recode income / household size ####
+ces19phone$inc<-Recode(ces19phone$q70r, "-8=NA; -9=NA")
+table(ces19phone$inc)
+ces19phone$inc2<-ces19phone$inc/ces19phone$household
+table(ces19phone$inc2)
+
+ces19phone %>% 
+    mutate(income_house=case_when(
+      inc2<3.1 ~ 1,
+      inc2>3 & inc2 <6  ~ 2,
+      inc2>5.99 & inc2 <98  ~ 3,
+    ))->ces19phone
+  
+table(ces19phone$income_house)
+table(ces19phone$income_tertile)
+table(ces19phone$income_tertile, ces19phone$income_house)
 
 #recode Community Size (p57)
 look_for(ces19phone, "live")
