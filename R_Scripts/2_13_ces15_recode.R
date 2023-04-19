@@ -240,6 +240,7 @@ ces15phone %>%
     CPS15_92>53 &CPS15_92<110~2,
     #Third Tertile
     CPS15_92>109 &CPS15_92<997 ~3,
+    
     #First Tertile
     CPS15_93<3 ~ 1,
     #Second Tertile
@@ -266,9 +267,9 @@ table(ces15phone$inc4)
 
 ces15phone %>% 
   mutate(income_house=case_when(
-    as.numeric(inc4)<5 |(as.numeric(inc2)> -1 & as.numeric(inc2) < 32) ~ 1,
-    (as.numeric(inc4)>4 &as.numeric(inc4) <7 )| as.numeric(inc2)> 53 & as.numeric(inc2) < 110 ~ 2,
-    (as.numeric(inc4)>6 & as.numeric(inc4)<54) | as.numeric(inc2)> 109 & as.numeric(inc2) <1501 ~ 3
+    as.numeric(inc4)<3 |(as.numeric(inc2)> 0 & as.numeric(inc2) < 54) ~ 1,
+    (as.numeric(inc4)>2.99 &as.numeric(inc4) <5 )| as.numeric(inc2)> 53 & as.numeric(inc2) < 110 ~ 2,
+    (as.numeric(inc4)>4.99 & as.numeric(inc4)<11) | as.numeric(inc2)> 109 & as.numeric(inc2) <1501 ~ 3
   ))->ces15phone
 table(ces15phone$income_house)
 table(ces15phone$income_tertile)

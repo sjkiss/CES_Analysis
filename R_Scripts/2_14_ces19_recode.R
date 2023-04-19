@@ -203,9 +203,9 @@ table(ces19phone$inc2)
 
 ces19phone %>% 
     mutate(income_house=case_when(
-      inc2<3.1 ~ 1,
-      inc2>3 & inc2 <6  ~ 2,
-      inc2>5.99 & inc2 <98  ~ 3,
+      inc2<3.01 ~ 1,
+      inc2>3 & inc2 <4.01  ~ 2,
+      inc2>4 & inc2 <98  ~ 3,
     ))->ces19phone
   
 table(ces19phone$income_house)
