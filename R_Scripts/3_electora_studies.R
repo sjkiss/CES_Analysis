@@ -47,7 +47,7 @@ ggsave(here("Plots", "block_degree_income_with_error.png"), width=8, height=6)
 
 #### Decompose By Party
 #### Basic Party vote models 1965-2021 ####
-
+ces$degree
 ces %>%
   nest(variables=-election) %>%
   filter(election<2021) %>% 
@@ -78,13 +78,14 @@ ces %>%
          tidied=map(model, tidy),
          vote=rep('Green', nrow(.))
   )->green_models_complete1
+
 #Join all parties and plot Degree coefficients
 
 ndp_models_complete1 %>%
   bind_rows(., liberal_models_complete1) %>%
   bind_rows(., conservative_models_complete1) %>%
   unnest(tidied) %>% 
-  filter(term=="degree"|term=="income_tertile") %>%
+  filter(term=="degree"|term=="income_tertile") %>% 
   filter(election<2021) %>% 
   mutate(term=Recode(term, "'degree'='Degree'; 'income_tertile'='Income'")) %>%
   ggplot(., aes(x=election, y=estimate, col=vote, size=term, group=term))+
@@ -96,7 +97,7 @@ ndp_models_complete1 %>%
   scale_size_manual(values=c(1,3), name="Coefficient")+
   geom_smooth(method="loess", size=0.5, alpha=0.2, se=F) +
   #scale_fill_manual(values=c("navy blue", "red", "orange"))+
-  labs( alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  labs(color="Vote", x="Election", y="Estimate")+
   #geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
   ylim(c(-0.2,0.2))+
   #Turn to greyscale for printing in the journal; also we don't actually need the legend because the labels are on the side
@@ -756,7 +757,7 @@ m27<-lm(conservative~region2+age+male+degree+income_tertile+religion2+redistribu
 ols.models<-list(m1, m2, m3, m4, m5, m6, m7, m8, m9)
 interaction.models<-list(m10, m11, m12, m13, m14, m15, m16, m17, m18)
 interaction.models2<-list(m19, m20, m21, m22, m23, m24, m25, m26, m27)
-interaction.models
+summary(m27)
 #### Stargazer Interaction models
 
 stargazer(interaction.models, 
@@ -791,7 +792,8 @@ stargazer(ols.models,
                              "Immigration Rates"
                              ), 
           dep.var.labels=c("NDP", "Liberal", "Conservative"),
-          omit=c(".[12][90]"), digits=2, column.labels=rep(c("1990s", "2000s", "2010s"), 3))
+          omit=c(".[12][90]"), digits=2, 
+          column.labels=rep(c("1990s", "2000s", "2010s"), 3))
 
 stargazer(ols.models,
           out=here("Tables", "ols_models_presentation.html"),
@@ -1066,7 +1068,7 @@ ols_block_models2 %>%
 ggsave(here("Plots", "block_postgrad_income_with_error.png"), width=8, height=6)
 
 
-#### Decompose By Party
+
 #### Postgrad robustness check Basic Party vote models 1965-2021 ####
 ces %>%
   nest(variables=-election) %>%
@@ -1164,13 +1166,13 @@ ces %>%
   filter(!is.na(postgrad)) %>% 
   summarize(avg=mean(Redistribution, na.rm=T), n=n(), sd=sd(Redistribution, na.rm=T), se=sd/sqrt(n)) %>% 
   arrange(Election, postgrad, Vote) %>% 
-  ggplot(. ,aes(x=avg, y=fct_reorder(Election, desc(Election)), col=postgrad))+
+  ggplot(. ,aes(x=avg, y=fct_reorder(Election, desc(Election)), col=as.factor(postgrad)))+
   geom_point()+
   facet_grid(~Vote)+
   scale_color_grey(start=0.8, end=0.2)+
   geom_errorbar(aes(xmin=avg-(1.96*se), xmax=avg+(1.96*se), width=0))+
   geom_vline(xintercept=0.5, linetype=2)+
-  labs(y="Year") 
+  labs(y="Year", col="Postgrad")
 ggsave(filename=here("Plots", "means_postgrad_redistribution_party.png"), width=8, height=8)
 
 #What we need is by decade, minus the BQ and the Greens
@@ -1223,16 +1225,6 @@ ols.models<-list(m31, m32, m33, m34, m35, m36, m37, m38, m39)
 interaction.models<-list(m40, m41, m42, m43, m44, m45, m46, m47, m48)
 interaction.models2<-list(m49, m50, m51, m52, m53, m54, m55, m56, m57)
 interaction.models
-#### Stargazer Interaction models
-# 
-# stargazer(interaction.models, 
-#           out=here("Tables", "interaction_models_degree_redistribution.html"),
-#           ep.var.labels=c("NDP", "Liberal", "Conservative"),
-#           omit=c(".[12][90]"), digits=2, column.labels=rep(c("1990s", "2000s", "2010s"), 3))
-# stargazer(interaction.models2, 
-#           out=here("Tables", "interaction_models_income_redistribution.html"),
-#           ep.var.labels=c("NDP", "Liberal", "Conservative"),
-
 
 
 #### Graph Degree & Income x Redistribution interactions ####
@@ -1283,17 +1275,16 @@ interaction.models2 %>%
   ggplot(., aes(x=Period, y=estimate, col=Period))+geom_point()+facet_grid(term~fct_relevel(Party, "NDP", "Liberal"), scales="free")+scale_color_grey(start=0.8, end=0.2) +geom_errorbar(width=0, aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+   geom_hline(yintercept=0,  linetype=2)+theme(strip.text.y.right = element_text(angle = 0))+labs(y="Coefficient")
 ggsave(filename=here("Plots", "postgrad_redistribution_interaction_terms.png"), width=8, height=4)
 
-#### Multinomial Robustness Check
-
-#### Repeat the same with multinomial
-
+#### Multinomial Robustness Check ####
 
 library(nnet)
-table(ces$vote3)
-ces$degree
-ces$degree<-as_factor(ces$degree)
-ces$male<-as_factor(ces$male)
+
+# Note going forward degree and male are no longer labelled
+# They are proper factors
+# ces$degree<-as_factor(ces$degree)
+# ces$male<-as_factor(ces$male)
 ces %>%
+as_factor() %>% 
   nest(variables=-election) %>%
   filter(election<2021) %>% 
   mutate(model=map(variables, function(x) multinom(vote2~region2+
@@ -1303,8 +1294,7 @@ ces %>%
                                                      degree+
                                                      religion2, data=x)), 
          tidied=map(model, tidy)) ->multinom_models
-names(multinom_models)
-multinom_models$tidied
+
 #Get predicted probabilities
 # Degree
 library(modelsummary)
@@ -1314,72 +1304,146 @@ names(multinom_models$model)<-multinom_models$election
 names(multinom_models$tidied)<-multinom_models$election
 # Comparison of Predicted Probabilities for Degree
 glimpse(multinom_models)
-multinom_models$model%>%
-  map_df(., function(x)
-    avg_comparisons(x, variables=list(degree="reference")), .id="Election" )%>% 
-  filter(group!="Green"&group!="BQ") %>% 
-  mutate(Election=as.Date(Election, "%Y")) %>% 
-  ggplot(., aes(x=Election,y=estimate, col=group))+
-  geom_pointrange(aes(ymin=conf.low, ymax=conf.high))+
-  facet_grid(~group)+
-  #geom_smooth(method="loess", se=F)+
-  scale_color_manual(values=c("darkblue", "darkred", "orange"))+
-  theme(legend.position="none", strip.text.y = element_text(angle=0))+
-  labs(y="Delta Predicted Probability", caption="Change in Predicted Probability of Voting For Conservative, Liberal, NDP, degree holders compared to non-degree holders. , controlling for age, income, degree, region and religion")+
-  scale_x_date(date_labels="%Y")+
-  geom_smooth(method="loess", se=F, linewidth=0.5)
-ggsave(filename=here("Plots/comparison_predicted_probabilities_degree.png"), width=12, height=6)
 
-multinom_models$model%>%
+multinom_models$model %>% 
   map_df(., function(x)
-    avg_comparisons(x, variables=list(income_tertile=c(1,3))), .id="Election") %>% 
+    avg_comparisons(x, variables=c("income_tertile", "degree")), .id="Election" ) %>% 
   filter(group!="Green"&group!="BQ") %>% 
-  mutate(Election=as.Date(Election, "%Y")) %>% 
-  ggplot(., aes(x=Election,y=estimate, col=group))+
-  geom_pointrange(aes(ymin=conf.low, ymax=conf.high))+
+  filter(contrast=="Highest - Lowest"|contrast=="Degree - No degree") %>% 
+  mutate(Election=as.Date(Election, "%Y")) %>%
+  mutate(term=Recode(term, "'Degree'='Degree'; 
+                     'Income Tercile'='income_tertile'")) %>% 
+  ggplot(., aes(x=Election,y=estimate, col=group, size=term))+
+  #geom_pointrange(aes(ymin=conf.low, ymax=conf.high))+
+  geom_point()+
   facet_grid(~group)+
   #geom_smooth(method="loess", se=F)+
   scale_color_manual(values=c("darkblue", "darkred", "orange"))+
-  theme(legend.position="none")+
-  labs(y="Delta Predicted Probability", caption="Change in Predicted Probability of Voting For Conservative, Liberal, NDP, highest income tercile compared to the lowest, controlling for age, income, degree, region and religion")+
+  theme(strip.text.y = element_text(angle=0))+
+  labs(y="Delta Predicted Probability", col="Vote")+
   scale_x_date(date_labels="%Y")+
+  scale_size_manual(values=c(1,3), name="Coefficient")+
   geom_smooth(method="loess", se=F, linewidth=0.5)
-ggsave(filename=here("Plots/comparison_predicted_probabilities_income.png"), width=12, height=6)
+ggsave(filename=here("Plots/multinomial_comparison_predicted_probabilities_degree_income.png"), width=12, height=6)
+
 
 
 
 #Coefficients for degree
 
-multinom_models$tidied %>% 
-  bind_rows(.id="Election") %>%
-  filter(term=="degreeDegree") %>% 
-  filter(y.level=="NDP"|y.level=="Liberal") %>% 
-  mutate(Election=as.Date(Election, format="%Y")) %>% 
-  ggplot(., aes(x=Election, y=estimate, group=y.level, col=y.level))+
-  geom_pointrange(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+
-  facet_grid(~y.level)+scale_x_date(date_labels="%Y")+
-  scale_color_manual(values=c("darkred", "orange"))+
-  geom_smooth(method="loess",se=F, linewidth=1)+
-  theme(legend.position="none")+
-  labs(y="Logit", caption="Effect of degree status on vote for Liberals / NDP v. Conservative\nControlling for age, gender, region, degree status,religion and income")
-ggsave(filename=here("Plots/coefficients_multinomial_degree.png"), width=8, height=6)
+# multinom_models$tidied %>% 
+#   bind_rows(.id="Election") %>%
+#   filter(term=="degreeDegree") %>% 
+#   filter(y.level=="NDP"|y.level=="Liberal") %>% 
+#   mutate(Election=as.Date(Election, format="%Y")) %>% 
+#   ggplot(., aes(x=Election, y=estimate, group=y.level, col=y.level))+
+#   geom_pointrange(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+
+#   facet_grid(~y.level)+scale_x_date(date_labels="%Y")+
+#   scale_color_manual(values=c("darkred", "orange"))+
+#   geom_smooth(method="loess",se=F, linewidth=1)+
+#   theme(legend.position="none")+
+#   labs(y="Logit", caption="Effect of degree status on vote for Liberals / NDP v. Conservative\nControlling for age, gender, region, degree status,religion and income")
+# ggsave(filename=here("Plots/coefficients_multinomial_degree.png"), width=8, height=6)
 
 # Coefficients for Income
-multinom_models$tidied %>% 
-  bind_rows(.id="Election") %>%
-  filter(term=="income_tertile") %>% 
-  filter(y.level=="NDP"|y.level=="Liberal") %>% 
-  mutate(Election=as.Date(Election, format="%Y")) %>% 
-  ggplot(., aes(x=Election, y=estimate, group=y.level, col=y.level))+
-  geom_pointrange(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+
-  facet_grid(~y.level)+scale_x_date(date_labels="%Y")+
-  geom_smooth(method="loess",se=F)+
-  scale_color_manual(values=c("darkred", "orange"))+
-  theme(legend.position="none")+
-  labs(y="Logit", caption="Effect of income on vote for Liberals / NDP v. Conservative\nControlling for age, gender, region, degree status,religion and income")
-ggsave(filename=here("Plots/coefficients_multinomial_income.png"), width=8, height=6)
+# multinom_models$tidied %>% 
+#   bind_rows(.id="Election") %>%
+#   filter(term=="income_tertile") %>% 
+#   filter(y.level=="NDP"|y.level=="Liberal") %>% 
+#   mutate(Election=as.Date(Election, format="%Y")) %>% 
+#   ggplot(., aes(x=Election, y=estimate, group=y.level, col=y.level))+
+#   geom_pointrange(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+
+#   facet_grid(~y.level)+scale_x_date(date_labels="%Y")+
+#   geom_smooth(method="loess",se=F)+
+#   scale_color_manual(values=c("darkred", "orange"))+
+#   theme(legend.position="none")+
+#   labs(y="Logit", caption="Effect of income on vote for Liberals / NDP v. Conservative\nControlling for age, gender, region, degree status,religion and income")
+# ggsave(filename=here("Plots/coefficients_multinomial_income.png"), width=8, height=6)
+
+#Multinomial Models by Decade
+ces$vote2
+
+multinom_mod1<-multinom(vote2 ~ region2 + age + male + degree + income_tertile + 
+                     religion2 + redistribution + market_liberalism + traditionalism2 + 
+                     immigration_rates + `1993` + `1997`, data=ces.1)
+multinom_mod2<-multinom(vote2 ~ region2 + age + male + degree + income_tertile + 
+                     religion2 + redistribution + market_liberalism + traditionalism2 + 
+                     immigration_rates + `2000` + `2004` + `2006` + `2008`, data = ces.2)
+multinom_mod3<-multinom(vote2~region2 + age + male + degree + income_tertile + 
+                     religion2 + redistribution + market_liberalism + traditionalism2 + 
+                     immigration_rates + `2011` + `2015` + 
+                     `2019`, data = ces.3)
+multinom.list
+multinom.list<-list(multinom_mod1, multinom_mod2, multinom_mod3)
+names(multinom.list)<-c("1990s", "2000s", "2010s")
+modelsummary(multinom.list, 
+             shape=term~response+model,output="gt", 
+             coef_map=c("region2Quebec"="Region (Quebec)",
+                           "region2Ontario"="Region (Ontario)",
+                           "region2West"="Region (West)",
+                           "age"="Age", 
+                           "male"="Gender (Male)",
+                           "income_tertile"="Income (Terciles)",
+                           "degree"="Education (Degree Holder)",
+             "religion2Catholic"="Religion (Catholic)",
+             "religion2Protestant"="Religion (Protestant)",
+             "religion2Other"="Religion (Other)",
+             "redistribution"="Redistribution",
+             "market_liberalism"="Market Liberalism",
+             "immigration_rates"="Immigration Rates",
+             "traditionalism2"="Moral Traditionalism"),
+             coef_omit=c("[[:digit:]]{4}"), fmt=2,gof_omit=c("BIC|AIC|RMSE"), stars=T) %>% 
+  cols_hide(., columns=8:12) %>% 
+  gtsave(., filename=here("Tables/multinomial_check_table_1.html"))
 
 
+multinomial_interaction_1<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+
+                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
+                                      degree:redistribution+`1993`+`1997`, data=ces.1)
+multinomial_interaction_2<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+
+                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
+                                      degree:redistribution+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+multinomial_interaction_3<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+
+                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
+                                      degree:redistribution+`2011`+`2015`+`2019`, data=ces.3)
+multinomial_interaction_4<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+
+                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
+                                     income_tertile:redistribution+`1993`+`1997`, data=ces.1)
+multinomial_interaction_5<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+
+                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
+                                      income_tertile:redistribution+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+multinomial_interaction_6<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+
+                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
+                                      income_tertile:redistribution+`2011`+`2015`+`2019`, data=ces.3)
+multinomial_interaction_model_list<-mget(grep("multinomial_interaction", ls(), value=T))
+library(marginaleffects)
 
+out1<-tidy(avg_slopes(multinomial_interaction_1, variables="redistribution", by="degree")) 
+out2<-tidy(avg_slopes(multinomial_interaction_2, variables="redistribution", by="degree")) 
+out3<-tidy(avg_slopes(multinomial_interaction_3, variables="redistribution", by="degree"))
 
+out1 %>% 
+  bind_rows(., out2, out3) %>% 
+  filter(group!="BQ"&group!="Green") %>% 
+  filter(degree==1) %>% 
+mutate(Decade=c(rep("1990", 3), rep("2000", 3), rep("2010", 3))) %>% 
+  ggplot(., aes(x=Decade, y=estimate))+
+  facet_grid(~fct_relevel(group, "NDP", "Liberal"))+
+  geom_pointrange(aes(ymin=conf.low, ymax=conf.high))
+ggsave(filename=here("Plots", "interaction_degree_multinomial_robustness_check.png"),width=8, height=4)
+out1
+out4<-tidy(avg_slopes(multinomial_interaction_4, variables="redistribution"))
+out5<-tidy(avg_slopes(multinomial_interaction_5, variables="redistribution"))
+out6<-tidy(avg_slopes(multinomial_interaction_6, variables="redistribution"))
+out4
+out4 %>% 
+  bind_rows(., out5, out6) %>% 
+  filter(group!="BQ"&group!="Green") %>% 
+ # filter(degree==1) %>% 
+  mutate(Decade=c(rep("1990", 3), rep("2000", 3), rep("2010", 3))) %>% 
+  ggplot(., aes(x=Decade, y=estimate))+
+  facet_grid(~fct_relevel(group, "NDP", "Liberal"))+
+  geom_pointrange(aes(ymin=conf.low, ymax=conf.high))
+ggsave(filename=here("Plots", "interaction_income_multinomial_robustness_check.png"),width=8, height=4)
 
+#### Factor Analysis ####
