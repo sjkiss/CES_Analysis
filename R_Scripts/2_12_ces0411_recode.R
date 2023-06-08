@@ -825,6 +825,13 @@ val_labels(ces0411$foreign04)<-c(No=0, Yes=1)
 val_labels(ces0411$foreign04)
 table(ces0411$foreign04, ces0411$ces04_CPS_S12, useNA="ifany")
 
+#### recode Environment Spend (ces04_PES_D1F) 
+look_for(ces0411, "env")
+ces0411$enviro_spend04<-Recode(ces0411$ces04_PES_D1F, "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
+#checks
+table(ces0411$enviro_spend04, useNA = "ifany" )
+
+
 ###Recode 2006 2nd ####
 
 # Gender done at top
@@ -1687,6 +1694,12 @@ val_labels(ces0411$foreign06)<-c(No=0, Yes=1)
 #checks
 val_labels(ces0411$foreign06)
 table(ces0411$foreign06, ces0411$ces06_CPS_S12, useNA="ifany")
+
+#### recode Environment Spend (ces06_PES_D1F) 
+look_for(ces0411, "env")
+ces0411$enviro_spend06<-Recode(ces0411$ces06_PES_D1F, "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
+#checks
+table(ces0411$enviro_spend06, useNA = "ifany" )
 
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
@@ -2773,6 +2786,13 @@ val_labels(ces0411$foreign08)<-c(No=0, Yes=1)
 val_labels(ces0411$foreign08)
 table(ces0411$foreign08, ces0411$ces08_CPS_S12, useNA="ifany")
 
+#### recode Environment Spend (ces04_PES_D1F) 
+look_for(ces0411, "env")
+ces0411$enviro_spend08<-Recode(ces0411$ces08_PES_D1F, "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
+#checks
+table(ces0411$enviro_spend08, useNA = "ifany" )
+
+
 ####Recode 2011 4th ####
 
 # Gender done at top
@@ -3485,3 +3505,9 @@ val_labels(ces0411$foreign11)<-c(No=0, Yes=1)
 #checks
 val_labels(ces0411$foreign11)
 table(ces0411$foreign11, ces0411$CPS11_83, useNA="ifany")
+
+#### recode Environment Spend (CPS11_35) 
+look_for(ces0411, "env")
+ces0411$enviro_spend11<-Recode(ces0411$CPS11_35, "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
+#checks
+table(ces0411$enviro_spend11, useNA = "ifany" )

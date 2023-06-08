@@ -562,3 +562,9 @@ val_labels(ces21$foreign)<-c(No=0, Yes=1)
 #checks
 val_labels(ces21$foreign)
 table(ces21$foreign, ces21$cps21_bornin_canada, useNA="ifany")
+
+#recode Environment Spend (cps21_spend_env)
+look_for(ces21, "env")
+ces21$enviro_spend<-Recode(ces21$cps21_spend_env, "1=0; 2=0.5; 3=1; else=NA")
+#checks
+table(ces21$enviro_spend , ces21$cps21_spend_env , useNA = "ifany" )

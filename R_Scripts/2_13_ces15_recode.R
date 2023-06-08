@@ -1025,3 +1025,9 @@ val_labels(ces15phone$foreign)<-c(No=0, Yes=1)
 #checks
 val_labels(ces15phone$foreign)
 table(ces15phone$foreign, ces15phone$CPS15_83, useNA="ifany")
+
+#recode Environment Spend (CPS15_35)
+look_for(ces15phone, "enviro")
+ces15phone$enviro_spend<-Recode(ces15phone$CPS15_35, "5=0.5; 1=1; 3=0; 8=0.5; else=NA")
+#checks
+table(ces15phone$enviro_spend , ces15phone$CPS15_35 , useNA = "ifany" )

@@ -360,6 +360,8 @@ ces04 %>%
   rename(pol_interest=pol_interest04)->ces04
 ces04 %>% 
   rename(foreign=foreign04)->ces04
+ces04 %>% 
+  rename(enviro_spend=enviro_spend04)->ces04
 
 #### Rename CES06 ####
 ces06 %>% 
@@ -491,6 +493,8 @@ ces06 %>%
   rename(pol_interest=pol_interest06)->ces06
 ces06 %>% 
   rename(foreign=foreign06)->ces06
+ces06 %>% 
+  rename(enviro_spend=enviro_spend06)->ces06
 
 #### Rename CES08 ####
 ces08 %>% 
@@ -624,6 +628,8 @@ ces08 %>%
   rename(pol_interest=pol_interest08)->ces08
 ces08 %>% 
   rename(foreign=foreign08)->ces08
+ces08 %>% 
+  rename(enviro_spend=enviro_spend08)->ces08
 
 #### Rename CES11 ####
 ces11 %>% 
@@ -756,6 +762,8 @@ ces11 %>%
   rename(pol_interest=pol_interest11)->ces11
 ces11 %>% 
   rename(foreign=foreign11)->ces11
+ces11 %>% 
+  rename(enviro_spend=enviro_spend11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -797,7 +805,7 @@ common_vars<-c('male',
                'market1','market2',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 'vote3',
                'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich', 'promise', 'trust', 'pol_interest', 'foreign',
-               'non_charter_language', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology', 'income_house')
+               'non_charter_language', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology', 'income_house', 'enviro_spend')
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
@@ -1075,6 +1083,7 @@ table(ces$pol_interest, ces$election)
 table(ces$foreign, ces$election)
 table(ces$household, ces$election)
 table(ces$income_house, ces$election)
+table(ces$enviro_spend, ces$election)
 
 table(ces$vote3, ces$election)
 
