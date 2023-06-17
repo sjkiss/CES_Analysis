@@ -2,6 +2,8 @@
 library(broom)
 library(stargazer)
 library(tidyverse)
+library(dplyr)
+
 #Set theme
 #### Set Theme ####
 theme_set(theme_bw(base_size=18))
@@ -416,7 +418,9 @@ select(Election, Vote, p.value, Degree, se, Average) %>%
   scale_color_grey()+
 guides(size="none")+
   labs(y="Election")+
-  geom_vline(xintercept=0.5, linetype=2)
+  geom_vline(xintercept=0.5, linetype=2)+
+  theme_bw()+
+xlim(c(0.4,1))
 ggsave(filename=here("Plots", "mean_degree_difference_significance.png"), height=8, width=13)
  
 
@@ -466,6 +470,7 @@ ces %>%
   guides(size=F)+
   labs(y="Election")+
   geom_vline(xintercept=0.5, linetype=2)
+  theme_bw()
 # ces %>% 
 #   select(election, redistribution, degree) %>% 
 #   filter(election>2000) %>% 
@@ -474,6 +479,65 @@ ces %>%
 #   summarize(average=mean(redistribution, na.rm = T)) %>% 
 #   View()
 ggsave(filename=here("Plots", "mean_income_difference_significance.png"), height=8, width=12)
+
+
+#### Figure 4 by Household Size ####
+
+ces %>%
+  #Select necessary variables
+  select(Income=income_house, Redistribution=redistribution, Vote=vote2, Election=election) %>%
+  #Filter only post-1988 elections
+  filter(Election>1988 & Election<2020) %>%
+  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
+  filter(Income!=2) %>% 
+  #Convert everything to factor
+  as_factor() %>%
+  #Party in each election
+  group_by(Election, Vote, Income) %>% 
+  summarize(Average=mean(Redistribution,na.rm=T), sd=sd(Redistribution, na.rm=T), n=n(), se=sd/sqrt(n)) ->
+  income_group_differences
+
+ces %>%
+  #Select necessary variables
+  select(Income=income_house, Redistribution=redistribution, Vote=vote2, Election=election) %>%
+  #Filter only post-1988 elections
+  filter(Election>1988 & Election<2020) %>%
+  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
+  filter(Income!=2) %>% 
+  #Convert everything to factor
+  as_factor() %>%
+  nest(-c(Election, Vote)) %>% 
+  mutate(model=map(data, function(x) t.test(Redistribution~factor(Income, levels=c("Lowest", "Highest")), data=x))) %>% 
+  mutate(tidied=map(model, tidy)) %>% 
+  unnest(tidied) %>% 
+  right_join(., income_group_differences, by=c("Vote", "Election")) %>% 
+  select(Election, Vote, p.value, Income, se, Average) %>% 
+  filter(!is.na(Income)) %>% 
+  mutate(Sig=case_when(
+    p.value<0.051~1,
+    p.value>0.05~0
+  )) %>% 
+  # pivot_longer(., cols=c("Degree", "No degree"), names_to=c("Degree"), values_to=c("Redistribution")) %>% 
+  ggplot(., aes(x=Average, y=fct_reorder(Election, desc(Election)), col=Income))+
+  facet_grid(~Vote)+
+  geom_point(aes(size=as.factor(Sig)), position=position_dodge(width=0.5))+
+  geom_errorbar(size=0.5,aes(xmin=Average-(1.96*se), xmax=Average+(1.96*se)),width=0,position=position_dodge(width=0.5))+
+  scale_size_manual(values=c(2, 3))+
+  scale_color_grey()+
+  guides(size=F)+
+  labs(y="Election")+
+  geom_vline(xintercept=0.5, linetype=2)+ 
+  theme_bw()+
+xlim(c(0.4,1))
+# ces %>% 
+#   select(election, redistribution, degree) %>% 
+#   filter(election>2000) %>% 
+#   as_factor() %>% 
+#   group_by(degree, election) %>% 
+#   summarize(average=mean(redistribution, na.rm = T)) %>% 
+#   View()
+ggsave(filename=here("Plots", "mean_income_household_difference_significance.png"), height=8, width=12)
+
 
 # #### CMP ####
 #   #Download the data

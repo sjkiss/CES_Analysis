@@ -26,7 +26,6 @@ ces15phone %>%
   select(PES15_NOC, occupation) %>% 
   print(n=264)
 
-
 #### Check the MIP Problems have been added ####
 ces19phone$mip
 
@@ -928,8 +927,6 @@ table(ces$upper_class2)
 ces$rich<-Recode(ces$income, "4:5=1; else=0")
 ces$poor<-Recode(ces$income, "1:2=1; else=0")
 
-
-
 # Create Time Dummies
 ces$`1965`<-Recode(ces$election, "1965=1; else=0")
 ces$`1968`<-Recode(ces$election, "1968=1; else=0")
@@ -982,7 +979,6 @@ ces %>%
   #It is defined as the average (mean) of market1, market2 and redistribution_reviersed; missing values ignored
   mutate(economic=rowMeans(select(., c("market1", "market2", "redistribution_reversed")), na.rm=T)) ->ces
 
-
 ### Socio-cultural Views ###
 
 #Start with data frame
@@ -1028,7 +1024,6 @@ val_labels(ces$left)<-c(Left=1, Other=0)
 val_labels(ces$rich)<-c(Rich=1, `Not Rich`=0)
 val_labels(ces$poor)<-c(Poor=1, `Not Poor`=0)
 
-
 #This command calls the file 2_diagnostics.R
 #source("R_scripts/3_recode_diagnostics.R", echo=T)
 #source("R_scripts/4_make_models.R", echo=T)
@@ -1067,6 +1062,7 @@ prop.table(table(ces$income_tertile, ces$election), 2)
 # val_labels(ces$income2)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 # val_labels(ces$income3)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 val_labels(ces$income_tertile)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
+val_labels(ces$income_house)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 
 table(ces$political_efficacy, ces$election)
 table(ces$efficacy_internal, ces$election)
@@ -1083,7 +1079,9 @@ table(ces$pol_interest, ces$election)
 table(ces$foreign, ces$election)
 table(ces$household, ces$election)
 table(ces$income_house, ces$election)
+table(ces$income_tertile, ces$election)
 table(ces$enviro_spend, ces$election)
 
 table(ces$vote3, ces$election)
+
 
