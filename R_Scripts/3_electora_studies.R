@@ -1393,38 +1393,7 @@ ggsave(filename=here("Plots/multinomial_comparison_predicted_probabilities_degre
 
 
 
-#Coefficients for degree
-
-# multinom_models$tidied %>% 
-#   bind_rows(.id="Election") %>%
-#   filter(term=="degreeDegree") %>% 
-#   filter(y.level=="NDP"|y.level=="Liberal") %>% 
-#   mutate(Election=as.Date(Election, format="%Y")) %>% 
-#   ggplot(., aes(x=Election, y=estimate, group=y.level, col=y.level))+
-#   geom_pointrange(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+
-#   facet_grid(~y.level)+scale_x_date(date_labels="%Y")+
-#   scale_color_manual(values=c("darkred", "orange"))+
-#   geom_smooth(method="loess",se=F, linewidth=1)+
-#   theme(legend.position="none")+
-#   labs(y="Logit", caption="Effect of degree status on vote for Liberals / NDP v. Conservative\nControlling for age, gender, region, degree status,religion and income")
-# ggsave(filename=here("Plots/coefficients_multinomial_degree.png"), width=8, height=6)
-
-# Coefficients for Income
-# multinom_models$tidied %>% 
-#   bind_rows(.id="Election") %>%
-#   filter(term=="income_tertile") %>% 
-#   filter(y.level=="NDP"|y.level=="Liberal") %>% 
-#   mutate(Election=as.Date(Election, format="%Y")) %>% 
-#   ggplot(., aes(x=Election, y=estimate, group=y.level, col=y.level))+
-#   geom_pointrange(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+
-#   facet_grid(~y.level)+scale_x_date(date_labels="%Y")+
-#   geom_smooth(method="loess",se=F)+
-#   scale_color_manual(values=c("darkred", "orange"))+
-#   theme(legend.position="none")+
-#   labs(y="Logit", caption="Effect of income on vote for Liberals / NDP v. Conservative\nControlling for age, gender, region, degree status,religion and income")
-# ggsave(filename=here("Plots/coefficients_multinomial_income.png"), width=8, height=6)
-
-#Multinomial Models by Decade
+#Multinomial Models by Decade with Degree
 ces$vote2
 
 multinom_mod1<-multinom(vote2 ~ region2 + age + male + degree + income_tertile + 
@@ -1459,6 +1428,43 @@ modelsummary(multinom.list,
              coef_omit=c("[[:digit:]]{4}"), fmt=2,gof_omit=c("BIC|AIC|RMSE"), stars=T) %>% 
   cols_hide(., columns=8:12) %>% 
   gtsave(., filename=here("Tables/multinomial_check_table_1.html"))
+
+##
+#Multinomial Models by Decade with Degree
+ces$vote2
+
+multinom_mod1a<-multinom(vote2 ~ region2 + age + male + postgrad + income_tertile + 
+                          religion2 + redistribution + market_liberalism + traditionalism2 + 
+                          immigration_rates + `1993` + `1997`, data=ces.1)
+multinom_mod2a<-multinom(vote2 ~ region2 + age + male + postgrad + income_tertile + 
+                          religion2 + redistribution + market_liberalism + traditionalism2 + 
+                          immigration_rates + `2000` + `2004` + `2006` + `2008`, data = ces.2)
+multinom_mod3a<-multinom(vote2~region2 + age + male + postgrad + income_tertile + 
+                          religion2 + redistribution + market_liberalism + traditionalism2 + 
+                          immigration_rates + `2011` + `2015` + 
+                          `2019`, data = ces.3)
+multinom.list
+multinom.list<-list(multinom_mod1a, multinom_mod2a, multinom_mod3a)
+names(multinom.list)<-c("1990s", "2000s", "2010s")
+modelsummary(multinom.list, 
+             shape=term~response+model,output="gt", 
+             coef_map=c("region2Quebec"="Region (Quebec)",
+                        "region2Ontario"="Region (Ontario)",
+                        "region2West"="Region (West)",
+                        "age"="Age", 
+                        "male"="Gender (Male)",
+                        "income_tertile"="Income (Terciles)",
+                        "postgrad"="Education (Postgrad)",
+                        "religion2Catholic"="Religion (Catholic)",
+                        "religion2Protestant"="Religion (Protestant)",
+                        "religion2Other"="Religion (Other)",
+                        "redistribution"="Redistribution",
+                        "market_liberalism"="Market Liberalism",
+                        "immigration_rates"="Immigration Rates",
+                        "traditionalism2"="Moral Traditionalism"),
+             coef_omit=c("[[:digit:]]{4}"), fmt=2,gof_omit=c("BIC|AIC|RMSE"), stars=T) %>% 
+  cols_hide(., columns=8:12) %>% 
+  gtsave(., filename=here("Tables/multinomial_postgrad_check_table_2.html"))
 
 ces.1$degree<-as_factor(ces.1$degree)
 ces.2$degree<-as_factor(ces.2$degree)
