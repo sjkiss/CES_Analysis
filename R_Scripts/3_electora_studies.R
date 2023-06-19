@@ -1481,14 +1481,15 @@ multinomial_interaction_5<-multinom(vote2~region2+age+male+degree+income_tertile
 multinomial_interaction_6<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+
                                       redistribution+market_liberalism+traditionalism2+immigration_rates+
                                       income_tertile:redistribution+`2011`+`2015`+`2019`, data=ces.3)
-multinomial_interaction_model_list<-mget(grep("multinomial_interaction", ls(), value=T))
 library(marginaleffects)
 modelsummary(list(multinomial_interaction_1, multinomial_interaction_2, 
                   multinomial_interaction_3),
              shape=term~response+model,output="gt",
              coef_omit=c("[[:digit:]]{4}"), 
              fmt=2,gof_omit=c("BIC|AIC|RMSE"), stars=T) %>% 
-  cols_hide(., columns=8:12)
+  cols_hide(., columns=8:12) %>% 
+  gtsave(., filename=here("Tables/multinomial_interaction_degree.html"))
+
 out1<-tidy(avg_slopes(multinomial_interaction_1, variables="redistribution", by="degree")) 
 out2<-tidy(avg_slopes(multinomial_interaction_2, variables="redistribution", by="degree")) 
 out3<-tidy(avg_slopes(multinomial_interaction_3, variables="redistribution", by="degree"))
@@ -1496,15 +1497,9 @@ out3<-tidy(avg_slopes(multinomial_interaction_3, variables="redistribution", by=
 out1 %>% 
   bind_rows(., out2, out3) %>% 
   filter(group!="BQ"&group!="Green") %>% 
-<<<<<<< HEAD
-  filter(degree==1) %>% 
-mutate(Decade=c(rep("1990", 3), rep("2000", 3), rep("2010", 3))) %>% 
-  ggplot(., aes(x=Decade, y=estimate))+
-=======
   #filter(degree=="Degree") %>% 
 mutate(Decade=c(rep("1990", 6), rep("2000", 6), rep("2010", 6))) %>% 
   ggplot(., aes(x=Decade, y=estimate, col=degree))+
->>>>>>> f06bee1 (Simon's Changes)
   facet_grid(~fct_relevel(group, "NDP", "Liberal"))+
   geom_pointrange(aes(ymin=conf.low, ymax=conf.high))
 ggsave(filename=here("Plots", "interaction_degree_multinomial_robustness_check.png"),width=8, height=4)
@@ -1523,18 +1518,10 @@ out4 %>%
   facet_grid(~fct_relevel(group, "NDP", "Liberal"))+
   geom_pointrange(aes(ymin=conf.low, ymax=conf.high))
 ggsave(filename=here("Plots", "interaction_income_multinomial_robustness_check.png"),width=8, height=4)
-
-#### Factor Analysis ####
-#install.packages("splithalfr")
-library(splithalfr)
-spearman_brown(ces.1$market1, ces.1$market2)
-ces %>% 
-  filter(election>1988) %>% 
-  select(market1, market2) %>% 
-  na.omit()->market_liberalism
-spearman_brown(market_liberalism[,1], market_lbieralism[,2])
-ces %>% 
-  filter(election>1988) %>% 
-  select(trad1, trad2) %>% 
-  na.omit()->moral_traditionalism
-spearman_brown(moral_traditionalism[,1], moral_traditionalism[,2])
+modelsummary(list(multinomial_interaction_4, multinomial_interaction_5, 
+                  multinomial_interaction_6),
+             shape=term~response+model,output="gt",
+             coef_omit=c("[[:digit:]]{4}"), 
+             fmt=2,gof_omit=c("BIC|AIC|RMSE"), stars=T) %>% 
+  cols_hide(., columns=8:12) %>% 
+gtsave(., filename=here("Tables/multinomial_interaction_income.html"))
