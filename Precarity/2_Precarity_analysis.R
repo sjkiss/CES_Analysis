@@ -242,10 +242,13 @@ m4<-svyglm(right~volatility_x+probability_x+consequence_x+
              immigrants+consequence_x*immigrants,
            #  as_factor(cps$region), 
            design=cps_des)
-cps$immigrants
-library(modelsummary)
-modelsummary(list(m1, m2, m3, m4), stars=T)
-str(m1)
-library(ggeffects)
+# cps$immigrants
+# library(modelsummary)
+# modelsummary(list(m1, m2, m3, m4), stars=T)
+# str(m1)
+# library(ggeffects)
+# 
+# ggpredict(m2, terms=c("volatility_x", "nativism[meansd]")) 
 
-ggpredict(m2, terms=c("volatility_x", "nativism[meansd]")) 
+
+ggplot(cps, aes(x=precarity2, y=precarity3))+geom_point()+geom_jitter()+labs(x="Probability", y="Consequence")

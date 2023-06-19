@@ -30,7 +30,7 @@ conv_val_labels <- function(x) {
 library(labelled)
 is.labelled(cps$cps19_imp_iss)
 cps <- map_dfc(cps, conv_val_labels)
-f
+
 look_for(cps, "income") #income volatility is kiss_q1
 look_for(cps, "job")
 look_for(cps, "business")
@@ -150,10 +150,7 @@ cps %>%
 cps %>% 
   select(precarity1, precarity2, precarity3) %>% 
   cor(., use="complete.obs")->precarity_matrix
-principal(precarity_matrix)
-principal(precarity_matrix, nfactors=2)
-principal(precarity_matrix, nfactors=3)
-?fa
+
 
 library(psych)
 cps %>% 
@@ -576,4 +573,7 @@ cps %>%
   summarize(average=mean(value, na.rm=T)) %>% 
   ggplot(., aes(x=male, y=average))+geom_point()+facet_wrap(~name)
   
-  
+
+cps %>% 
+  select(starts_with("precarity")) 
+
