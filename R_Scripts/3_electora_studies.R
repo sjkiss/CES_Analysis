@@ -205,23 +205,28 @@ ces$region2<-relevel(ces$region2, "Atlantic")
 #What we need is by decade
 #Get 1993, 1997 
 ces %>% 
+  filter(vote2!="Green"&vote2!="BQ") %>% 
   filter(election<1999 & election> 1989 )->ces.1
+table(ces.1$vote2)
 #Get 2000, 20004, 2006 2008
 ces %>% 
+  filter(vote2!="Green"&vote2!="BQ") %>% 
   filter(election<2009 & election> 1999 )->ces.2
+table(ces.2$vote2)
 #Get 2011 and 2015 and 2019
 ces %>% 
+  filter(vote2!="Green"&vote2!="BQ") %>% 
   filter(election<2020 & election> 2009 )->ces.3
 
 
 multinom_mod1<-multinom(vote2 ~ region2 + age + male + degree + income_tertile + 
-                          religion2 + redistribution + market_liberalism + traditionalism2 + 
+                          religion2 + household+redistribution + market_liberalism + traditionalism2 + 
                           immigration_rates + `1993` + `1997`, data=ces.1)
 multinom_mod2<-multinom(vote2 ~ region2 + age + male + degree + income_tertile + 
-                          religion2 + redistribution + market_liberalism + traditionalism2 + 
+                          religion2 + household+redistribution + market_liberalism + traditionalism2 + 
                           immigration_rates + `2000` + `2004` + `2006` + `2008`, data = ces.2)
 multinom_mod3<-multinom(vote2~region2 + age + male + degree + income_tertile + 
-                          religion2 + redistribution + market_liberalism + traditionalism2 + 
+                          religion2 + household+redistribution + market_liberalism + traditionalism2 + 
                           immigration_rates + `2011` + `2015` + 
                           `2019`, data = ces.3)
 #List these models in multinom.list
@@ -230,21 +235,38 @@ multinom.list<-list(multinom_mod1, multinom_mod2, multinom_mod3)
 names(multinom.list)<-c("1990s", "2000s", "2010s")
 summary(multinom_mod3)
 #Generate table
+#Rows to add.
+
+rows<-tibble(
+  term=c("Region (Atlantic)", "Religion (None)"),
+  model1=c(rep("ref", 2)),
+  model2=c(rep("ref", 2)),
+  model3=c(rep("ref", 2)),
+  model4=c(rep("ref", 2)),
+  model5=c(rep("ref", 2)),
+  model6=c(rep("ref", 2))
+)
+attr(rows, 'position') <- c(1, 16)
+
 
 modelsummary(multinom.list, 
              shape=term~response+model,output="gt", 
-             "region2Ontario"="Region (Ontario)",
+             coef_map = c(
+               "region2Quebec"="Region (Quebec)",
+               "region2Ontario"="Region (Ontario)",
              "region2West"="Region (West)",
              "age"="Age", 
-             "male"="Test",
+             "male"="Male",
              "income_tertile"="Income (Terciles)",
-             "degree"="Test",
+             "degree"="Degree",
              "religion2Catholic"="Religion (Catholic)",
              "religion2Protestant"="Religion (Protestant)",
              "religion2Other"="Religion (Other)",
+             "household"="Household Size",
              "redistribution"="Redistribution",
              "market_liberalism"="Market Liberalism",
              "immigration_rates"="Immigration Rates",
+             "(Intercept)"="Constant"),
              #Omit year fixed effects
              coef_omit=c("[[:digit:]]{4}"), 
              #format to two digits
@@ -252,10 +274,236 @@ modelsummary(multinom.list,
              #omit goodness of fit statistics
              gof_omit=c("BIC|AIC|RMSE"), 
              #Produce significance stars
-             stars=T) %>% 
-  #Hide some columns
-  cols_hide(., columns=8:12) %>% 
+             stars=T, add_rows = rows) %>% 
   gtsave(., filename=here("Tables/multinomial_check_table_1.html"))
+
+# Check # of missing values in each 
+
+ces %>%
+  filter(vote2!="Green"|vote2!="BQ") %>% 
+  select(election, region2, vote2, male, age, degree,
+         household, income_tertile, immigration_rates, 
+         market_liberalism, traditionalism2, redistribution, religion) %>%  
+  filter(election> 1988) %>% 
+  group_by(election) %>% 
+  summarise_all(funs(sum(is.na(.)))) %>% 
+  write.csv(here("data/missing_values_jun_2023.csv"))
+#### Table 2 and 3
+
+#fit multinom only with degree, include year fixed effects
+#90s models
+degree90_no_controls<-multinom(vote2 ~  degree +`1993`+`1997`, data=ces.1)
+degree90_demographics<-update(degree90_no_controls, .~.+region2 + age + male +  income_tertile + 
+         religion2 + household)
+degree90_demographics
+degree90_redistro<-update(degree90_demographics, .~.+redistribution)
+degree90_market<-update(degree90_demographics, .~.+market_liberalism)
+degree90_immigration<-update(degree90_demographics, .~.+immigration_rates)
+degree90_traditionalism<-update(degree90_demographics, .~.+traditionalism2)
+degree90_full<-multinom(vote2 ~ region2 + age + male + degree + income_tertile + 
+                       religion2 + household+redistribution + market_liberalism + traditionalism2 + 
+                       immigration_rates + `1993` + `1997`, data=ces.1)
+
+
+#00s models
+degree00_no_controls<-multinom(vote2 ~  degree +`2000`+`2004`+`2006`+`2008`, data=ces.2)
+degree00_demographics<-update(degree00_no_controls, .~.+region2 + age + male +  income_tertile + 
+                             religion2 + household)
+degree00_demographics
+degree00_redistro<-update(degree00_demographics, .~.+redistribution)
+degree00_market<-update(degree00_demographics, .~.+market_liberalism)
+degree00_immigration<-update(degree00_demographics, .~.+immigration_rates)
+degree00_traditionalism<-update(degree00_demographics, .~.+traditionalism2)
+degree00_full<-multinom(vote2 ~ region2 + age + male + degree + income_tertile + 
+                       religion2 + household+redistribution + market_liberalism + traditionalism2 + 
+                       immigration_rates + +`2000`+`2004`+`2006`+`2008`, data=ces.2)
+
+#2010s
+degree10_no_controls<-multinom(vote2 ~  degree +`2011`+`2015`+`2019`, data=ces.3)
+degree10_demographics<-update(degree10_no_controls, .~.+region2 + age + male +  income_tertile + 
+                             religion2 + household)
+degree10_demographics
+degree10_redistro<-update(degree10_demographics, .~.+redistribution)
+degree10_market<-update(degree10_demographics, .~.+market_liberalism)
+degree10_immigration<-update(degree10_demographics, .~.+immigration_rates)
+degree10_traditionalism<-update(degree10_demographics, .~.+traditionalism2)
+degree10_full<-multinom(vote2 ~ region2 + age + male + degree + income_tertile + 
+                       religion2 + household+redistribution + market_liberalism + traditionalism2 + 
+                       immigration_rates  +`2011`+`2015`+`2019`, data=ces.3)
+
+#Make list for printing
+
+#list the 10s models
+model.list.degree<-list(degree90_no_controls, degree90_demographics, degree90_redistro, degree90_market, degree90_immigration,
+                       degree90_traditionalism, degree90_full, degree00_no_controls, degree00_demographics, degree00_redistro, degree00_market, degree00_immigration,
+      degree00_traditionalism, degree00_full, degree10_no_controls, degree10_demographics, degree10_redistro, degree10_market, degree10_immigration,
+degree10_traditionalism, degree10_full)
+#Print table
+names(model.list.degree)<-rep(c("No controls", "No controls + Demographics",
+                            "Demographics + Redistribution", "Demographics + Market Liberalism", 
+                            "Demographics + Immigration", "Demographics + Traditionalism", 
+                            "Full Model"),3)
+modelsummary(model.list.degree, shape=term+model~response,
+             #Omit all coefficients except degree
+             coef_map = "degree",
+             #Omit SE
+             statistic=NULL,
+             #Omit all Goodness of fit
+          gof_omit=c(".*"),
+             #output as gt table
+             output="dataframe", stars=T) %>% 
+  rename(Model=model) %>% 
+  mutate(Decade=c(rep("90", 7), rep("00", 7), rep("10", 7)), Model=str_trim(Model))  %>% 
+  select(-c(term, part, statistic)) %>% 
+#group_by(model) %>% 
+  pivot_wider(names_from=Decade, values_from=c(Liberal, NDP), 
+              id_cols=c(Model)) %>% 
+  gt() %>% 
+  gtsave(., filename=here("Tables/table2_degree_coefficients_multinomial.html"))
+
+# Repeat for Income Table 3
+#90s models
+income90_no_controls<-multinom(vote2 ~  income_tertile +`1993`+`1997`, data=ces.1)
+income90_demographics<-update(income90_no_controls, .~.+region2 + age + male +  income_tertile + 
+                                religion2 + household)
+income90_demographics
+income90_redistro<-update(income90_demographics, .~.+redistribution)
+income90_market<-update(income90_demographics, .~.+market_liberalism)
+income90_immigration<-update(income90_demographics, .~.+immigration_rates)
+income90_traditionalism<-update(income90_demographics, .~.+traditionalism2)
+income90_full<-multinom(vote2 ~ region2 + age + male + degree + income_tertile + 
+                          religion2 + household+redistribution + market_liberalism + traditionalism2 + 
+                          immigration_rates + `1993` + `1997`, data=ces.1)
+
+
+#00s models
+income00_no_controls<-multinom(vote2 ~  income_tertile +`2000`+`2004`+`2006`+`2008`, data=ces.2)
+income00_demographics<-update(income00_no_controls, .~.+region2 + age + male +  income_tertile + 
+                                religion2 + household)
+income00_demographics
+income00_redistro<-update(income00_demographics, .~.+redistribution)
+income00_market<-update(income00_demographics, .~.+market_liberalism)
+income00_immigration<-update(income00_demographics, .~.+immigration_rates)
+income00_traditionalism<-update(income00_demographics, .~.+traditionalism2)
+income00_full<-multinom(vote2 ~ region2 + age + male + degree + income_tertile + 
+                          religion2 + household+redistribution + market_liberalism + traditionalism2 + 
+                          immigration_rates + +`2000`+`2004`+`2006`+`2008`, data=ces.2)
+
+#2010s
+income10_no_controls<-multinom(vote2 ~  income_tertile +`2011`+`2015`+`2019`, data=ces.3)
+income10_demographics<-update(income10_no_controls, .~.+region2 + age + male +  income_tertile + 
+                                religion2 + household)
+income10_demographics
+income10_redistro<-update(income10_demographics, .~.+redistribution)
+income10_market<-update(income10_demographics, .~.+market_liberalism)
+income10_immigration<-update(income10_demographics, .~.+immigration_rates)
+income10_traditionalism<-update(income10_demographics, .~.+traditionalism2)
+income10_full<-multinom(vote2 ~ region2 + age + male + degree + income_tertile + 
+                          religion2 + household+redistribution + market_liberalism + traditionalism2 + 
+                          immigration_rates  +`2011`+`2015`+`2019`, data=ces.3)
+
+#Make list for printing
+
+#list the 10s models
+model.list.income<-list(income90_no_controls, income90_demographics, income90_redistro, income90_market, income90_immigration,
+                        income90_traditionalism, income90_full, income00_no_controls, income00_demographics, income00_redistro, income00_market, income00_immigration,
+                        income00_traditionalism, income00_full, income10_no_controls, income10_demographics, income10_redistro, income10_market, income10_immigration,
+                        income10_traditionalism, income10_full)
+#Print table
+names(model.list.income)<-rep(c("No controls", "No controls + Demographics",
+                                "Demographics + Redistribution", "Demographics + Market Liberalism", 
+                                "Demographics + Immigration", "Demographics + Traditionalism", 
+                                "Full Model"),3)
+modelsummary(model.list.income, shape=term+model~response,
+             #Omit all coefficients except income
+             coef_map = "income_tertile",
+             #Omit SE
+             statistic=NULL,
+             #Omit all Goodness of fit
+             gof_omit=c(".*"),
+             #output as gt table
+             output="dataframe", stars=T) %>% 
+  rename(Model=model) %>% 
+  mutate(Decade=c(rep("90", 7), rep("00", 7), rep("10", 7)), Model=str_trim(Model))  %>% 
+  select(-c(term, part, statistic)) %>% 
+  #group_by(model) %>% 
+  pivot_wider(names_from=Decade, values_from=c(Liberal, NDP), 
+              id_cols=c(Model)) %>% 
+  gt() %>% 
+  gtsave(., filename=here("Tables/table3_income_coefficients_multinomial.html"))
+#### Multinomial Interactions
+# Convert degree to factor
+ces.1$degree<-as_factor(ces.1$degree)
+ces.2$degree<-as_factor(ces.2$degree)
+ces.3$degree<-as_factor(ces.3$degree)
+multinomial_interaction_1<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+household+
+                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
+                                      degree:redistribution+`1993`+`1997`, data=ces.1)
+multinomial_interaction_2<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+household+
+                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
+                                      degree:redistribution+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+multinomial_interaction_3<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+household+
+                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
+                                      degree:redistribution+`2011`+`2015`+`2019`, data=ces.3)
+multinomial_interaction_4<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+household+
+                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
+                                      income_tertile:redistribution+`1993`+`1997`, data=ces.1)
+multinomial_interaction_5<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+household+
+                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
+                                      income_tertile:redistribution+`2000`+`2004`+`2006`+`2008`, data=ces.2)
+multinomial_interaction_6<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+household+
+                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
+                                      income_tertile:redistribution+`2011`+`2015`+`2019`, data=ces.3)
+
+modelsummary(list(multinomial_interaction_1, multinomial_interaction_2, 
+                  multinomial_interaction_3),
+             shape=term~response+model,output="gt",
+             coef_omit=c("[[:digit:]]{4}"), 
+             fmt=2,gof_omit=c("BIC|AIC|RMSE"), stars=T) %>%  
+  #cols_hide(., columns=8:12) %>% 
+  gtsave(., filename=here("Tables/multinomial_interaction_degree.html"))
+modelsummary(list(multinomial_interaction_4, multinomial_interaction_5, 
+                  multinomial_interaction_6),
+             shape=term~response+model,output="gt",
+             coef_omit=c("[[:digit:]]{4}"), 
+             fmt=2,gof_omit=c("BIC|AIC|RMSE"), stars=T) %>% 
+  cols_hide(., columns=8:12) %>% 
+  gtsave(., filename=here("Tables/multinomial_interaction_income.html"))
+
+#Figure 5
+out1<-tidy(avg_slopes(multinomial_interaction_1, variables="redistribution", by="degree")) 
+out2<-tidy(avg_slopes(multinomial_interaction_2, variables="redistribution", by="degree")) 
+out3<-tidy(avg_slopes(multinomial_interaction_3, variables="redistribution", by="degree"))
+
+out1 %>% 
+  bind_rows(., out2, out3) %>%   
+  filter(group!="BQ"&group!="Green") %>% 
+  #filter(degree=="Degree") %>% 
+  mutate(Decade=c(rep("1990", 6), rep("2000", 6), rep("2010", 6))) %>% 
+  ggplot(., aes(x=Decade, y=estimate, col=degree))+
+  facet_grid(~fct_relevel(group, "NDP", "Liberal"))+
+  geom_pointrange(aes(ymin=conf.low, ymax=conf.high))+
+  labs(y="Average Marginal Effect")
+ggsave(filename=here("Plots", "interaction_degree_multinomial.png"),width=8, height=4)
+# Figure 6
+out4<-tidy(avg_slopes(multinomial_interaction_4, by="income_tertile", variables="redistribution"))
+out5<-tidy(avg_slopes(multinomial_interaction_5, by="income_tertile", variables="redistribution"))
+out6<-tidy(avg_slopes(multinomial_interaction_6, by="income_tertile", variables="redistribution"))
+out4
+out4 %>% 
+  bind_rows(., out5, out6) %>% 
+  filter(group!="BQ"&group!="Green")  %>% 
+  as_factor() %>% 
+  #filter(degree==1) 
+  mutate(Decade=c(rep("1990", 9), rep("2000", 9), rep("2010", 9))) %>% 
+  ggplot(., aes(x=Decade, y=estimate, col=income_tertile))+
+  facet_grid(~fct_relevel(group, "NDP", "Liberal"))+
+  geom_pointrange(aes(ymin=conf.low, ymax=conf.high))+
+  labs(y="Average Marginal Effect")
+ggsave(filename=here("Plots", "interaction_income_multinomial.png"),width=8, height=4)
+
+
+
 
 
 #### Basic OLS Party vote models 1965-2021 ####
@@ -985,214 +1233,7 @@ interaction.models2 %>%
   ggplot(., aes(x=Period, y=estimate, col=Period))+geom_point()+facet_grid(term~fct_relevel(Party, "NDP", "Liberal"), scales="free")+scale_color_grey(start=0.8, end=0.2) +geom_errorbar(width=0, aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))+   geom_hline(yintercept=0,  linetype=2)+theme(strip.text.y.right = element_text(angle = 0))+labs(y="Coefficient")
 ggsave(filename=here("Plots", "income_redistribution_interaction_terms.png"), width=8, height=4)
 
-#### Table 2 Degree. ####
-tab2_90_0_ndp<-lm(ndp~degree+`1993`+`1997`, data=ces.1)
-tab2_90_00_ndp<-lm(ndp~income_tertile+`1993`+`1997`, data=ces.1)
-tab2_90_1_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+`1993`+`1997`, data=ces.1)
-tab2_90_2_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+redistribution+`1993`+`1997`, data=ces.1)
-tab2_90_3_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+market_liberalism+`1993`+`1997`, data=ces.1)
-tab2_90_4_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+immigration_rates+`1993`+`1997`, data=ces.1)
-tab2_90_5_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+traditionalism2+`1993`+`1997`, data=ces.1)
-tab2_90_6_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`1993`+`1997`, data=ces.1)
-tab2_00_0_ndp<-lm(ndp~degree+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_00_ndp<-lm(ndp~income_tertile+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_1_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_2_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+redistribution+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_3_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+market_liberalism+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_4_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+immigration_rates+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_5_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+traditionalism2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_6_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_10_0_ndp<-lm(ndp~degree+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_00_ndp<-lm(ndp~income_tertile+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_1_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_2_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+redistribution+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_3_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+market_liberalism+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_4_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+immigration_rates+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_5_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+traditionalism2+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_6_ndp<-lm(ndp~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2011`+`2015`+`2019`, data=ces.3)
 
-### Liberal OLS
-tab2_90_0_liberal<-lm(liberal~degree+`1993`+`1997`, data=ces.1)
-tab2_90_00_liberal<-lm(liberal~income_tertile+`1993`+`1997`, data=ces.1)
-tab2_90_1_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+`1993`+`1997`, data=ces.1)
-tab2_90_2_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+redistribution+`1993`+`1997`, data=ces.1)
-tab2_90_3_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+market_liberalism+`1993`+`1997`, data=ces.1)
-tab2_90_4_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+immigration_rates+`1993`+`1997`, data=ces.1)
-tab2_90_5_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+traditionalism+`1993`+`1997`, data=ces.1)
-tab2_90_6_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism+`1993`+`1997`, data=ces.1)
-tab2_00_0_liberal<-lm(liberal~degree+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_00_liberal<-lm(liberal~income_tertile+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_1_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_2_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+redistribution+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_3_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+market_liberalism+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_4_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+immigration_rates+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_5_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+traditionalism2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_6_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_10_0_liberal<-lm(liberal~degree+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_00_liberal<-lm(liberal~income_tertile+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_1_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_2_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+redistribution+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_3_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+market_liberalism+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_4_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+immigration_rates+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_5_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+traditionalism2+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_6_liberal<-lm(liberal~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2011`+`2015`+`2019`, data=ces.3)
-
-###
-### Conservative OLS
-tab2_90_0_conservative<-lm(conservative~degree+`1993`+`1997`, data=ces.1)
-tab2_90_00_conservative<-lm(conservative~income+`1993`+`1997`, data=ces.1)
-tab2_90_1_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+`1993`+`1997`, data=ces.1)
-tab2_90_2_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+redistribution+`1993`+`1997`, data=ces.1)
-tab2_90_3_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+market_liberalism+`1993`+`1997`, data=ces.1)
-tab2_90_4_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+immigration_rates+`1993`+`1997`, data=ces.1)
-tab2_90_5_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+traditionalism2+`1993`+`1997`, data=ces.1)
-tab2_90_6_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`1993`+`1997`, data=ces.1)
-tab2_00_0_conservative<-lm(conservative~degree+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_00_conservative<-lm(conservative~income_tertile+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_1_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_2_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+redistribution+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_3_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+market_liberalism+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_4_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+immigration_rates+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_5_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+traditionalism2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_00_6_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-tab2_10_0_conservative<-lm(conservative~degree+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_00_conservative<-lm(conservative~income_tertile+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_1_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_2_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+redistribution+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_3_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+market_liberalism+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_4_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+immigration_rates+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_5_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+traditionalism2+`2011`+`2015`+`2019`, data=ces.3)
-tab2_10_6_conservative<-lm(conservative~region2+age+male+degree+income_tertile+religion2+redistribution+market_liberalism+immigration_rates+traditionalism2+`2011`+`2015`+`2019`, data=ces.3)
-#Make the degree table
-tab2_90_ndp<-list(tab2_90_0_ndp,tab2_90_1_ndp, tab2_90_2_ndp, tab2_90_3_ndp, tab2_90_4_ndp, tab2_90_5_ndp, tab2_90_6_ndp)
-tab2_00_ndp<-list(tab2_00_0_ndp,tab2_00_1_ndp, tab2_00_2_ndp, tab2_00_3_ndp, tab2_00_4_ndp, tab2_00_5_ndp, tab2_00_6_ndp)
-tab2_10_ndp<-list(tab2_10_0_ndp,tab2_10_1_ndp, tab2_10_2_ndp, tab2_10_3_ndp, tab2_10_4_ndp, tab2_10_5_ndp, tab2_10_6_ndp)
-tab2_90_liberal<-list(tab2_90_0_liberal, tab2_90_1_liberal, tab2_90_2_liberal, tab2_90_3_liberal, tab2_90_4_liberal, tab2_90_5_liberal, tab2_90_6_liberal)
-tab2_00_liberal<-list(tab2_00_0_liberal,tab2_00_1_liberal, tab2_00_2_liberal, tab2_00_3_liberal, tab2_00_4_liberal, tab2_00_5_liberal, tab2_90_6_liberal)
-tab2_10_liberal<-list(tab2_10_0_liberal,tab2_10_1_liberal, tab2_10_2_liberal, tab2_10_3_liberal, tab2_10_4_liberal, tab2_10_5_liberal, tab2_90_6_liberal)
-tab2_90_conservative<-list(tab2_90_0_conservative,tab2_90_1_conservative, tab2_90_2_conservative, tab2_90_3_conservative, tab2_90_4_conservative, tab2_90_5_conservative, tab2_90_6_conservative)
-tab2_00_conservative<-list(tab2_00_0_conservative, tab2_00_1_conservative, tab2_00_2_conservative, tab2_00_3_conservative, tab2_00_4_conservative, tab2_00_5_conservative, tab2_00_6_conservative)
-tab2_10_conservative<-list(tab2_10_0_conservative, tab2_10_1_conservative, tab2_10_2_conservative, tab2_10_3_conservative, tab2_10_4_conservative, tab2_10_5_conservative, tab2_10_6_conservative)
-tab2_90_conservative
-
-tab2_90_ndp %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "degree"))->tab2_col1
-
-tab2_00_ndp %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "degree"))->tab2_col2
-tab2_10_ndp %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "degree"))->tab2_col3
-
-tab2_90_liberal %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "degree"))->tab2_col4
-tab2_00_liberal %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "degree"))->tab2_col5
-tab2_10_liberal %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "degree"))->tab2_col6
-tab2_90_conservative %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "degree"))->tab2_col7
-tab2_00_conservative %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "degree"))->tab2_col8
-tab2_10_conservative %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "degree"))->tab2_col9
-tab2_col9
-library(gt)
-cbind(tab2_col1, tab2_col2, tab2_col3, tab2_col4, tab2_col5, tab2_col6, tab2_col7, tab2_col8, tab2_col9) %>% 
-data.frame() %>% 
-  mutate(`Coefficients`=c("No Controls", 
-                          "Demographics", 
-                          "Demographics+Redistribution",
-                          "Demographics+Market Liberalism", 
-                          "Demographics+Immigration",
-                          "Demographics+Traditionalism", 
-                          "Full Model")) %>% 
-  select(`Coefficients`, matches("estimate|p.value")) %>% 
-  gt() %>% 
-  fmt_number(.,columns=2:19, decimals=3) %>% 
-  gtsave(., filename="Tables/table2_simon_degree.html")
-
-#### Make the Income table
-tab2a_90_ndp<-list(tab2_90_00_ndp,tab2_90_1_ndp, tab2_90_2_ndp, tab2_90_3_ndp, tab2_90_4_ndp, tab2_90_5_ndp, tab2_90_6_ndp)
-tab2a_00_ndp<-list(tab2_00_00_ndp,tab2_00_1_ndp, tab2_00_2_ndp, tab2_00_3_ndp, tab2_00_4_ndp, tab2_00_5_ndp, tab2_00_6_ndp)
-tab2a_10_ndp<-list(tab2_10_00_ndp,tab2_10_1_ndp, tab2_10_2_ndp, tab2_10_3_ndp, tab2_10_4_ndp, tab2_10_5_ndp, tab2_10_6_ndp)
-tab2a_90_liberal<-list(tab2_90_00_liberal, tab2_90_1_liberal, tab2_90_2_liberal, tab2_90_3_liberal, tab2_90_4_liberal, tab2_90_5_liberal, tab2_90_6_liberal)
-tab2a_00_liberal<-list(tab2_00_00_liberal,tab2_00_1_liberal, tab2_00_2_liberal, tab2_00_3_liberal, tab2_00_4_liberal, tab2_00_5_liberal, tab2_90_6_liberal)
-tab2a_10_liberal<-list(tab2_10_00_liberal,tab2_10_1_liberal, tab2_10_2_liberal, tab2_10_3_liberal, tab2_10_4_liberal, tab2_10_5_liberal, tab2_90_6_liberal)
-tab2a_90_conservative<-list(tab2_90_00_conservative,tab2_90_1_conservative, tab2_90_2_conservative, tab2_90_3_conservative, tab2_90_4_conservative, tab2_90_5_conservative, tab2_90_6_conservative)
-tab2a_00_conservative<-list(tab2_00_00_conservative, tab2_00_1_conservative, tab2_00_2_conservative, tab2_00_3_conservative, tab2_00_4_conservative, tab2_00_5_conservative, tab2_00_6_conservative)
-tab2a_10_conservative<-list(tab2_10_00_conservative, tab2_10_1_conservative, tab2_10_2_conservative, tab2_10_3_conservative, tab2_10_4_conservative, tab2_10_5_conservative, tab2_10_6_conservative)
-
-tab2a_90_ndp %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "income"))->tab2a_col1
-
-tab2a_00_ndp %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "income"))->tab2a_col2
-tab2a_10_ndp %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "income"))->tab2a_col3
-
-tab2a_90_liberal %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "income"))->tab2a_col4
-tab2a_00_liberal %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "income"))->tab2a_col5
-tab2a_10_liberal %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "income"))->tab2a_col6
-tab2a_90_conservative %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "income"))->tab2a_col7
-tab2a_00_conservative %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "income"))->tab2a_col8
-tab2a_10_conservative %>% 
-  map(., tidy) %>% 
-  bind_rows() %>% 
-  filter(str_detect(term, "income"))->tab2a_col9
-tab2a_col9
-library(gt)
-cbind(tab2a_col1, tab2a_col2, tab2a_col3, tab2a_col4, tab2a_col5, tab2a_col6, tab2a_col7, tab2a_col8, tab2a_col9) %>% 
-  data.frame() %>% 
-  mutate(`Coefficients`=c("No Controls", 
-                          "Demographics", 
-                          "Demographics+Redistribution",
-                          "Demographics+Market Liberalism", 
-                          "Demographics+Immigration",
-                          "Demographics+Traditionalism", 
-                          "Full Model")) %>% 
-  select(`Coefficients`, matches("estimate|p.value")) %>% 
-  gt() %>% 
-  fmt_number(.,columns=2:19, decimals=3) %>% 
-  gtsave(., filename="Tables/table2_simon_income.html")
   
   
 
@@ -1482,68 +1523,4 @@ modelsummary(multinom.list,
   cols_hide(., columns=8:12) %>% 
   gtsave(., filename=here("Tables/multinomial_postgrad_check_table_2.html"))
 
-ces.1$degree<-as_factor(ces.1$degree)
-ces.2$degree<-as_factor(ces.2$degree)
-ces.3$degree<-as_factor(ces.3$degree)
-multinomial_interaction_1<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+
-                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
-                                      degree:redistribution+`1993`+`1997`, data=ces.1)
-multinomial_interaction_2<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+
-                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
-                                      degree:redistribution+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-multinomial_interaction_3<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+
-                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
-                                      degree:redistribution+`2011`+`2015`+`2019`, data=ces.3)
-multinomial_interaction_4<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+
-                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
-                                     income_tertile:redistribution+`1993`+`1997`, data=ces.1)
-multinomial_interaction_5<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+
-                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
-                                      income_tertile:redistribution+`2000`+`2004`+`2006`+`2008`, data=ces.2)
-multinomial_interaction_6<-multinom(vote2~region2+age+male+degree+income_tertile+religion2+
-                                      redistribution+market_liberalism+traditionalism2+immigration_rates+
-                                      income_tertile:redistribution+`2011`+`2015`+`2019`, data=ces.3)
-library(marginaleffects)
-modelsummary(list(multinomial_interaction_1, multinomial_interaction_2, 
-                  multinomial_interaction_3),
-             shape=term~response+model,output="gt",
-             coef_omit=c("[[:digit:]]{4}"), 
-             fmt=2,gof_omit=c("BIC|AIC|RMSE"), stars=T) %>% 
-  cols_hide(., columns=8:12) %>% 
-  gtsave(., filename=here("Tables/multinomial_interaction_degree.html"))
 
-out1<-tidy(avg_slopes(multinomial_interaction_1, variables="redistribution", by="degree")) 
-out2<-tidy(avg_slopes(multinomial_interaction_2, variables="redistribution", by="degree")) 
-out3<-tidy(avg_slopes(multinomial_interaction_3, variables="redistribution", by="degree"))
-
-out1 %>% 
-  bind_rows(., out2, out3) %>% 
-  filter(group!="BQ"&group!="Green") %>% 
-  #filter(degree=="Degree") %>% 
-mutate(Decade=c(rep("1990", 6), rep("2000", 6), rep("2010", 6))) %>% 
-  ggplot(., aes(x=Decade, y=estimate, col=degree))+
-  facet_grid(~fct_relevel(group, "NDP", "Liberal"))+
-  geom_pointrange(aes(ymin=conf.low, ymax=conf.high))
-ggsave(filename=here("Plots", "interaction_degree_multinomial_robustness_check.png"),width=8, height=4)
-
-out4<-tidy(avg_slopes(multinomial_interaction_4, by="income_tertile", variables="redistribution"))
-out5<-tidy(avg_slopes(multinomial_interaction_5, by="income_tertile", variables="redistribution"))
-out6<-tidy(avg_slopes(multinomial_interaction_6, by="income_tertile", variables="redistribution"))
-out4
-out4 %>% 
-  bind_rows(., out5, out6) %>% 
-  filter(group!="BQ"&group!="Green")  %>% 
-  as_factor() %>% 
- #filter(degree==1) 
-  mutate(Decade=c(rep("1990", 9), rep("2000", 9), rep("2010", 9))) %>% 
-  ggplot(., aes(x=Decade, y=estimate, col=income_tertile))+
-  facet_grid(~fct_relevel(group, "NDP", "Liberal"))+
-  geom_pointrange(aes(ymin=conf.low, ymax=conf.high))
-ggsave(filename=here("Plots", "interaction_income_multinomial_robustness_check.png"),width=8, height=4)
-modelsummary(list(multinomial_interaction_4, multinomial_interaction_5, 
-                  multinomial_interaction_6),
-             shape=term~response+model,output="gt",
-             coef_omit=c("[[:digit:]]{4}"), 
-             fmt=2,gof_omit=c("BIC|AIC|RMSE"), stars=T) %>% 
-  cols_hide(., columns=8:12) %>% 
-gtsave(., filename=here("Tables/multinomial_interaction_income.html"))
