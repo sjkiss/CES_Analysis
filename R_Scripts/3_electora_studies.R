@@ -664,61 +664,39 @@ multinom_models_post_grad$model %>%
 ggsave(filename=here("Plots/multinomial_comparison_predicted_probabilities_post_grad_degree_income_robustness_check.png"), width=12, height=6, dpi=300)
 
 #A6 
-ces %>% 
-  filter(election> 1988) %>% 
-  filter(vote=="Conservative"|vote=="NDP"|vote=="Liberal") %>% 
-  filter(income_tertile!=2) %>% 
-  select(Election=election, Vote=vote, Degree=degree, Income=income_tertile, 
-         redistribution) %>% 
-  as_factor() %>% 
-  mutate(Decade=case_when(
-    Election<2000 ~ "1990s",
-    Election<1999 &Election<2010 ~ "2000s",
-    Election<2020&Election<2009~ "2010s"
-  )) %>% 
-  group_by(Vote, Decade) %>% 
+# might come back to this later
+# ces %>% 
+#   filter(election> 1988) %>% 
+#   filter(vote=="Conservative"|vote=="NDP"|vote=="Liberal") %>% 
+#   filter(income_tertile!=2) %>% 
+#   select(Election=election, Vote=vote, Degree=degree, Income=income_tertile, 
+#          redistribution) %>% 
+#   as_factor() %>% 
+#   mutate(Decade=case_when(
+#     Election<2000 ~ "1990s",
+#     Election<1999 &Election<2010 ~ "2000s",
+#     Election<2020&Election<2009~ "2010s"
+#   )) %>% 
+#   group_by(Vote, Decade) 
   
   
-# A7 Multinomial Vote By Decade
-  
-  #Multinomial Models by Decade with Degree
-  #Relevel region to set Atlantic as reference category
-  ces$region2<-relevel(ces$region2, "Atlantic")
-ces$vote<-factor(as_factor(ces$vote), levels=c("Conservative", "Liberal", "NDP", "BQ", "Green", "Other", "PPC"))
+# A7 Multinomial Vote With Separate Attitudinal Measures
 
-table(ces$election)
-#What we need is by decade
-#Get 1993, 1997 
-ces %>% 
-  #filter(vote2!="Green"&vote2!="BQ") %>% 
-  filter(election<1999 & election> 1989 )->ces.1
-table(ces.1$vote2)
-#Get 2000, 20004, 2006 2008
-ces %>% 
-  #filter(vote2!="Green"&vote2!="BQ") %>% 
-  filter(election<2009 & election> 1999 )->ces.2
-table(ces.2$vote2)
-#Get 2011 and 2015 and 2019
-ces %>% 
-  #filter(vote2!="Green"&vote2!="BQ") %>% 
-  filter(election<2020 & election> 2009 )->ces.3
-
-
-multinom_mod1<-multinom(vote ~ region2 + age + male + degree + income_tertile + 
-                          religion2 + household+redistribution + market_liberalism + traditionalism2 + 
+multinom_mod1a<-multinom(vote ~ region2 + age + male + degree + income_tertile + 
+                          religion2 + household+redistribution + market1 +market2+ trad1+trad2 + 
                           immigration_rates + `1993` + `1997`, data=ces.1)
-multinom_mod2<-multinom(vote ~ region2 + age + male + degree + income_tertile + 
-                          religion2 + household+redistribution + market_liberalism + traditionalism2 + 
+multinom_mod2a<-multinom(vote ~ region2 + age + male + degree + income_tertile + 
+                          religion2 + household+redistribution + market1 +market2+ trad1+trad2 + 
                           immigration_rates + `2000` + `2004` + `2006` + `2008`, data = ces.2)
-multinom_mod3<-multinom(vote~region2 + age + male + degree + income_tertile + 
-                          religion2 + household+redistribution + market_liberalism + traditionalism2 + 
+multinom_mod3a<-multinom(vote~region2 + age + male + degree + income_tertile + 
+                          religion2 + household+redistribution + market1 +market2+ trad1+trad2 + 
                           immigration_rates + `2011` + `2015` + 
                           `2019`, data = ces.3)
 #List these models in multinom.list
-multinom.list<-list(multinom_mod1, multinom_mod2, multinom_mod3)
+multinom.list.a<-list(multinom_mod1a, multinom_mod2a, multinom_mod3a)
 #Provide names for labels
-names(multinom.list)<-c("1990s", "2000s", "2010s")
-summary(multinom_mod3)
+names(multinom.list.a)<-c("1990s", "2000s", "2010s")
+
 #Generate table
 #Rows to add.
 
@@ -742,7 +720,7 @@ rows<-tibble(
 attr(rows, 'position') <- c(1, 16)
 
 
-modelsummary(multinom.list, 
+modelsummary(multinom.lista, 
              shape=term~response+model,output="gt", 
              coef_map = c(
                "region2Quebec"="Region (Quebec)",
@@ -757,9 +735,11 @@ modelsummary(multinom.list,
                "religion2Other"="Religion (Other)",
                "household"="Household Size",
                "redistribution"="Redistribution",
-               "market_liberalism"="Market Liberalism",
+            "market1"="Private Sector Job Creation",
+            "market2"="People To Blame For Fates",
                "immigration_rates"="Immigration Rates",
-               "traditionalism2"="Traditionalism",
+               "trad1"="Women Should Stay At Home",
+               "trad2"="Same sex rights",
                "(Intercept)"="Constant"),
              #Omit year fixed effects
              coef_omit=c("[[:digit:]]{4}"), 
@@ -769,7 +749,10 @@ modelsummary(multinom.list,
              gof_omit=c("BIC|AIC|RMSE"), 
              #Produce significance stars
              stars=T, add_rows = rows) %>% 
+  cols_hide(8:15) %>% 
   gtsave(., filename=here("Tables/table_A7.html"))
+
+
 #### Basic OLS Party vote models 1965-2021 ####
 # 
 # ces %>%
