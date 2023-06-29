@@ -999,7 +999,7 @@ ces %>%
 ### Value labels often go missing in the creation of the ces data frame
 ### assign value label
 val_labels(ces$sector)<-c(Private=0, Public=1)
-val_labels(ces$vote)<-c(Conservative=2, Liberal=1, NDP=3, BQ=4, Green=5, Other=0)
+val_labels(ces$vote)<-c(Conservative=2, Liberal=1, NDP=3, BQ=4, Green=5, Other=0, PPC=6)
 val_labels(ces$male)<-c(Female=0, Male=1)
 val_labels(ces$union_both)<-c(None=0, Union=1)
 val_labels(ces$degree)<-c(`No degree`=0, Degree=1)
@@ -1023,7 +1023,7 @@ val_labels(ces$right)<-c(Right=1, Other=0)
 val_labels(ces$left)<-c(Left=1, Other=0)
 val_labels(ces$rich)<-c(Rich=1, `Not Rich`=0)
 val_labels(ces$poor)<-c(Poor=1, `Not Poor`=0)
-
+val_labels(ces$postgrad)<-c(`Post-grad`=1, Other=0)
 #This command calls the file 2_diagnostics.R
 #source("R_scripts/3_recode_diagnostics.R", echo=T)
 #source("R_scripts/4_make_models.R", echo=T)
@@ -1063,25 +1063,5 @@ prop.table(table(ces$income_tertile, ces$election), 2)
 # val_labels(ces$income3)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 val_labels(ces$income_tertile)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 val_labels(ces$income_house)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
-
-table(ces$political_efficacy, ces$election)
-table(ces$efficacy_internal, ces$election)
-table(ces$efficacy_external, ces$election)
-table(ces$efficacy_external2, ces$election)
-table(ces$efficacy_rich, ces$election)
-table(ces$inequality, ces$election)
-table(ces$turnout, ces$election)
-table(ces$promise, ces$election)
-table(ces$trust, ces$election)
-table(ces$satdem, ces$election)
-table(ces$satdem2, ces$election)
-table(ces$pol_interest, ces$election)
-table(ces$foreign, ces$election)
-table(ces$household, ces$election)
-table(ces$income_house, ces$election)
-table(ces$income_tertile, ces$election)
-table(ces$enviro_spend, ces$election)
-
-table(ces$vote3, ces$election)
 
 

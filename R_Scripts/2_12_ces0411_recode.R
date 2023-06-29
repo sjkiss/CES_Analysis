@@ -537,8 +537,12 @@ ces0411 %>%
   select(trad041:trad042)
 
 ces0411 %>% 
-mutate(traditionalism204=rowMeans(select(., c('trad041', 'trad042'))))->ces0411
- 
+mutate(traditionalism204=rowMeans(select(., c('trad041', 'trad042')), na.rm=T))->ces0411
+#Test recode
+ ces0411 %>% 
+   select(trad041, trad042, traditionalism204) %>% 
+   slice(823:840)
+
 ces0411 %>% 
   select(starts_with("trad04")) %>% 
   summary()

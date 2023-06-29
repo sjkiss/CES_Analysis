@@ -47,22 +47,24 @@ ols_block_models %>%
  # geom_errorbar(width=0,aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))
 ggsave(here("Plots", "block_degree_income_with_error.png"), width=8, height=6)
 
-#### Decompose By Party
+#### Decompose By Party ####
 # Figure 2
 library(nnet)
 library(modelsummary)
 library(marginaleffects)
+ces$vote
 ces %>%
   as_factor() %>% 
   nest(variables=-election) %>%
   filter(election<2021) %>% 
-  mutate(model=map(variables, function(x) multinom(vote2~region2+
+  mutate(model=map(variables, function(x) multinom(vote~region2+
                                                      male+
                                                      age+
                                                      income_tertile+
                                                      degree+
                                                      religion2, data=x)), 
          tidied=map(model, tidy)) ->multinom_models
+
 
 #Get predicted probabilities
 # Degree
@@ -76,7 +78,7 @@ glimpse(multinom_models)
 multinom_models$model %>% 
   map_df(., function(x)
     avg_comparisons(x, variables=c("income_tertile", "degree")), .id="Election" ) %>% 
-  filter(group!="Green"&group!="BQ") %>% 
+  filter(group!="Green"&group!="BQ"& group!="Other"&group!="PPC") %>% 
   filter(contrast=="Highest - Lowest"|contrast=="Degree - No degree") %>% 
   mutate(Election=as.Date(Election, "%Y")) %>% 
   mutate(term=car::Recode(term, "'degree'='Degree'; 
@@ -94,11 +96,11 @@ multinom_models$model %>%
   geom_smooth(method="loess", se=F, linewidth=0.5)
 ggsave(filename=here("Plots/multinomial_comparison_predicted_probabilities_degree_income.png"), width=12, height=6, dpi=300)
 
-#### Figure 3 Simple ####
+#### Figure 3  ####
 names(ces)
 ces %>%
   #Select necessary variables
-  select(Degree=degree, Redistribution=redistribution, Vote=vote2, Election=election) %>%
+  select(Degree=degree, Redistribution=redistribution, Vote=vote, Election=election) %>%
   #Filter only post-1988 elections
   filter(Election>1988 & Election<2020) %>%
   filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
@@ -111,7 +113,7 @@ ces %>%
 
 ces %>%
   #Select necessary variables
-  select(Degree=degree, Redistribution=redistribution, Vote=vote2, Election=election) %>%
+  select(Degree=degree, Redistribution=redistribution, Vote=vote, Election=election) %>%
   #Filter only post-1988 elections
   filter(Election>1988 & Election<2020) %>%
   filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
@@ -142,9 +144,8 @@ ces %>%
   xlim(c(0.4,1))
 ggsave(filename=here("Plots", "mean_degree_difference_significance.png"), height=8, width=13)
 
-#### Figure 4 Simple ####
-#### Figure 4 by Household Size ####
-#### Figure 4 by Household Size ####
+
+#### Figure 4  ####
 
 ces %>%
   #Select necessary variables
@@ -275,6 +276,7 @@ modelsummary(multinom.list,
              "redistribution"="Redistribution",
              "market_liberalism"="Market Liberalism",
              "immigration_rates"="Immigration Rates",
+             "traditionalism2"="Traditionalism",
              "(Intercept)"="Constant"),
              #Omit year fixed effects
              coef_omit=c("[[:digit:]]{4}"), 
@@ -284,20 +286,22 @@ modelsummary(multinom.list,
              gof_omit=c("BIC|AIC|RMSE"), 
              #Produce significance stars
              stars=T, add_rows = rows) %>% 
-  gtsave(., filename=here("Tables/multinomial_check_table_1.html"))
+  cols_hide(., columns=8:15) %>% 
+  gtsave(., filename=here("Tables/table_1.html"))
 
 # Check # of missing values in each 
 table(ces$election)
-ces %>%
-  #filter(vote2!="Green"|vote2!="BQ") %>% 
-  select(election, region2, vote, male, age, degree,
-         household, income_tertile, immigration_rates, 
-         market_liberalism, traditionalism2, redistribution, religion) %>%  
-  filter(election> 1988) %>% 
-  group_by(election) %>% 
-  summarise_all(funs(sum(!is.na(.)))) %>% 
-  write.csv(here("data/missing_values_jun_2023.csv"))
-#### Table 2 and 3
+# ces %>%
+#   #filter(vote2!="Green"|vote2!="BQ") %>% 
+#   select(election, region2, vote, male, age, degree,
+#          household, income_tertile, immigration_rates, 
+#          market_liberalism, traditionalism2, redistribution, religion) %>%  
+#   filter(election> 1988) %>% 
+#   group_by(election) %>% 
+#   summarise_all(funs(sum(!is.na(.)))) %>% 
+#   write.csv(here("data/missing_values_jun_2023.csv"))
+
+#### Table 2 and 3 ####
 
 #fit multinom only with degree, include year fixed effects
 #90s models
@@ -434,7 +438,7 @@ modelsummary(model.list.income, shape=term+model~response,
              output="dataframe", stars=T) %>% 
   rename(Model=model) %>% 
   mutate(Decade=c(rep("90", 7), rep("00", 7), rep("10", 7)), Model=str_trim(Model))  %>% 
-  select(-c(term, part, statistic, BQ, Green)) 
+  select(-c(term, part, statistic, BQ, Green)) %>% 
   #group_by(model) %>% 
   pivot_wider(names_from=Decade, values_from=c(Liberal, NDP), 
               id_cols=c(Model)) %>% 
@@ -487,6 +491,7 @@ modelsummary(model.list.interaction.degree,
                "redistribution"="Redistribution",
                "market_liberalism"="Market Liberalism",
                "immigration_rates"="Immigration Rates",
+               "traditionalism2"="Traditionalism",
                "degreeDegree:redistribution"="Degree x Redistribution",
                "(Intercept)"="Constant"),
              fmt=2,gof_omit=c("BIC|AIC|RMSE"), add_rows = rows,stars=T) %>%  
@@ -512,13 +517,14 @@ modelsummary(model.list.interaction.income,
                "redistribution"="Redistribution",
                "market_liberalism"="Market Liberalism",
                "immigration_rates"="Immigration Rates",
+               "traditionalism2"="Traditionalism",
                "income_tertile:redistribution"="Income x Redistribution",
                "(Intercept)"="Constant"),
              coef_omit=c("[[:digit:]]{4}"), 
              fmt=2,gof_omit=c("BIC|AIC|RMSE"), add_rows=rows,stars=T) %>% 
   cols_hide(., columns=8:15) %>% 
   gtsave(., filename=here("Tables/multinomial_interaction_income.html"))
-summary(multinomial_interaction_4)
+
 #Figure 5
 out1<-tidy(avg_slopes(multinomial_interaction_1, variables="redistribution", by="degree")) 
 out2<-tidy(avg_slopes(multinomial_interaction_2, variables="redistribution", by="degree")) 
@@ -544,7 +550,7 @@ out4 %>%
   filter(group!="BQ"&group!="Green")  %>% 
   as_factor() %>% 
   #filter(degree==1) 
-  mutate(Decade=c(rep("1990", 9), rep("2000", 9), rep("2010", 9))) %>% 
+  mutate(Decade=c(rep("1990", 12), rep("2000", 12), rep("2010", 12))) %>% 
   ggplot(., aes(x=Decade, y=estimate, col=income_tertile))+
   facet_grid(~fct_relevel(group, "NDP", "Liberal"))+
   geom_pointrange(aes(ymin=conf.low, ymax=conf.high))+
@@ -553,18 +559,217 @@ ggsave(filename=here("Plots", "interaction_income_multinomial.png"),width=8, hei
 
 #### Appendix ####
 # Descriptive STatistics
-# Appendix A5
+# Appendix A1
 # Descriptive Statistics
 library(gtsummary)
 ces %>% 
-  filter(election> 1988 & election< 2021) %>% 
-  select(election, male, degree, income_tertile, religion2, region2, redistribution,
+  #Filter the elections under consideration
+  filter(election< 2021) %>% 
+  #Select variables used
+  select(election, male, age,degree, income_tertile, religion2, region2, redistribution,
          market_liberalism, traditionalism2, immigration_rates, vote, ndp, liberal, conservative, household) %>% 
   as_factor() %>% 
-  glimpse()
-  tbl_summary()
+  # capitalize all variable names %>% 
+janitor::clean_names(case="title") %>% 
+  #Some renames
+rename(Religion=6, Region=7, Traditionalism=10,NDP=13, `Household Size`=16) %>% 
+  #
+  tbl_summary(., 
+              #Treat any numeric variable (e.g. class dbl as continuous, not as categorical)
+              type = list(where(is.numeric) ~ "continuous2"),
+              #Print the mean followed by the SD in parentheses for each continuous variable
+              statistic = list(all_continuous() ~ "{mean} ({sd})"),
+              #Use the word Missing in parenthesess for missing values
+              missing_text = "(Missing)") %>% 
+  #Turn the word characteristic into variable at the head of the table
+  modify_header(label = "**Variable**") %>% 
+  #Convert to gt()
+  as_gt() %>% 
+  #Save
+  gtsave(., filename=here("Tables/descriptives.html"))
+
+# A5 OLS Robustness Check Postgrad
+# Postgrad robustness check  Degree and Income gap for left-right block #
+ces %>% 
+  nest(variables=-election) %>%
+  filter(election>1984 & election<2021) %>% 
+  mutate(model=map(variables, function(x) lm(left~region2+male+age+income_tertile+postgrad+as.factor(religion2), data=x)),
+         tidied=map(model, tidy))->ols_block_models2
+
+ols_block_models2 %>% 
+  unnest(tidied) %>% 
+  filter(term=="postgrad"|term=="income_tertile") %>% 
+  filter(election>1984 & election<2021) %>% 
+  mutate(Measure=Recode(term, "'postgrad'='Degree' ; 'income_tertile'='Income'")) %>% 
+  ggplot(., aes(x=election, y=estimate, col=Measure, group=Measure))+
+  geom_point(position=position_dodge(.5))+
+  geom_line()+
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), 
+                    ymax=estimate+(1.96*std.error), width=0), position=position_dodge(.5))+
+  
+  #geom_smooth(se=F, method="lm")+
+  labs(x="Election", y="Estimate")+
+  scale_color_grey()+
+  geom_hline(yintercept=0, linetype=2)+
+  theme(legend.position="bottom")
+# geom_errorbar(width=0,aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))
+ggsave(here("Plots", "block_postgrad_income_with_error.png"), width=8, height=6, dpi=300)
+
+# A5
+library(nnet)
+library(modelsummary)
+library(marginaleffects)
+
+ces %>%
+  as_factor() %>% 
+  nest(variables=-election) %>%
+  filter(election > 1984&election<2021) %>% 
+  mutate(model=map(variables, function(x) multinom(vote~region2+
+                                                     male+
+                                                     age+
+                                                     income_tertile+
+                                                     postgrad+
+                                                     religion2, data=x)), 
+         tidied=map(model, tidy)) ->multinom_models_post_grad
 
 
+#Get predicted probabilities
+# Degree
+
+#Assign names to the list of models
+names(multinom_models_post_grad$model)<-multinom_models_post_grad$election
+names(multinom_models_post_grad$tidied)<-multinom_models_post_grad$election
+# Comparison of Predicted Probabilities for Degree
+glimpse(multinom_models_post_grad)
+
+multinom_models_post_grad$model %>% 
+  map_df(., function(x)
+    avg_comparisons(x, variables=c("income_tertile", "postgrad")), .id="Election" ) 
+  filter(group!="Green"&group!="BQ"& group!="Other"&group!="PPC") %>% 
+  filter(contrast=="Highest - Lowest"|contrast=="Post-grad - Other") %>% 
+  mutate(Election=as.Date(Election, "%Y")) %>% 
+  mutate(term=car::Recode(term, "'postgrad'='Post-Graduate Degree'; 
+                     'income_tertile'='Income Tercile'")) %>% 
+  ggplot(., aes(x=Election,y=estimate, col=group, size=term))+
+  #geom_pointrange(aes(ymin=conf.low, ymax=conf.high))+
+  geom_point()+
+  facet_grid(~group)+
+  #geom_smooth(method="loess", se=F)+
+  scale_color_manual(values=c("darkblue", "darkred", "orange"))+
+  theme(strip.text.y = element_text(angle=0))+
+  labs(y="Delta Predicted Probability", col="Vote")+
+  scale_x_date(date_labels="%Y")+
+  scale_size_manual(values=c(1,3), name="Coefficient")+
+  geom_smooth(method="loess", se=F, linewidth=0.5)
+ggsave(filename=here("Plots/multinomial_comparison_predicted_probabilities_post_grad_degree_income_robustness_check.png"), width=12, height=6, dpi=300)
+
+#A6 
+ces %>% 
+  filter(election> 1988) %>% 
+  filter(vote=="Conservative"|vote=="NDP"|vote=="Liberal") %>% 
+  filter(income_tertile!=2) %>% 
+  select(Election=election, Vote=vote, Degree=degree, Income=income_tertile, 
+         redistribution) %>% 
+  as_factor() %>% 
+  mutate(Decade=case_when(
+    Election<2000 ~ "1990s",
+    Election<1999 &Election<2010 ~ "2000s",
+    Election<2020&Election<2009~ "2010s"
+  )) %>% 
+  group_by(Vote, Decade) %>% 
+  
+  
+# A7 Multinomial Vote By Decade
+  
+  #Multinomial Models by Decade with Degree
+  #Relevel region to set Atlantic as reference category
+  ces$region2<-relevel(ces$region2, "Atlantic")
+ces$vote<-factor(as_factor(ces$vote), levels=c("Conservative", "Liberal", "NDP", "BQ", "Green", "Other", "PPC"))
+
+table(ces$election)
+#What we need is by decade
+#Get 1993, 1997 
+ces %>% 
+  #filter(vote2!="Green"&vote2!="BQ") %>% 
+  filter(election<1999 & election> 1989 )->ces.1
+table(ces.1$vote2)
+#Get 2000, 20004, 2006 2008
+ces %>% 
+  #filter(vote2!="Green"&vote2!="BQ") %>% 
+  filter(election<2009 & election> 1999 )->ces.2
+table(ces.2$vote2)
+#Get 2011 and 2015 and 2019
+ces %>% 
+  #filter(vote2!="Green"&vote2!="BQ") %>% 
+  filter(election<2020 & election> 2009 )->ces.3
+
+
+multinom_mod1<-multinom(vote ~ region2 + age + male + degree + income_tertile + 
+                          religion2 + household+redistribution + market_liberalism + traditionalism2 + 
+                          immigration_rates + `1993` + `1997`, data=ces.1)
+multinom_mod2<-multinom(vote ~ region2 + age + male + degree + income_tertile + 
+                          religion2 + household+redistribution + market_liberalism + traditionalism2 + 
+                          immigration_rates + `2000` + `2004` + `2006` + `2008`, data = ces.2)
+multinom_mod3<-multinom(vote~region2 + age + male + degree + income_tertile + 
+                          religion2 + household+redistribution + market_liberalism + traditionalism2 + 
+                          immigration_rates + `2011` + `2015` + 
+                          `2019`, data = ces.3)
+#List these models in multinom.list
+multinom.list<-list(multinom_mod1, multinom_mod2, multinom_mod3)
+#Provide names for labels
+names(multinom.list)<-c("1990s", "2000s", "2010s")
+summary(multinom_mod3)
+#Generate table
+#Rows to add.
+
+rows<-tibble(
+  term=c("Region (Atlantic)", "Religion (None)"),
+  model1=c(rep("ref", 2)),
+  model2=c(rep("ref", 2)),
+  model3=c(rep("ref", 2)),
+  model4=c(rep("ref", 2)),
+  model5=c(rep("ref", 2)),
+  model6=c(rep("ref", 2)),
+  model7=c(rep("ref", 2)),
+  model8=c(rep("ref", 2)),
+  model9=c(rep("ref", 2)),
+  model10=c(rep("ref", 2)),
+  model11=c(rep("ref", 2)),
+  model12=c(rep("ref", 2)),
+  model13=c(rep("ref", 2)),
+  model14=c(rep("ref", 2)),
+)
+attr(rows, 'position') <- c(1, 16)
+
+
+modelsummary(multinom.list, 
+             shape=term~response+model,output="gt", 
+             coef_map = c(
+               "region2Quebec"="Region (Quebec)",
+               "region2Ontario"="Region (Ontario)",
+               "region2West"="Region (West)",
+               "age"="Age", 
+               "male"="Male",
+               "income_tertile"="Income (Terciles)",
+               "degree"="Degree",
+               "religion2Catholic"="Religion (Catholic)",
+               "religion2Protestant"="Religion (Protestant)",
+               "religion2Other"="Religion (Other)",
+               "household"="Household Size",
+               "redistribution"="Redistribution",
+               "market_liberalism"="Market Liberalism",
+               "immigration_rates"="Immigration Rates",
+               "traditionalism2"="Traditionalism",
+               "(Intercept)"="Constant"),
+             #Omit year fixed effects
+             coef_omit=c("[[:digit:]]{4}"), 
+             #format to two digits
+             fmt=3,
+             #omit goodness of fit statistics
+             gof_omit=c("BIC|AIC|RMSE"), 
+             #Produce significance stars
+             stars=T, add_rows = rows) %>% 
+  gtsave(., filename=here("Tables/table_A7.html"))
 #### Basic OLS Party vote models 1965-2021 ####
 # 
 # ces %>%
@@ -1249,31 +1454,7 @@ ggsave(filename=here("Plots", "income_redistribution_interaction_terms.png"), wi
 #### Postgrad robustness check (postgrad substituted for degree 1988-2019)#### 
 
 
-#### Postgrad robustness check  Degree and Income gap for left-right block ####
-ces %>% 
-  nest(variables=-election) %>%
-  filter(election>1984 & election<2021) %>% 
-  mutate(model=map(variables, function(x) lm(left~region2+male+age+income_tertile+postgrad+as.factor(religion2), data=x)),
-         tidied=map(model, tidy))->ols_block_models2
 
-ols_block_models2 %>% 
-  unnest(tidied) %>% 
-  filter(term=="postgrad"|term=="income_tertile") %>% 
-  filter(election>1984 & election<2021) %>% 
-  mutate(Measure=Recode(term, "'postgrad'='Degree' ; 'income_tertile'='Income'")) %>% 
-  ggplot(., aes(x=election, y=estimate, col=Measure, group=Measure))+
-  geom_point(position=position_dodge(.5))+
-  geom_line()+
-  geom_errorbar(aes(ymin=estimate-(1.96*std.error), 
-                    ymax=estimate+(1.96*std.error), width=0), position=position_dodge(.5))+
-
-  #geom_smooth(se=F, method="lm")+
-  labs(x="Election", y="Estimate")+
-  scale_color_grey()+
-  geom_hline(yintercept=0, linetype=2)+
-  theme(legend.position="bottom")
-# geom_errorbar(width=0,aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))
-ggsave(here("Plots", "block_postgrad_income_with_error.png"), width=8, height=6)
 
 
 
@@ -1496,40 +1677,6 @@ library(nnet)
 
 
 ##
-#Multinomial Models by Decade with Degree
-ces$vote2
 
-multinom_mod1a<-multinom(vote2 ~ region2 + age + male + postgrad + income_tertile + 
-                          religion2 + redistribution + market_liberalism + traditionalism2 + 
-                          immigration_rates + `1993` + `1997`, data=ces.1)
-multinom_mod2a<-multinom(vote2 ~ region2 + age + male + postgrad + income_tertile + 
-                          religion2 + redistribution + market_liberalism + traditionalism2 + 
-                          immigration_rates + `2000` + `2004` + `2006` + `2008`, data = ces.2)
-multinom_mod3a<-multinom(vote2~region2 + age + male + postgrad + income_tertile + 
-                          religion2 + redistribution + market_liberalism + traditionalism2 + 
-                          immigration_rates + `2011` + `2015` + 
-                          `2019`, data = ces.3)
-multinom.list
-multinom.list<-list(multinom_mod1a, multinom_mod2a, multinom_mod3a)
-names(multinom.list)<-c("1990s", "2000s", "2010s")
-modelsummary(multinom.list, 
-             shape=term~response+model,output="gt", 
-             coef_map=c("region2Quebec"="Region (Quebec)",
-                        "region2Ontario"="Region (Ontario)",
-                        "region2West"="Region (West)",
-                        "age"="Age", 
-                        "male"="Gender (Male)",
-                        "income_tertile"="Income (Terciles)",
-                        "postgrad"="Education (Postgrad)",
-                        "religion2Catholic"="Religion (Catholic)",
-                        "religion2Protestant"="Religion (Protestant)",
-                        "religion2Other"="Religion (Other)",
-                        "redistribution"="Redistribution",
-                        "market_liberalism"="Market Liberalism",
-                        "immigration_rates"="Immigration Rates",
-                        "traditionalism2"="Moral Traditionalism"),
-             coef_omit=c("[[:digit:]]{4}"), fmt=2,gof_omit=c("BIC|AIC|RMSE"), stars=T) %>% 
-  cols_hide(., columns=8:12) %>% 
-  gtsave(., filename=here("Tables/multinomial_postgrad_check_table_2.html"))
 
 
