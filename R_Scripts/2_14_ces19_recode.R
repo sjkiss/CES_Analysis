@@ -840,3 +840,10 @@ ces19phone$enviro_spend<-Recode(ces19phone$q27_b, "1=1; 2=0; 3=0.5; -9=0.5; else
 #checks
 table(ces19phone$enviro_spend , ces19phone$q27_b , useNA = "ifany" )
 
+#recode duty (q76 )
+look_for(ces19phone, "duty")
+ces19phone$duty<-Recode(ces19phone$q76 , "1=1; 2:3=0; else=NA")
+val_labels(ces19phone$duty)<-c(No=0, Yes=1)
+#checks
+val_labels(ces19phone$duty)
+table(ces19phone$duty, ces19phone$q76, useNA="ifany")

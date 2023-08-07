@@ -568,3 +568,11 @@ look_for(ces21, "env")
 ces21$enviro_spend<-Recode(ces21$cps21_spend_env, "1=0; 2=0.5; 3=1; else=NA")
 #checks
 table(ces21$enviro_spend , ces21$cps21_spend_env , useNA = "ifany" )
+
+#recode duty (cps21_duty_choice )
+look_for(ces21, "duty")
+ces21$duty<-Recode(ces21$cps21_duty_choice , "1=1; 2=0; else=NA")
+val_labels(ces21$duty)<-c(No=0, Yes=1)
+#checks
+val_labels(ces21$duty)
+table(ces21$duty, ces21$cps21_duty_choice, useNA="ifany")

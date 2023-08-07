@@ -1031,3 +1031,11 @@ look_for(ces15phone, "enviro")
 ces15phone$enviro_spend<-Recode(ces15phone$CPS15_35, "5=0.5; 1=1; 3=0; 8=0.5; else=NA")
 #checks
 table(ces15phone$enviro_spend , ces15phone$CPS15_35 , useNA = "ifany" )
+
+#recode duty (CPS15_62 )
+look_for(ces15phone, "duty")
+ces15phone$duty<-Recode(ces15phone$CPS15_62 , "1=1; 5=0; else=NA")
+val_labels(ces15phone$duty)<-c(No=0, Yes=1)
+#checks
+val_labels(ces15phone$duty)
+table(ces15phone$duty, ces15phone$CPS15_62, useNA="ifany")

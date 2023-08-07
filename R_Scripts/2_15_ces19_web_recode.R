@@ -148,3 +148,12 @@ val_labels(ces19web$trust)<-c(no=0, yes=1)
 val_labels(ces19web$trust)
 table(ces19web$trust)
 table(ces19web$trust, ces19web$pes19_trust , useNA = "ifany" )
+
+#recode duty (cps19_duty_choice )
+look_for(ces19web, "duty")
+ces19web$duty<-Recode(ces19web$cps19_duty_choice , "1=1; 2=0; else=NA")
+val_labels(ces19web$duty)<-c(No=0, Yes=1)
+#checks
+val_labels(ces19web$duty)
+table(ces19web$duty, ces19web$cps19_duty_choice, useNA="ifany")
+

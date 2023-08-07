@@ -835,6 +835,13 @@ ces0411$enviro_spend04<-Recode(ces0411$ces04_PES_D1F, "1=1; 3=0; 5=0.5; 8=0.5; e
 #checks
 table(ces0411$enviro_spend04, useNA = "ifany" )
 
+#### recode duty (ces04_CPS_P16 )
+look_for(ces0411, "duty")
+ces0411$duty04<-Recode(ces0411$ces04_CPS_P16 , "1=1; 2:7=0; else=NA")
+val_labels(ces0411$duty04)<-c(No=0, Yes=1)
+#checks
+val_labels(ces0411$duty04)
+table(ces0411$duty04, ces0411$ces04_CPS_P16, useNA="ifany")
 
 ###Recode 2006 2nd ####
 
@@ -1704,6 +1711,14 @@ look_for(ces0411, "env")
 ces0411$enviro_spend06<-Recode(ces0411$ces06_PES_D1F, "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
 #checks
 table(ces0411$enviro_spend06, useNA = "ifany" )
+
+#### recode duty (ces06_CPS_P5 )
+look_for(ces0411, "duty")
+ces0411$duty06<-Recode(ces0411$ces06_CPS_P5 , "1=1; 2:7=0; else=NA")
+val_labels(ces0411$duty06)<-c(No=0, Yes=1)
+#checks
+val_labels(ces0411$duty06)
+table(ces0411$duty06, ces0411$ces06_CPS_P5, useNA="ifany")
 
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
@@ -2796,6 +2811,13 @@ ces0411$enviro_spend08<-Recode(ces0411$ces08_PES_D1F, "1=1; 3=0; 5=0.5; 8=0.5; e
 #checks
 table(ces0411$enviro_spend08, useNA = "ifany" )
 
+#### recode duty (ces08_CPS_P1 )
+look_for(ces0411, "duty")
+ces0411$duty08<-Recode(ces0411$ces08_CPS_P1 , "1=1; 2:7=0; else=NA")
+val_labels(ces0411$duty08)<-c(No=0, Yes=1)
+#checks
+val_labels(ces0411$duty08)
+table(ces0411$duty08, ces0411$ces08_CPS_P1, useNA="ifany")
 
 ####Recode 2011 4th ####
 
@@ -3515,3 +3537,12 @@ look_for(ces0411, "env")
 ces0411$enviro_spend11<-Recode(ces0411$CPS11_35, "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
 #checks
 table(ces0411$enviro_spend11, useNA = "ifany" )
+
+#### recode duty (CPS11_62 )
+look_for(ces0411, "duty")
+ces0411$duty11<-Recode(ces0411$CPS11_62 , "1=1; 5=0; else=NA")
+val_labels(ces0411$duty11)<-c(No=0, Yes=1)
+#checks
+val_labels(ces0411$duty11)
+table(ces0411$duty11, ces0411$CPS11_62, useNA="ifany")
+

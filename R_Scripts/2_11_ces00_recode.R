@@ -751,3 +751,11 @@ val_labels(ces00$foreign)<-c(No=0, Yes=1)
 #checks
 val_labels(ces00$foreign)
 table(ces00$foreign, ces00$cpsm11, useNA="ifany")
+
+#recode duty (mbsc9 )
+look_for(ces00, "duty")
+ces00$duty<-Recode(ces00$mbsc9 , "1=1; 2:4=0; else=NA")
+val_labels(ces00$duty)<-c(No=0, Yes=1)
+#checks
+val_labels(ces00$duty)
+table(ces00$duty, ces00$mbsc9, useNA="ifany")

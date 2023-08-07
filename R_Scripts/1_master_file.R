@@ -361,6 +361,8 @@ ces04 %>%
   rename(foreign=foreign04)->ces04
 ces04 %>% 
   rename(enviro_spend=enviro_spend04)->ces04
+ces04 %>% 
+  rename(duty=duty04)->ces04
 
 #### Rename CES06 ####
 ces06 %>% 
@@ -494,6 +496,8 @@ ces06 %>%
   rename(foreign=foreign06)->ces06
 ces06 %>% 
   rename(enviro_spend=enviro_spend06)->ces06
+ces06 %>% 
+  rename(duty=duty06)->ces06
 
 #### Rename CES08 ####
 ces08 %>% 
@@ -629,6 +633,8 @@ ces08 %>%
   rename(foreign=foreign08)->ces08
 ces08 %>% 
   rename(enviro_spend=enviro_spend08)->ces08
+ces08 %>% 
+  rename(duty=duty08)->ces08
 
 #### Rename CES11 ####
 ces11 %>% 
@@ -763,6 +769,8 @@ ces11 %>%
   rename(foreign=foreign11)->ces11
 ces11 %>% 
   rename(enviro_spend=enviro_spend11)->ces11
+ces11 %>% 
+  rename(duty=duty11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -804,7 +812,7 @@ common_vars<-c('male',
                'market1','market2',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 'vote3',
                'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich', 'promise', 'trust', 'pol_interest', 'foreign',
-               'non_charter_language', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology', 'income_house', 'enviro_spend')
+               'non_charter_language', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology', 'income_house', 'enviro_spend', 'duty')
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
@@ -1064,4 +1072,4 @@ prop.table(table(ces$income_tertile, ces$election), 2)
 val_labels(ces$income_tertile)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 val_labels(ces$income_house)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 
-
+table(ces$election, ces$duty)
