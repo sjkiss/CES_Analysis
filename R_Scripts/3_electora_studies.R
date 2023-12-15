@@ -102,10 +102,10 @@ ces %>%
   #Select necessary variables
   select(Degree=degree, Redistribution=redistribution, Vote=vote, Election=election) %>%
   #Filter only post-1988 elections
-  filter(Election>1988 & Election<2020) %>%
-  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
+  filter(Election>1988 & Election<2020) %>% 
   #Convert everything to factor
   as_factor() %>%
+  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
   #Party in each election
   group_by(Election, Vote, Degree) %>% 
   summarize(Average=mean(Redistribution,na.rm=T), sd=sd(Redistribution, na.rm=T), n=n(), se=sd/sqrt(n)) ->
@@ -116,9 +116,9 @@ ces %>%
   select(Degree=degree, Redistribution=redistribution, Vote=vote, Election=election) %>%
   #Filter only post-1988 elections
   filter(Election>1988 & Election<2020) %>%
-  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
   #Convert everything to factor
   as_factor() %>%
+  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
   nest(-c(Election, Vote)) %>% 
   mutate(model=map(data, function(x) t.test(Redistribution~factor(Degree, levels=c("Degree", "No degree")), data=x))) %>% 
   mutate(tidied=map(model, tidy)) %>% 
@@ -152,10 +152,10 @@ ces %>%
   select(Income=income_house, Redistribution=redistribution, Vote=vote2, Election=election) %>%
   #Filter only post-1988 elections
   filter(Election>1988 & Election<2020) %>%
-  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
-  filter(Income!=2) %>% 
   #Convert everything to factor
   as_factor() %>%
+  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
+  filter(Income!=2) %>% 
   #Party in each election
   group_by(Election, Vote, Income) %>% 
   summarize(Average=mean(Redistribution,na.rm=T), sd=sd(Redistribution, na.rm=T), n=n(), se=sd/sqrt(n)) ->
@@ -166,10 +166,10 @@ ces %>%
   select(Income=income_house, Redistribution=redistribution, Vote=vote2, Election=election) %>%
   #Filter only post-1988 elections
   filter(Election>1988 & Election<2020) %>%
-  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
-  filter(Income!=2) %>% 
   #Convert everything to factor
   as_factor() %>%
+  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
+  filter(Income!=2) %>% 
   nest(-c(Election, Vote)) %>% 
   mutate(model=map(data, function(x) t.test(Redistribution~factor(Income, levels=c("Lowest", "Highest")), data=x))) %>% 
   mutate(tidied=map(model, tidy)) %>% 
@@ -287,7 +287,7 @@ modelsummary(multinom.list,
              #Produce significance stars
              stars=T, add_rows = rows) %>% 
   cols_hide(., columns=8:15) %>% 
-  gtsave(., filename=here("Tables/table_1.html"))
+  gtsave(., filename=here("Tables/table_1_created_with_cesdata.html"))
 
 # Check # of missing values in each 
 table(ces$election)
@@ -586,7 +586,7 @@ rename(Religion=6, Region=7, Traditionalism=10,NDP=13, `Household Size`=16) %>%
   #Convert to gt()
   as_gt() %>% 
   #Save
-  gtsave(., filename=here("Tables/descriptives.html"))
+  gtsave(., filename=here("Tables/descriptives_with_cesdata.html"))
 
 # A5 OLS Robustness Check Postgrad
 # Postgrad robustness check  Degree and Income gap for left-right block #
@@ -644,7 +644,7 @@ glimpse(multinom_models_post_grad)
 
 multinom_models_post_grad$model %>% 
   map_df(., function(x)
-    avg_comparisons(x, variables=c("income_tertile", "postgrad")), .id="Election" ) 
+    avg_comparisons(x, variables=c("income_tertile", "postgrad")), .id="Election" ) %>% 
   filter(group!="Green"&group!="BQ"& group!="Other"&group!="PPC") %>% 
   filter(contrast=="Highest - Lowest"|contrast=="Post-grad - Other") %>% 
   mutate(Election=as.Date(Election, "%Y")) %>% 
@@ -720,7 +720,7 @@ rows<-tibble(
 attr(rows, 'position') <- c(1, 16)
 
 
-modelsummary(multinom.lista, 
+modelsummary(multinom.list, 
              shape=term~response+model,output="gt", 
              coef_map = c(
                "region2Quebec"="Region (Quebec)",
