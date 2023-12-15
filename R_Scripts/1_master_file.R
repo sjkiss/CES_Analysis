@@ -838,7 +838,7 @@ ces.list %>%
   #bind_rows smushes all the data frames together, and creates a variable called election
   #The value of which come from the name of the list item
   #e.g. if a row comes from, it's value of election will be 2000
-  bind_rows(., .id="election")->ces 
+  bind_rows(.)->ces 
 
 #Remove ces.list
 # We don't need it here

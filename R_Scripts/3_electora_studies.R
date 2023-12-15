@@ -302,7 +302,7 @@ modelsummary(multinom.list,
              #Produce significance stars
              stars=T, add_rows = rows) %>% 
   cols_hide(., columns=8:15) %>% 
-  gtsave(., filename=here("Tables/table_1.html"))
+  gtsave(., filename=here("Tables/table_1_created_with_cesdata2.html"))
 
 # Check # of missing values in each 
 table(ces$election)
@@ -601,7 +601,7 @@ rename(Religion=6, Region=7, Traditionalism=10,NDP=13, `Household Size`=16) %>%
   #Convert to gt()
   as_gt() %>% 
   #Save
-  gtsave(., filename=here("Tables/descriptives.html"))
+  gtsave(., filename=here("Tables/descriptives_created_with_cesdata2.html"))
 
 # A5 OLS Robustness Check Postgrad
 # Postgrad robustness check  Degree and Income gap for left-right block #
@@ -659,7 +659,7 @@ glimpse(multinom_models_post_grad)
 
 multinom_models_post_grad$model %>% 
   map_df(., function(x)
-    avg_comparisons(x, variables=c("income_tertile", "postgrad")), .id="Election" ) 
+    avg_comparisons(x, variables=c("income_tertile", "postgrad")), .id="Election" ) %>%  
   filter(group!="Green"&group!="BQ"& group!="Other"&group!="PPC") %>% 
   filter(contrast=="Highest - Lowest"|contrast=="Post-grad - Other") %>% 
   mutate(Election=as.Date(Election, "%Y")) %>% 
@@ -735,7 +735,7 @@ rows<-tibble(
 attr(rows, 'position') <- c(1, 16)
 
 
-modelsummary(multinom.lista, 
+modelsummary(multinom.list, 
              shape=term~response+model,output="gt", 
              coef_map = c(
                "region2Quebec"="Region (Quebec)",
