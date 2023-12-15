@@ -21,7 +21,18 @@ ces %>%
   summarize(n=n()) %>% 
   filter(!is.na(vote2)) %>% 
   mutate(pct=n/sum(n))
-
+#### 
+ces %>% 
+  group_by(election, degree, vote2) %>% 
+  summarize(n=n()) %>% 
+ # filter(!is.na(vote2)) %>% 
+  mutate(pct=n/sum(n)) %>% 
+  as_factor() %>% 
+  filter(degree!="No degree") %>% 
+  filter(!is.na(vote2)) %>% 
+  filter(vote2=="Conservative") %>% 
+  ggplot(., aes(x=election, y=pct))+
+  geom_point()+geom_smooth(method="lm")
 #### First cut Degree and Income gap for left-right block ####
 
 ces %>% 
@@ -37,33 +48,36 @@ ols_block_models %>%
   mutate(Measure=Recode(term, "'degree'='Degree' ; 'income_tertile'='Income'")) %>% 
   ggplot(., aes(x=election, y=estimate, col=Measure, group=Measure))+
   geom_point(position=position_dodge(.5))+
-  geom_line()+
+  #geom_line()+
+  geom_smooth(method="loess", se=F)+
   geom_errorbar(aes(ymin=estimate-(1.96*std.error), 
                     ymax=estimate+(1.96*std.error), width=0), position=position_dodge(.5))+
   #geom_smooth(se=F, method="lm")+
   labs(x="Election", y="Estimate")+
   scale_color_grey()+
-  geom_hline(yintercept=0, linetype=2)
+  geom_hline(yintercept=0, linetype=2)+
+  theme(legend.position="bottom")
  # geom_errorbar(width=0,aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)))
-ggsave(here("Plots", "block_degree_income_with_error.png"), width=8, height=6)
+ggsave(here("Plots", "block_degree_income_with_error.png"), width=10, height=6)
 
 #### Decompose By Party ####
 # Figure 2
 library(nnet)
 library(modelsummary)
 library(marginaleffects)
-ces$vote
+table(as_factor(ces$vote2))
 ces %>%
   as_factor() %>% 
   nest(variables=-election) %>%
   filter(election<2021) %>% 
-  mutate(model=map(variables, function(x) multinom(vote~region2+
+  mutate(model=map(variables, function(x) multinom(vote2~region2+
                                                      male+
                                                      age+
                                                      income_tertile+
                                                      degree+
-                                                     religion2, data=x)), 
+                                                     religion2, data=x, maxit=1000)), 
          tidied=map(model, tidy)) ->multinom_models
+
 
 
 #Get predicted probabilities
@@ -90,10 +104,11 @@ multinom_models$model %>%
   #geom_smooth(method="loess", se=F)+
   scale_color_manual(values=c("darkblue", "darkred", "orange"))+
   theme(strip.text.y = element_text(angle=0))+
-  labs(y="Delta Predicted Probability", col="Vote")+
+  labs(y="Change in Probability", col="Vote")+
   scale_x_date(date_labels="%Y")+
-  scale_size_manual(values=c(1,3), name="Coefficient")+
-  geom_smooth(method="loess", se=F, linewidth=0.5)
+  scale_size_manual(values=c(1,3), name="Variable")+
+  geom_smooth(method="loess", se=F, linewidth=0.5)+
+  theme(legend.position="bottom")
 ggsave(filename=here("Plots/multinomial_comparison_predicted_probabilities_degree_income.png"), width=12, height=6, dpi=300)
 
 #### Figure 3  ####
@@ -103,9 +118,9 @@ ces %>%
   select(Degree=degree, Redistribution=redistribution, Vote=vote, Election=election) %>%
   #Filter only post-1988 elections
   filter(Election>1988 & Election<2020) %>%
-  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
   #Convert everything to factor
-  as_factor() %>%
+  mutate(Vote=as_factor(Vote), Election=factor(Election)) %>%
+  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ"&Vote!="Other") %>% 
   #Party in each election
   group_by(Election, Vote, Degree) %>% 
   summarize(Average=mean(Redistribution,na.rm=T), sd=sd(Redistribution, na.rm=T), n=n(), se=sd/sqrt(n)) ->
@@ -116,9 +131,9 @@ ces %>%
   select(Degree=degree, Redistribution=redistribution, Vote=vote, Election=election) %>%
   #Filter only post-1988 elections
   filter(Election>1988 & Election<2020) %>%
-  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
   #Convert everything to factor
-  as_factor() %>%
+  mutate(Vote=as_factor(Vote), Election=factor(Election), Degree=as_factor(Degree)) %>%
+  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ"&Vote!="Other") %>%
   nest(-c(Election, Vote)) %>% 
   mutate(model=map(data, function(x) t.test(Redistribution~factor(Degree, levels=c("Degree", "No degree")), data=x))) %>% 
   mutate(tidied=map(model, tidy)) %>% 
@@ -127,11 +142,11 @@ ces %>%
   select(Election, Vote, p.value, Degree, se, Average) %>% 
   filter(!is.na(Degree)) %>% 
   mutate(Sig=case_when(
-    p.value<0.051~1,
-    p.value>0.05~0
+    p.value<0.0500009~1,
+    p.value>0.0500009~0
   )) %>% 
   # pivot_longer(., cols=c("Degree", "No degree"), names_to=c("Degree"), values_to=c("Redistribution")) %>% 
-  ggplot(., aes(x=Average, y=fct_reorder(Election, desc(Election)), col=Degree))+
+  ggplot(., aes(x=Average, y=fct_reorder(Election, desc(Election)), col=as_factor(Degree)))+
   facet_grid(~Vote)+
   geom_point(aes(size=as.factor(Sig)), position=position_dodge(width=0.5))+
   geom_errorbar(size=0.5,aes(xmin=Average-(1.96*se), xmax=Average+(1.96*se)),width=0,position=position_dodge(width=0.5))+
@@ -152,10 +167,10 @@ ces %>%
   select(Income=income_house, Redistribution=redistribution, Vote=vote2, Election=election) %>%
   #Filter only post-1988 elections
   filter(Election>1988 & Election<2020) %>%
-  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
-  filter(Income!=2) %>% 
   #Convert everything to factor
   as_factor() %>%
+  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
+  filter(Income!=2) %>% 
   #Party in each election
   group_by(Election, Vote, Income) %>% 
   summarize(Average=mean(Redistribution,na.rm=T), sd=sd(Redistribution, na.rm=T), n=n(), se=sd/sqrt(n)) ->
@@ -166,7 +181,7 @@ ces %>%
   select(Income=income_house, Redistribution=redistribution, Vote=vote2, Election=election) %>%
   #Filter only post-1988 elections
   filter(Election>1988 & Election<2020) %>%
-  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ") %>% 
+  filter(!is.na(Vote)&Vote!="Green"&Vote!="BQ"& Vote!="Other") %>% 
   filter(Income!=2) %>% 
   #Convert everything to factor
   as_factor() %>%
@@ -182,13 +197,13 @@ ces %>%
     p.value>0.05~0
   )) %>% 
   # pivot_longer(., cols=c("Degree", "No degree"), names_to=c("Degree"), values_to=c("Redistribution")) %>% 
-  ggplot(., aes(x=Average, y=fct_reorder(Election, desc(Election)), col=Income))+
+  ggplot(., aes(x=Average, y=fct_reorder(factor(Election), desc(Election)), col=Income))+
   facet_grid(~Vote)+
   geom_point(aes(size=as.factor(Sig)), position=position_dodge(width=0.5))+
   geom_errorbar(size=0.5,aes(xmin=Average-(1.96*se), xmax=Average+(1.96*se)),width=0,position=position_dodge(width=0.5))+
   scale_size_manual(values=c(2, 3))+
   scale_color_grey()+
-  guides(size=F)+
+  guides(size="none")+
   labs(y="Election")+
   geom_vline(xintercept=0.5, linetype=2)+ 
   theme_bw()+

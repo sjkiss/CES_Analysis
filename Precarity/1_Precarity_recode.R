@@ -98,6 +98,7 @@ cps %>%
     job_prob==5 | bus_prob==5 ~ 5,
   ))->cps
 table(cps$probability, useNA = "ifany" )
+# 
 
 #Recode Consequence of losing job or business (job_prob & bus_prob)
 cps %>% 
@@ -110,54 +111,51 @@ cps %>%
   ))->cps
 table(cps$consequence, useNA = "ifany" )
 
+#Calculate Cronbach's alpha
+cps %>% 
+  select(probability, volatility, consequence) %>% 
+  psych::alpha(.)
+#Check correlation
+cps %>% 
+  select(probability, volatility, consequence) %>% 
+  cor(., use="complete.obs")
+cps %>% 
+  select(probability, volatility, consequence) %>% 
+  cor(., use="complete.obs")->precarity_matrix
+library(psych)
+
+scree(cps[,c("probability", "volatility", "consequence")])
 #### Rescale 0 to 1
 cps %>% 
   mutate(across(c(probability, volatility, consequence), scales::rescale, .names="{.col}_x"))->cps
-
-#### Combine Precarity Index
-#recode into a precarity index (combines volatility + probability + consequence)
-cps$precarity1<-cps$volatility
-cps$precarity2<-cps$probability
-cps$precarity3<-cps$consequence
-
-
-
+# Check the rescale of probability, volatility and consequence
+# Should be 1
+cor(cps$probability, cps$probability_x, use="complete.obs")
+cor(cps$volatility, cps$volatility_x, use="complete.obs")
+cor(cps$consequence, cps$consequence_x, use="complete.obs")
+names(cps)
 #Scale Averaging 
 cps %>% 
   rowwise() %>% 
-  mutate(precarity=mean(
-    c_across(num_range('precarity', 1:3)), na.rm=T  
-  )) %>% 
+  #Calculate precarity as average of probability and volatility
+  mutate(precarity_x=mean(
+    c_across(c(probability_x, volatility_x)), na.rm=T )) %>% 
   ungroup()->cps
 
 cps %>% 
-  select(starts_with("precarity")) %>% 
+  select(c(precarity_x, probability_x, volatility_x)) %>% 
   summary()
+
 
 
 #Check distribution
 qplot(cps$precarity, geom="histogram")
 table(cps$precarity, useNA="ifany")
 
-#Calculate Cronbach's alpha
-cps %>% 
-  select(precarity1, precarity2, precarity3) %>% 
-  psych::alpha(.)
-#Check correlation
-cps %>% 
-  select(precarity1, precarity2, precarity3) %>% 
-  cor(., use="complete.obs")
-cps %>% 
-  select(precarity1, precarity2, precarity3) %>% 
-  cor(., use="complete.obs")->precarity_matrix
 
 
-library(psych)
-cps %>% 
-  select(precarity1, precarity2, precarity3) %>% 
-  corr.test(.) %>% 
-  print(., short=F)
-scree(cps[,c("precarity1", "precarity2", "precarity3")])
+
+
 #### recode control variables ####
 #recode Gender (cps19_gender)
 look_for(cps, "gender")
@@ -566,7 +564,7 @@ cps %>%
   select(authoritarian1, authoritarian2) %>% 
   cor(., use="complete.obs")
 cps %>% 
-  select(starts_with("precarity"), male) %>% 
+  select(c("volatility", "consequence", "probability"), male) %>% 
   as_factor() %>% 
   pivot_longer(1:3) %>% 
   group_by(male, name) %>% 
@@ -574,6 +572,4 @@ cps %>%
   ggplot(., aes(x=male, y=average))+geom_point()+facet_wrap(~name)
   
 
-cps %>% 
-  select(starts_with("precarity")) 
 

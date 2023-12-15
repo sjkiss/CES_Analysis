@@ -1,11 +1,28 @@
 ##load recoded ces files
-load("Data/recoded_cesdata.Rdata")
+#load("Data/recoded_cesdata.Rdata")
+library(cesdata2)
 
 library(tidyverse)
 library(labelled)
 library(here)
 library(car)
 library(haven)
+#Load all thee data files
+#### IT TURNS OUT YOU CAN LOAD THE FILES WITHOUT THESE LINES
+# data("ces65")
+# data("ces68")
+# data("ces72_nov")
+# data("ces74")
+# data("ces7980")
+# data("ces84")
+# data("ces88")
+# data("ces93")
+# data("ces97")
+# data("ces00")
+# data("ces0411")
+# data("ces15phone")
+# data("ces19phone")
+
 ces0411
 ces0411$market_liberalism04
 
@@ -32,8 +49,6 @@ ces19phone$mip
 #### SPLITTING THE 1979-1980 FILE ####
 table(ces7980$male80)
 names(ces7980)
-names(ces93)
-tail(names(ces0411))
 
 library(labelled)
 look_for(ces74, "respondent")
@@ -118,9 +133,9 @@ table(ces80$region, ces80$region80)
 ##but they are different for political variables for obvious reasons. Demographics didn't change much but vote changed quite a bit.
 table(ces80$vote, ces80$vote80)
 ##We just need to turn the variables that end with 80 into regularly named variables.
-
-ces80 %>% 
-  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income,income_tertile, income2, occupation, occupation3, religion, non_charter_language, size, ideology, turnout, redistribution, market_liberalism, immigration_rates, traditionalism2, mip=mip80, foreign=foreign80)->ces80
+names(ces80)<-str_remove_all(names(ces80), "80")
+# ces80 %>% 
+#   select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income,income_tertile, income2, occupation, occupation3, religion, non_charter_language, size, ideology, turnout, redistribution, market_liberalism, immigration_rates, traditionalism2, mip=mip80, foreign=foreign80)->ces80
 
 ### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
   ces93[!is.na(ces93$RTYPE4), ] -> ces93
@@ -228,541 +243,545 @@ table(ces04$union04, ces04$ces04_CPS_S6A, useNA = "ifany")
 table(ces04$union_both04, ces04$ces04_CPS_S6A, useNA = "ifany")
 table(ces04$union_both04, ces04$ces04_CPS_S6B, useNA = "ifany")
 table(as_factor(ces04$ces04_CPS_S6A), as_factor(ces04$ces04_CPS_S6B), useNA = "ifany")
-
+#### Rename Variables in CES0411 ####
+names(ces04)<-str_remove_all(names(ces04), "04")
+names(ces06)<-str_remove_all(names(ces06), "06")
+names(ces08)<-str_remove_all(names(ces08), "08")
+names(ces11)<-str_remove_all(names(ces11), "11")
 #### Rename CES 04####
-ces04 %>% 
-  rename(union_both=union_both04)->ces04
-ces04 %>% 
-  rename(income2=income042)->ces04
-ces04 %>% 
-  rename(union=union04)->ces04
-ces04 %>% 
-  rename(degree=degree04)->ces04
-ces04 %>% 
-  rename(region=region04)->ces04
-ces04 %>% 
-  rename(quebec=quebec04)->ces04
-ces04 %>% 
-  rename(age=age04)->ces04
-ces04 %>% 
-  rename(religion=religion04)->ces04
-ces04 %>% 
-  rename(language=language04)->ces04
-ces04 %>% 
-  rename(employment=employment04)->ces04
-ces04 %>% 
-  rename(sector=sector04)->ces04
-ces04 %>% 
-  rename(party_id=party_id04)->ces04
-ces04 %>% 
-  rename(vote=vote04)->ces04
-ces04 %>% 
-  rename(occupation=occupation04)->ces04
-ces04 %>% 
-  rename(income=income04)->ces04
-ces04 %>% 
-  rename(non_charter_language=non_charter_language04)->ces04
-ces04 %>% 
-  rename(occupation3=occupation04_3)->ces04
-ces04 %>% 
-  rename(redistribution=redistribution04)->ces04
-ces04 %>% 
-  rename(pro_redistribution=pro_redistribution04)->ces04
-ces04 %>% 
-  rename(market_liberalism=market_liberalism04)->ces04
-ces04 %>% 
-  rename(traditionalism=traditionalism04)->ces04
-ces04 %>% 
-  rename(traditionalism2=traditionalism204)->ces04
-ces04 %>% 
-  rename(immigration_rates=immigration_rates04)->ces04
-ces04 %>% 
-  rename(enviro=enviro04)->ces04
-ces04 %>% 
-  rename(death_penalty=death_penalty04)->ces04
-ces04 %>% 
-  rename(crime=crime04)->ces04
-ces04 %>% 
-  rename(gay_rights=gay_rights04)->ces04
-ces04 %>% 
-  rename(abortion=abortion04)->ces04
-ces04 %>% 
-  rename(authoritarianism=authoritarianism04)->ces04
-ces04 %>% 
-  rename(quebec_accom=quebec_accom04)->ces04
-ces04 %>% 
-  rename(religiosity=religiosity04)->ces04
-ces04 %>% 
-  rename(liberal_leader=liberal_leader04)->ces04
-ces04 %>% 
-  rename(conservative_leader=conservative_leader04)->ces04
-ces04 %>% 
-  rename(ndp_leader=ndp_leader04)->ces04
-ces04 %>% 
-  rename(bloc_leader=bloc_leader04)->ces04
-#ces04 %>% 
- # rename(green_leader=green_leader04)->ces04
-ces04 %>% 
-  rename(liberal_rating=liberal_rating04)->ces04
-ces04 %>% 
-  rename(conservative_rating=conservative_rating04)->ces04
-ces04 %>% 
-  rename(ndp_rating=ndp_rating04)->ces04
-ces04 %>% 
-  rename(bloc_rating=bloc_rating04)->ces04
-ces04 %>% 
-  rename(green_rating=green_rating04)->ces04
-ces04 %>% 
-  rename(education=education04)->ces04
-ces04 %>% 
-  rename(personal_retrospective=personal_retrospective04)->ces04
-ces04 %>% 
-  rename(ideology=ideology04)->ces04
-ces04 %>% 
-  rename(turnout=turnout04)->ces04
-ces04 %>% 
-  rename(mip=mip04)->ces04
-ces04 %>% 
-  rename(satdem=satdem04)->ces04
-ces04 %>% 
-  rename(satdem2=satdem204)->ces04
-ces04 %>% 
-  rename(postgrad=postgrad04)->ces04
-ces04 %>% 
-  rename(market1=market041)->ces04
-ces04 %>% 
-  rename(market2=market042)->ces04
-ces04 %>% 
-  rename(trad1=trad041, trad2=trad042)->ces04
-table(ces04$survey, ces04$non_charter_language)
-ces04 %>% 
-  rename(income_tertile=income_tertile04)->ces04
-ces04 %>% 
-  rename(national_retrospective=national_retrospective04)->ces04
-ces04 %>% 
-  rename(efficacy_external=efficacy_external04)->ces04
-ces04 %>% 
-  rename(efficacy_external2=efficacy_external204)->ces04
-ces04 %>% 
-  rename(efficacy_internal=efficacy_internal04)->ces04
-ces04 %>% 
-  rename(political_efficacy=political_efficacy04)->ces04
-ces04 %>% 
-  rename(promise=promise04)->ces04
-ces04 %>% 
-  rename(trust=trust04)->ces04
-ces04 %>% 
-  rename(household=household04)->ces04
-ces04 %>% 
-  rename(income_house=income_house04)->ces04
-ces04 %>% 
-  rename(pol_interest=pol_interest04)->ces04
-ces04 %>% 
-  rename(foreign=foreign04)->ces04
-ces04 %>% 
-  rename(enviro_spend=enviro_spend04)->ces04
-
-#### Rename CES06 ####
-ces06 %>% 
-  rename(income2=income062)->ces06
-ces06 %>% 
-  rename(income_tertile=income_tertile06)->ces06
-ces06 %>% 
-  rename(trad1=trad061, trad2=trad062)->ces06
-ces06 %>% 
-  rename(union_both=union_both06)->ces06
-ces06 %>% 
-  rename(union=union06)->ces06
-ces06 %>% 
-  rename(degree=degree06)->ces06
-ces06 %>% 
-  rename(region=region06)->ces06
-ces06 %>% 
-  rename(quebec=quebec06)->ces06
-ces06 %>% 
-  rename(age=age06)->ces06
-ces06 %>% 
-  rename(religion=religion06)->ces06
-ces06 %>% 
-  rename(language=language06)->ces06
-ces06 %>% 
-  rename(employment=employment06)->ces06
-ces06 %>% 
-  rename(sector=sector06)->ces06
-ces06 %>% 
-  rename(vote=vote06)->ces06
-ces06 %>% 
-  rename(party_id=party_id06)->ces06
-ces06 %>% 
-  rename(occupation=occupation06)->ces06
-ces06 %>% 
-  rename(income=income06)->ces06
-ces06 %>% 
-  rename(non_charter_language=non_charter_language06)->ces06
-ces06 %>% 
-  rename(occupation3=occupation06_3)->ces06
-ces06 %>% 
-  rename(redistribution=redistribution06)->ces06
-ces06 %>% 
-  rename(pro_redistribution=pro_redistribution06)->ces06
-ces06 %>% 
-  rename(market_liberalism=market_liberalism06)->ces06
-ces06 %>% 
-  rename(traditionalism=traditionalism06)->ces06
-ces06 %>% 
-  rename(traditionalism2=traditionalism206)->ces06
-ces06 %>% 
-  rename(immigration_rates=immigration_rates06)->ces06
-ces06 %>% 
-  rename(enviro=enviro06)->ces06
-ces06 %>% 
-  rename(death_penalty=death_penalty06)->ces06
-ces06 %>% 
-  rename(crime=crime06)->ces06
-ces06 %>% 
-  rename(gay_rights=gay_rights06)->ces06
-ces06 %>% 
-  rename(abortion=abortion06)->ces06
-ces06 %>% 
-  rename(authoritarianism=authoritarianism06)->ces06
-ces06 %>% 
-  rename(quebec_accom=quebec_accom06)->ces06
-ces06 %>% 
-  rename(religiosity=religiosity06)->ces06
-ces06 %>% 
-  rename(liberal_leader=liberal_leader06)->ces06
-ces06 %>% 
-  rename(conservative_leader=conservative_leader06)->ces06
-ces06 %>% 
-  rename(ndp_leader=ndp_leader06)->ces06
-ces06 %>% 
-  rename(bloc_leader=bloc_leader06)->ces06
-#ces06 %>% 
-  #rename(green_leader=green_leader06)->ces06
-ces06 %>% 
-  rename(liberal_rating=liberal_rating06)->ces06
-ces06 %>% 
-  rename(conservative_rating=conservative_rating06)->ces06
-ces06 %>% 
-  rename(ndp_rating=ndp_rating06)->ces06
-ces06 %>% 
-  rename(bloc_rating=bloc_rating06)->ces06
-ces06 %>% 
-  rename(green_rating=green_rating06)->ces06
-ces06 %>% 
-  rename(education=education06)->ces06
-ces06 %>% 
-  rename(personal_retrospective=personal_retrospective06)->ces06
-ces06 %>% 
-  rename(immigration_job=immigration_job06)->ces06
-ces06 %>% 
-  rename(turnout=turnout06)->ces06
-ces06 %>% 
-  rename(mip=mip06)->ces06
-ces06 %>% 
-  rename(satdem=satdem06)->ces06
-ces06 %>% 
-  rename(satdem2=satdem206)->ces06
-ces06 %>% 
-  rename(postgrad=postgrad06)->ces06
-ces06 %>% 
-  rename(market1=market061)->ces06
-ces06 %>% 
-  rename(market2=market062)->ces06
-ces06 %>% 
-  rename(national_retrospective=national_retrospective06)->ces06
+# ces04 %>% 
+#   rename(union_both=union_both04)->ces04
+# ces04 %>% 
+#   rename(income2=income042)->ces04
+# ces04 %>% 
+#   rename(union=union04)->ces04
+# ces04 %>% 
+#   rename(degree=degree04)->ces04
+# ces04 %>% 
+#   rename(region=region04)->ces04
+# ces04 %>% 
+#   rename(quebec=quebec04)->ces04
+# ces04 %>% 
+#   rename(age=age04)->ces04
+# ces04 %>% 
+#   rename(religion=religion04)->ces04
+# ces04 %>% 
+#   rename(language=language04)->ces04
+# ces04 %>% 
+#   rename(employment=employment04)->ces04
+# ces04 %>% 
+#   rename(sector=sector04)->ces04
+# ces04 %>% 
+#   rename(party_id=party_id04)->ces04
+# ces04 %>% 
+#   rename(vote=vote04)->ces04
+# ces04 %>% 
+#   rename(occupation=occupation04)->ces04
+# ces04 %>% 
+#   rename(income=income04)->ces04
+# ces04 %>% 
+#   rename(non_charter_language=non_charter_language04)->ces04
+# ces04 %>% 
+#   rename(occupation3=occupation04_3)->ces04
+# ces04 %>% 
+#   rename(redistribution=redistribution04)->ces04
+# ces04 %>% 
+#   rename(pro_redistribution=pro_redistribution04)->ces04
+# ces04 %>% 
+#   rename(market_liberalism=market_liberalism04)->ces04
+# ces04 %>% 
+#   rename(traditionalism=traditionalism04)->ces04
+# ces04 %>% 
+#   rename(traditionalism2=traditionalism204)->ces04
+# ces04 %>% 
+#   rename(immigration_rates=immigration_rates04)->ces04
+# ces04 %>% 
+#   rename(enviro=enviro04)->ces04
+# ces04 %>% 
+#   rename(death_penalty=death_penalty04)->ces04
+# ces04 %>% 
+#   rename(crime=crime04)->ces04
+# ces04 %>% 
+#   rename(gay_rights=gay_rights04)->ces04
+# ces04 %>% 
+#   rename(abortion=abortion04)->ces04
+# ces04 %>% 
+#   rename(authoritarianism=authoritarianism04)->ces04
+# ces04 %>% 
+#   rename(quebec_accom=quebec_accom04)->ces04
+# ces04 %>% 
+#   rename(religiosity=religiosity04)->ces04
+# ces04 %>% 
+#   rename(liberal_leader=liberal_leader04)->ces04
+# ces04 %>% 
+#   rename(conservative_leader=conservative_leader04)->ces04
+# ces04 %>% 
+#   rename(ndp_leader=ndp_leader04)->ces04
+# ces04 %>% 
+#   rename(bloc_leader=bloc_leader04)->ces04
+# #ces04 %>% 
+#  # rename(green_leader=green_leader04)->ces04
+# ces04 %>% 
+#   rename(liberal_rating=liberal_rating04)->ces04
+# ces04 %>% 
+#   rename(conservative_rating=conservative_rating04)->ces04
+# ces04 %>% 
+#   rename(ndp_rating=ndp_rating04)->ces04
+# ces04 %>% 
+#   rename(bloc_rating=bloc_rating04)->ces04
+# ces04 %>% 
+#   rename(green_rating=green_rating04)->ces04
+# ces04 %>% 
+#   rename(education=education04)->ces04
+# ces04 %>% 
+#   rename(personal_retrospective=personal_retrospective04)->ces04
+# ces04 %>% 
+#   rename(ideology=ideology04)->ces04
+# ces04 %>% 
+#   rename(turnout=turnout04)->ces04
+# ces04 %>% 
+#   rename(mip=mip04)->ces04
+# ces04 %>% 
+#   rename(satdem=satdem04)->ces04
+# ces04 %>% 
+#   rename(satdem2=satdem204)->ces04
+# ces04 %>% 
+#   rename(postgrad=postgrad04)->ces04
+# ces04 %>% 
+#   rename(market1=market041)->ces04
+# ces04 %>% 
+#   rename(market2=market042)->ces04
+# ces04 %>% 
+#   rename(trad1=trad041, trad2=trad042)->ces04
+# table(ces04$survey, ces04$non_charter_language)
+# ces04 %>% 
+#   rename(income_tertile=income_tertile04)->ces04
+# ces04 %>% 
+#   rename(national_retrospective=national_retrospective04)->ces04
+# ces04 %>% 
+#   rename(efficacy_external=efficacy_external04)->ces04
+# ces04 %>% 
+#   rename(efficacy_external2=efficacy_external204)->ces04
+# ces04 %>% 
+#   rename(efficacy_internal=efficacy_internal04)->ces04
+# ces04 %>% 
+#   rename(political_efficacy=political_efficacy04)->ces04
+# ces04 %>% 
+#   rename(promise=promise04)->ces04
+# ces04 %>% 
+#   rename(trust=trust04)->ces04
+# ces04 %>% 
+#   rename(household=household04)->ces04
+# ces04 %>% 
+#   rename(income_house=income_house04)->ces04
+# ces04 %>% 
+#   rename(pol_interest=pol_interest04)->ces04
+# ces04 %>% 
+#   rename(foreign=foreign04)->ces04
+# ces04 %>% 
+#   rename(enviro_spend=enviro_spend04)->ces04
+# 
+# #### Rename CES06 ####
 # ces06 %>% 
-#   rename(efficacy_external=efficacy_external06)->ces06
-ces06 %>%
-  rename(efficacy_external2=efficacy_external206)->ces06
+#   rename(income2=income062)->ces06
 # ces06 %>% 
-#   rename(efficacy_internal=efficacy_internal06)->ces06
-ces06 %>%
-  rename(political_efficacy=political_efficacy06)->ces06
-ces06 %>% 
-  rename(promise=promise06)->ces06
-#ces06 %>% 
-#  rename(trust=trust06)->ces06
-table(ces06$survey, ces06$non_charter_language)
-ces06 %>% 
-  rename(household=household06)->ces06
-ces06 %>% 
-  rename(income_house=income_house06)->ces06
-ces06 %>% 
-  rename(pol_interest=pol_interest06)->ces06
-ces06 %>% 
-  rename(foreign=foreign06)->ces06
-ces06 %>% 
-  rename(enviro_spend=enviro_spend06)->ces06
-
-#### Rename CES08 ####
-ces08 %>% 
-  rename(income2=income082)->ces08
-ces08 %>% 
-  rename(income_tertile=income_tertile08)->ces08
-ces08 %>% 
-  rename(trad1=trad081, trad2=trad082)->ces08
-ces08 %>% 
-  rename(union_both=union_both08)->ces08
-ces08 %>% 
-  rename(union=union08)->ces08
-ces08 %>% 
-  rename(degree=degree08)->ces08
-ces08 %>% 
-  rename(region=region08)->ces08
-ces08 %>% 
-  rename(quebec=quebec08)->ces08
-ces08 %>% 
-  rename(age=age08)->ces08
-ces08 %>% 
-  rename(religion=religion08)->ces08
-ces08 %>% 
-  rename(language=language08)->ces08
-ces08 %>% 
-  rename(employment=employment08)->ces08
-ces08 %>% 
-  rename(sector=sector08)->ces08
-ces08 %>% 
-  rename(party_id=party_id08)->ces08
-ces08 %>% 
-  rename(vote=vote08)->ces08
-ces08 %>% 
-  rename(occupation=occupation08)->ces08
-ces08 %>% 
-  rename(income=income08)->ces08
-ces08 %>% 
-  rename(non_charter_language=non_charter_language08)->ces08
-ces08 %>% 
-  rename(occupation3=occupation08_3)->ces08
-ces08 %>% 
-  rename(redistribution=redistribution08)->ces08
-ces08 %>% 
-  rename(pro_redistribution=pro_redistribution08)->ces08
-ces08 %>% 
-  rename(market_liberalism=market_liberalism08)->ces08
-ces08 %>% 
-  rename(traditionalism=traditionalism08)->ces08
-ces08 %>% 
-  rename(traditionalism2=traditionalism208)->ces08
-ces08 %>% 
-  rename(immigration_rates=immigration_rates08)->ces08
-ces08 %>% 
-  rename(enviro=enviro08)->ces08
-ces08 %>% 
-  rename(death_penalty=death_penalty08)->ces08
-ces08 %>% 
-  rename(crime=crime08)->ces08
-ces08 %>% 
-  rename(gay_rights=gay_rights08)->ces08
-ces08 %>% 
-  rename(abortion=abortion08)->ces08
-ces08 %>% 
-  rename(authoritarianism=authoritarianism08)->ces08
-ces08 %>% 
-  rename(quebec_accom=quebec_accom08)->ces08
-ces08 %>% 
-  rename(religiosity=religiosity08)->ces08
-ces08 %>% 
-  rename(liberal_leader=liberal_leader08)->ces08
-ces08 %>% 
-  rename(conservative_leader=conservative_leader08)->ces08
-ces08 %>% 
-  rename(ndp_leader=ndp_leader08)->ces08
-ces08 %>% 
-  rename(bloc_leader=bloc_leader08)->ces08
-ces08 %>% 
-  rename(green_leader=green_leader08)->ces08
-ces08 %>% 
-  rename(liberal_rating=liberal_rating08)->ces08
-ces08 %>% 
-  rename(conservative_rating=conservative_rating08)->ces08
-ces08 %>% 
-  rename(ndp_rating=ndp_rating08)->ces08
-ces08 %>% 
-  rename(bloc_rating=bloc_rating08)->ces08
-ces08 %>%  
-  rename(green_rating=green_rating08)->ces08
-ces08 %>% 
-  rename(education=education08)->ces08
-ces08 %>% 
-  rename(personal_retrospective=personal_retrospective08)->ces08
-ces08 %>% 
-  rename(ideology=ideology08)->ces08
-ces08 %>% 
-  rename(immigration_job=immigration_job08)->ces08
-ces08 %>% 
-  rename(turnout=turnout08)->ces08
-ces08 %>% 
-  rename(mip=mip08)->ces08
-ces08 %>% 
-  rename(satdem=satdem08)->ces08
-ces08 %>% 
-  rename(satdem2=satdem208)->ces08
-ces08 %>% 
-  rename(postgrad=postgrad08)->ces08
-ces08 %>% 
-  rename(market1=market081)->ces08
-ces08 %>% 
-  rename(market2=market082)->ces08
-ces08 %>% 
-  rename(national_retrospective=national_retrospective08)->ces08
-ces08 %>% 
-  rename(efficacy_external=efficacy_external08)->ces08
-ces08 %>% 
-  rename(efficacy_external2=efficacy_external208)->ces08
-ces08 %>% 
-  rename(efficacy_internal=efficacy_internal08)->ces08
-ces08 %>% 
-  rename(political_efficacy=political_efficacy08)->ces08
-ces08 %>% 
-  rename(promise=promise08)->ces08
-ces08 %>% 
-  rename(trust=trust08)->ces08
-table(ces08$survey, ces08$non_charter_language)
-ces08 %>% 
-  rename(household=household08)->ces08
-ces08 %>% 
-  rename(income_house=income_house08)->ces08
-ces08 %>% 
-  rename(pol_interest=pol_interest08)->ces08
-ces08 %>% 
-  rename(foreign=foreign08)->ces08
-ces08 %>% 
-  rename(enviro_spend=enviro_spend08)->ces08
-
-#### Rename CES11 ####
-ces11 %>% 
-  rename(income2=income112)->ces11
-ces11 %>% 
-  rename(trad1=trad111, trad2=trad112)->ces11
-ces11 %>% 
-  rename(union_both=union_both11)->ces11
-ces11 %>% 
-  rename(union=union11)->ces11
-ces11 %>% 
-  rename(degree=degree11)->ces11
-ces11 %>% 
-  rename(region=region11)->ces11
-ces11 %>% 
-  rename(quebec=quebec11)->ces11
-ces11 %>% 
-  rename(age=age11)->ces11
-ces11 %>% 
-  rename(religion=religion11)->ces11
-ces11 %>% 
-  rename(language=language11)->ces11
-ces11 %>% 
-  rename(employment=employment11)->ces11
-ces11 %>% 
-  rename(sector=sector11)->ces11
-ces11 %>% 
-  rename(party_id=party_id11)->ces11
-ces11 %>% 
-  rename(vote=vote11)->ces11
-ces11 %>% 
-  rename(occupation=occupation11)->ces11
-ces11 %>% 
-  rename(income=income11)->ces11
-ces11 %>% 
-  rename(non_charter_language=non_charter_language11)->ces11
-ces11 %>% 
-  rename(occupation3=occupation11_3)->ces11
-ces11 %>% 
-  rename(redistribution=redistribution11)->ces11
-ces11 %>% 
-  rename(pro_redistribution=pro_redistribution11)->ces11
-ces11 %>% 
-  rename(market_liberalism=market_liberalism11)->ces11
-ces11 %>% 
-  rename(traditionalism=traditionalism11)->ces11
-ces11 %>% 
-  rename(traditionalism2=traditionalism211)->ces11
-ces11 %>% 
-  rename(immigration_rates=immigration_rates11)->ces11
-ces11 %>% 
-  rename(enviro=enviro11)->ces11
-ces11 %>% 
-  rename(death_penalty=death_penalty11)->ces11
-ces11 %>% 
-  rename(crime=crime11)->ces11
-ces11 %>% 
-  rename(gay_rights=gay_rights11)->ces11
-ces11 %>% 
-  rename(abortion=abortion11)->ces11
-ces11 %>% 
-  rename(authoritarianism=authoritarianism11)->ces11
-ces11 %>% 
-  rename(quebec_accom=quebec_accom11)->ces11
-ces11 %>% 
-  rename(religiosity=religiosity11)->ces11
-ces11 %>% 
-  rename(liberal_leader=liberal_leader11)->ces11
-ces11 %>% 
-  rename(conservative_leader=conservative_leader11)->ces11
-ces11 %>% 
-  rename(ndp_leader=ndp_leader11)->ces11
-ces11 %>% 
-  rename(bloc_leader=bloc_leader11)->ces11
-ces11 %>% 
-  rename(green_leader=green_leader11)->ces11
-ces11 %>% 
-  rename(liberal_rating=liberal_rating11)->ces11
-ces11 %>% 
-  rename(conservative_rating=conservative_rating11)->ces11
-ces11 %>% 
-  rename(ndp_rating=ndp_rating11)->ces11
-ces11 %>% 
-  rename(bloc_rating=bloc_rating11)->ces11
-ces11 %>% 
-  rename(green_rating=green_rating11)->ces11
-ces11 %>% 
-  rename(education=education11)->ces11
-ces11 %>% 
-  rename(personal_retrospective=personal_retrospective11)->ces11
-ces11 %>% 
-  rename(ideology=ideology11)->ces11
-ces11 %>% 
-  rename(immigration_job=immigration_job11)->ces11
-ces11 %>% 
-  rename(turnout=turnout11)->ces11
-ces11 %>% 
-  rename(mip=mip11)->ces11
-ces11 %>% 
-  rename(satdem=satdem11)->ces11
-ces11 %>% 
-  rename(satdem2=satdem211)->ces11
-ces11 %>% 
-  rename(postgrad=postgrad11)->ces11
-ces11 %>% 
-  rename(market1=market111)->ces11
-ces11 %>% 
-  rename(market2=market112)->ces11
-ces11 %>% 
-  rename(income_tertile=income_tertile11)->ces11
-ces11 %>% 
-  rename(national_retrospective=national_retrospective11)->ces11
-ces11 %>% 
-  rename(efficacy_external=efficacy_external11)->ces11
-ces11 %>% 
-  rename(efficacy_external2=efficacy_external211)->ces11
-ces11 %>% 
-  rename(efficacy_internal=efficacy_internal11)->ces11
-ces11 %>% 
-  rename(political_efficacy=political_efficacy11)->ces11
-ces11 %>% 
-  rename(promise=promise11)->ces11
-ces11 %>% 
-  rename(trust=trust11)->ces11
-ces11 %>% 
-  rename(household=household11)->ces11
-ces11 %>% 
-  rename(income_house=income_house11)->ces11
-ces11 %>% 
-  rename(pol_interest=pol_interest11)->ces11
-ces11 %>% 
-  rename(foreign=foreign11)->ces11
-ces11 %>% 
-  rename(enviro_spend=enviro_spend11)->ces11
+#   rename(income_tertile=income_tertile06)->ces06
+# ces06 %>% 
+#   rename(trad1=trad061, trad2=trad062)->ces06
+# ces06 %>% 
+#   rename(union_both=union_both06)->ces06
+# ces06 %>% 
+#   rename(union=union06)->ces06
+# ces06 %>% 
+#   rename(degree=degree06)->ces06
+# ces06 %>% 
+#   rename(region=region06)->ces06
+# ces06 %>% 
+#   rename(quebec=quebec06)->ces06
+# ces06 %>% 
+#   rename(age=age06)->ces06
+# ces06 %>% 
+#   rename(religion=religion06)->ces06
+# ces06 %>% 
+#   rename(language=language06)->ces06
+# ces06 %>% 
+#   rename(employment=employment06)->ces06
+# ces06 %>% 
+#   rename(sector=sector06)->ces06
+# ces06 %>% 
+#   rename(vote=vote06)->ces06
+# ces06 %>% 
+#   rename(party_id=party_id06)->ces06
+# ces06 %>% 
+#   rename(occupation=occupation06)->ces06
+# ces06 %>% 
+#   rename(income=income06)->ces06
+# ces06 %>% 
+#   rename(non_charter_language=non_charter_language06)->ces06
+# ces06 %>% 
+#   rename(occupation3=occupation06_3)->ces06
+# ces06 %>% 
+#   rename(redistribution=redistribution06)->ces06
+# ces06 %>% 
+#   rename(pro_redistribution=pro_redistribution06)->ces06
+# ces06 %>% 
+#   rename(market_liberalism=market_liberalism06)->ces06
+# ces06 %>% 
+#   rename(traditionalism=traditionalism06)->ces06
+# ces06 %>% 
+#   rename(traditionalism2=traditionalism206)->ces06
+# ces06 %>% 
+#   rename(immigration_rates=immigration_rates06)->ces06
+# ces06 %>% 
+#   rename(enviro=enviro06)->ces06
+# ces06 %>% 
+#   rename(death_penalty=death_penalty06)->ces06
+# ces06 %>% 
+#   rename(crime=crime06)->ces06
+# ces06 %>% 
+#   rename(gay_rights=gay_rights06)->ces06
+# ces06 %>% 
+#   rename(abortion=abortion06)->ces06
+# ces06 %>% 
+#   rename(authoritarianism=authoritarianism06)->ces06
+# ces06 %>% 
+#   rename(quebec_accom=quebec_accom06)->ces06
+# ces06 %>% 
+#   rename(religiosity=religiosity06)->ces06
+# ces06 %>% 
+#   rename(liberal_leader=liberal_leader06)->ces06
+# ces06 %>% 
+#   rename(conservative_leader=conservative_leader06)->ces06
+# ces06 %>% 
+#   rename(ndp_leader=ndp_leader06)->ces06
+# ces06 %>% 
+#   rename(bloc_leader=bloc_leader06)->ces06
+# #ces06 %>% 
+#   #rename(green_leader=green_leader06)->ces06
+# ces06 %>% 
+#   rename(liberal_rating=liberal_rating06)->ces06
+# ces06 %>% 
+#   rename(conservative_rating=conservative_rating06)->ces06
+# ces06 %>% 
+#   rename(ndp_rating=ndp_rating06)->ces06
+# ces06 %>% 
+#   rename(bloc_rating=bloc_rating06)->ces06
+# ces06 %>% 
+#   rename(green_rating=green_rating06)->ces06
+# ces06 %>% 
+#   rename(education=education06)->ces06
+# ces06 %>% 
+#   rename(personal_retrospective=personal_retrospective06)->ces06
+# ces06 %>% 
+#   rename(immigration_job=immigration_job06)->ces06
+# ces06 %>% 
+#   rename(turnout=turnout06)->ces06
+# ces06 %>% 
+#   rename(mip=mip06)->ces06
+# ces06 %>% 
+#   rename(satdem=satdem06)->ces06
+# ces06 %>% 
+#   rename(satdem2=satdem206)->ces06
+# ces06 %>% 
+#   rename(postgrad=postgrad06)->ces06
+# ces06 %>% 
+#   rename(market1=market061)->ces06
+# ces06 %>% 
+#   rename(market2=market062)->ces06
+# ces06 %>% 
+#   rename(national_retrospective=national_retrospective06)->ces06
+# # ces06 %>% 
+# #   rename(efficacy_external=efficacy_external06)->ces06
+# ces06 %>%
+#   rename(efficacy_external2=efficacy_external206)->ces06
+# # ces06 %>% 
+# #   rename(efficacy_internal=efficacy_internal06)->ces06
+# ces06 %>%
+#   rename(political_efficacy=political_efficacy06)->ces06
+# ces06 %>% 
+#   rename(promise=promise06)->ces06
+# #ces06 %>% 
+# #  rename(trust=trust06)->ces06
+# table(ces06$survey, ces06$non_charter_language)
+# ces06 %>% 
+#   rename(household=household06)->ces06
+# ces06 %>% 
+#   rename(income_house=income_house06)->ces06
+# ces06 %>% 
+#   rename(pol_interest=pol_interest06)->ces06
+# ces06 %>% 
+#   rename(foreign=foreign06)->ces06
+# ces06 %>% 
+#   rename(enviro_spend=enviro_spend06)->ces06
+# 
+# #### Rename CES08 ####
+# ces08 %>% 
+#   rename(income2=income082)->ces08
+# ces08 %>% 
+#   rename(income_tertile=income_tertile08)->ces08
+# ces08 %>% 
+#   rename(trad1=trad081, trad2=trad082)->ces08
+# ces08 %>% 
+#   rename(union_both=union_both08)->ces08
+# ces08 %>% 
+#   rename(union=union08)->ces08
+# ces08 %>% 
+#   rename(degree=degree08)->ces08
+# ces08 %>% 
+#   rename(region=region08)->ces08
+# ces08 %>% 
+#   rename(quebec=quebec08)->ces08
+# ces08 %>% 
+#   rename(age=age08)->ces08
+# ces08 %>% 
+#   rename(religion=religion08)->ces08
+# ces08 %>% 
+#   rename(language=language08)->ces08
+# ces08 %>% 
+#   rename(employment=employment08)->ces08
+# ces08 %>% 
+#   rename(sector=sector08)->ces08
+# ces08 %>% 
+#   rename(party_id=party_id08)->ces08
+# ces08 %>% 
+#   rename(vote=vote08)->ces08
+# ces08 %>% 
+#   rename(occupation=occupation08)->ces08
+# ces08 %>% 
+#   rename(income=income08)->ces08
+# ces08 %>% 
+#   rename(non_charter_language=non_charter_language08)->ces08
+# ces08 %>% 
+#   rename(occupation3=occupation08_3)->ces08
+# ces08 %>% 
+#   rename(redistribution=redistribution08)->ces08
+# ces08 %>% 
+#   rename(pro_redistribution=pro_redistribution08)->ces08
+# ces08 %>% 
+#   rename(market_liberalism=market_liberalism08)->ces08
+# ces08 %>% 
+#   rename(traditionalism=traditionalism08)->ces08
+# ces08 %>% 
+#   rename(traditionalism2=traditionalism208)->ces08
+# ces08 %>% 
+#   rename(immigration_rates=immigration_rates08)->ces08
+# ces08 %>% 
+#   rename(enviro=enviro08)->ces08
+# ces08 %>% 
+#   rename(death_penalty=death_penalty08)->ces08
+# ces08 %>% 
+#   rename(crime=crime08)->ces08
+# ces08 %>% 
+#   rename(gay_rights=gay_rights08)->ces08
+# ces08 %>% 
+#   rename(abortion=abortion08)->ces08
+# ces08 %>% 
+#   rename(authoritarianism=authoritarianism08)->ces08
+# ces08 %>% 
+#   rename(quebec_accom=quebec_accom08)->ces08
+# ces08 %>% 
+#   rename(religiosity=religiosity08)->ces08
+# ces08 %>% 
+#   rename(liberal_leader=liberal_leader08)->ces08
+# ces08 %>% 
+#   rename(conservative_leader=conservative_leader08)->ces08
+# ces08 %>% 
+#   rename(ndp_leader=ndp_leader08)->ces08
+# ces08 %>% 
+#   rename(bloc_leader=bloc_leader08)->ces08
+# ces08 %>% 
+#   rename(green_leader=green_leader08)->ces08
+# ces08 %>% 
+#   rename(liberal_rating=liberal_rating08)->ces08
+# ces08 %>% 
+#   rename(conservative_rating=conservative_rating08)->ces08
+# ces08 %>% 
+#   rename(ndp_rating=ndp_rating08)->ces08
+# ces08 %>% 
+#   rename(bloc_rating=bloc_rating08)->ces08
+# ces08 %>%  
+#   rename(green_rating=green_rating08)->ces08
+# ces08 %>% 
+#   rename(education=education08)->ces08
+# ces08 %>% 
+#   rename(personal_retrospective=personal_retrospective08)->ces08
+# ces08 %>% 
+#   rename(ideology=ideology08)->ces08
+# ces08 %>% 
+#   rename(immigration_job=immigration_job08)->ces08
+# ces08 %>% 
+#   rename(turnout=turnout08)->ces08
+# ces08 %>% 
+#   rename(mip=mip08)->ces08
+# ces08 %>% 
+#   rename(satdem=satdem08)->ces08
+# ces08 %>% 
+#   rename(satdem2=satdem208)->ces08
+# ces08 %>% 
+#   rename(postgrad=postgrad08)->ces08
+# ces08 %>% 
+#   rename(market1=market081)->ces08
+# ces08 %>% 
+#   rename(market2=market082)->ces08
+# ces08 %>% 
+#   rename(national_retrospective=national_retrospective08)->ces08
+# ces08 %>% 
+#   rename(efficacy_external=efficacy_external08)->ces08
+# ces08 %>% 
+#   rename(efficacy_external2=efficacy_external208)->ces08
+# ces08 %>% 
+#   rename(efficacy_internal=efficacy_internal08)->ces08
+# ces08 %>% 
+#   rename(political_efficacy=political_efficacy08)->ces08
+# ces08 %>% 
+#   rename(promise=promise08)->ces08
+# ces08 %>% 
+#   rename(trust=trust08)->ces08
+# table(ces08$survey, ces08$non_charter_language)
+# ces08 %>% 
+#   rename(household=household08)->ces08
+# ces08 %>% 
+#   rename(income_house=income_house08)->ces08
+# ces08 %>% 
+#   rename(pol_interest=pol_interest08)->ces08
+# ces08 %>% 
+#   rename(foreign=foreign08)->ces08
+# ces08 %>% 
+#   rename(enviro_spend=enviro_spend08)->ces08
+# 
+# #### Rename CES11 ####
+# ces11 %>% 
+#   rename(income2=income112)->ces11
+# ces11 %>% 
+#   rename(trad1=trad111, trad2=trad112)->ces11
+# ces11 %>% 
+#   rename(union_both=union_both11)->ces11
+# ces11 %>% 
+#   rename(union=union11)->ces11
+# ces11 %>% 
+#   rename(degree=degree11)->ces11
+# ces11 %>% 
+#   rename(region=region11)->ces11
+# ces11 %>% 
+#   rename(quebec=quebec11)->ces11
+# ces11 %>% 
+#   rename(age=age11)->ces11
+# ces11 %>% 
+#   rename(religion=religion11)->ces11
+# ces11 %>% 
+#   rename(language=language11)->ces11
+# ces11 %>% 
+#   rename(employment=employment11)->ces11
+# ces11 %>% 
+#   rename(sector=sector11)->ces11
+# ces11 %>% 
+#   rename(party_id=party_id11)->ces11
+# ces11 %>% 
+#   rename(vote=vote11)->ces11
+# ces11 %>% 
+#   rename(occupation=occupation11)->ces11
+# ces11 %>% 
+#   rename(income=income11)->ces11
+# ces11 %>% 
+#   rename(non_charter_language=non_charter_language11)->ces11
+# ces11 %>% 
+#   rename(occupation3=occupation11_3)->ces11
+# ces11 %>% 
+#   rename(redistribution=redistribution11)->ces11
+# ces11 %>% 
+#   rename(pro_redistribution=pro_redistribution11)->ces11
+# ces11 %>% 
+#   rename(market_liberalism=market_liberalism11)->ces11
+# ces11 %>% 
+#   rename(traditionalism=traditionalism11)->ces11
+# ces11 %>% 
+#   rename(traditionalism2=traditionalism211)->ces11
+# ces11 %>% 
+#   rename(immigration_rates=immigration_rates11)->ces11
+# ces11 %>% 
+#   rename(enviro=enviro11)->ces11
+# ces11 %>% 
+#   rename(death_penalty=death_penalty11)->ces11
+# ces11 %>% 
+#   rename(crime=crime11)->ces11
+# ces11 %>% 
+#   rename(gay_rights=gay_rights11)->ces11
+# ces11 %>% 
+#   rename(abortion=abortion11)->ces11
+# ces11 %>% 
+#   rename(authoritarianism=authoritarianism11)->ces11
+# ces11 %>% 
+#   rename(quebec_accom=quebec_accom11)->ces11
+# ces11 %>% 
+#   rename(religiosity=religiosity11)->ces11
+# ces11 %>% 
+#   rename(liberal_leader=liberal_leader11)->ces11
+# ces11 %>% 
+#   rename(conservative_leader=conservative_leader11)->ces11
+# ces11 %>% 
+#   rename(ndp_leader=ndp_leader11)->ces11
+# ces11 %>% 
+#   rename(bloc_leader=bloc_leader11)->ces11
+# ces11 %>% 
+#   rename(green_leader=green_leader11)->ces11
+# ces11 %>% 
+#   rename(liberal_rating=liberal_rating11)->ces11
+# ces11 %>% 
+#   rename(conservative_rating=conservative_rating11)->ces11
+# ces11 %>% 
+#   rename(ndp_rating=ndp_rating11)->ces11
+# ces11 %>% 
+#   rename(bloc_rating=bloc_rating11)->ces11
+# ces11 %>% 
+#   rename(green_rating=green_rating11)->ces11
+# ces11 %>% 
+#   rename(education=education11)->ces11
+# ces11 %>% 
+#   rename(personal_retrospective=personal_retrospective11)->ces11
+# ces11 %>% 
+#   rename(ideology=ideology11)->ces11
+# ces11 %>% 
+#   rename(immigration_job=immigration_job11)->ces11
+# ces11 %>% 
+#   rename(turnout=turnout11)->ces11
+# ces11 %>% 
+#   rename(mip=mip11)->ces11
+# ces11 %>% 
+#   rename(satdem=satdem11)->ces11
+# ces11 %>% 
+#   rename(satdem2=satdem211)->ces11
+# ces11 %>% 
+#   rename(postgrad=postgrad11)->ces11
+# ces11 %>% 
+#   rename(market1=market111)->ces11
+# ces11 %>% 
+#   rename(market2=market112)->ces11
+# ces11 %>% 
+#   rename(income_tertile=income_tertile11)->ces11
+# ces11 %>% 
+#   rename(national_retrospective=national_retrospective11)->ces11
+# ces11 %>% 
+#   rename(efficacy_external=efficacy_external11)->ces11
+# ces11 %>% 
+#   rename(efficacy_external2=efficacy_external211)->ces11
+# ces11 %>% 
+#   rename(efficacy_internal=efficacy_internal11)->ces11
+# ces11 %>% 
+#   rename(political_efficacy=political_efficacy11)->ces11
+# ces11 %>% 
+#   rename(promise=promise11)->ces11
+# ces11 %>% 
+#   rename(trust=trust11)->ces11
+# ces11 %>% 
+#   rename(household=household11)->ces11
+# ces11 %>% 
+#   rename(income_house=income_house11)->ces11
+# ces11 %>% 
+#   rename(pol_interest=pol_interest11)->ces11
+# ces11 %>% 
+#   rename(foreign=foreign11)->ces11
+# ces11 %>% 
+#   rename(enviro_spend=enviro_spend11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -775,7 +794,7 @@ ces11 %>%
 
 ##We are going to make a list of each survey
 ces.list<-list(ces65, ces68, ces72_nov, ces74, ces79, ces80, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone, ces19phone, ces21)
-#WE are going to name each item in the list
+#We are going to name each item in the list
 names(ces.list)<-c(1965, 1968, 1972, 1974, 1979, 1980, 1984, 1988, 1993, 1997, 2000, 2004, 2006, 2008, 2011, 2015, 2019, 2021)
 
 ces.list %>% 
@@ -804,11 +823,11 @@ common_vars<-c('male',
                'market1','market2',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 'vote3',
                'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich', 'promise', 'trust', 'pol_interest', 'foreign',
-               'non_charter_language', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology', 'income_house', 'enviro_spend')
+               'non_charter_language', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology', 'income_house', 'enviro_spend', "election", "mode")
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
-  map(., zap_labels) %>%
+  # map(., zap_labels) %>%
 #Then we tell it to select any of the variables found in the object common_vars
   # NOTE I CHANGED THIS RECENTLY
   #THIS WAY IS BETTER.
@@ -1063,5 +1082,5 @@ prop.table(table(ces$income_tertile, ces$election), 2)
 # val_labels(ces$income3)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 val_labels(ces$income_tertile)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 val_labels(ces$income_house)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
-
+#ces<-as_factor(ces)
 

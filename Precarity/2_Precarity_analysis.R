@@ -50,6 +50,7 @@ m11<-glm(right~(age+degree+as.factor(income)+male+native+as.factor(region)+homeo
 
 stargazer(m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, type="html", out=here("Precarity", "Tables", "Precarity_models.html"))
 
+
 #### Precarity models ####
 pm1<-lm(volatility~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner), data=cps)
 summary(pm1)
@@ -78,7 +79,7 @@ cm3<-lm(consequence~(age+degree+as.factor(income)+male+native+as.factor(region)+
 cm4<-lm(consequence~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner+ideology+immigrants+feminists), data=cps)
 cm5<-lm(consequence~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner+ideology+immigrants+feminists+minorities), data=cps)
 cm6<-lm(consequence~(age+degree+as.factor(income)+male+native+as.factor(region)+homeowner+ideology+immigrants+feminists+minorities+satisfaction_demos), data=cps)
-stargazer(cm1, cm2, cm3, cm4, cm5, cm6, type="html", out=here("Precarity ", "Tables", "Consequence_models.html"))
+stargazer(cm1, cm2, cm3, cm4, cm5, cm6, type="html", out=here("Precarity", "Tables", "Consequence_models.html"))
 
 
 #### Descriptives ####
@@ -174,11 +175,11 @@ library(kableExtra)
 
 
 #### 
-cps %>% 
-  select(starts_with("precarity"))
-save_kable(kable(cor(cps$education, cps$probability, use="complete.obs"),format="html" , caption="Correlation Between Years of Education And Probability of Job Loss"), file=here("Precarity", "Tables", "Correlation_years_education_probability_job_loss.html"))
-lookfor(cps, "employ")
-prop.table(table(as_factor(cps$cps19_employment), cps$probability),2)
+# cps %>% 
+#   select(starts_with("precarity"))
+# save_kable(kable(cor(cps$education, cps$probability, use="complete.obs"),format="html" , caption="Correlation Between Years of Education And Probability of Job Loss"), file=here("Precarity", "Tables", "Correlation_years_education_probability_job_loss.html"))
+# lookfor(cps, "employ")
+# prop.table(table(as_factor(cps$cps19_employment), cps$probability),2)
 
 
 # 
@@ -242,13 +243,4 @@ m4<-svyglm(right~volatility_x+probability_x+consequence_x+
              immigrants+consequence_x*immigrants,
            #  as_factor(cps$region), 
            design=cps_des)
-# cps$immigrants
-# library(modelsummary)
-# modelsummary(list(m1, m2, m3, m4), stars=T)
-# str(m1)
-# library(ggeffects)
-# 
-# ggpredict(m2, terms=c("volatility_x", "nativism[meansd]")) 
-
-
-ggplot(cps, aes(x=precarity2, y=precarity3))+geom_point()+geom_jitter()+labs(x="Probability", y="Consequence")
+#### Is Precarity Correlated With Hostility to Immigrants####
