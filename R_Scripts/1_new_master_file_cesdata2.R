@@ -115,16 +115,20 @@ ces.list %>%
   #This is a bit different; we don't have to 
    bind_rows(.)->ces 
 
-
+table(ces$election)
 # Descriptives
+#Convert mode to factor
+ces$mode<-factor(ces$mode)
 
 library(skimr)
 #This code is just deleting a bunch of statistics that are not usefulr
-my_skim<-skim_with(numeric = sfl(p0=NULL, p25=NULL, p50=NULL, p75=NULL, p100=NULL,hist = NULL))
+my_skim<-skim_with(factor=sfl(ordered=NULL, n_unique=NULL), 
+                   numeric = sfl(p0=NULL, sd=NULL,p25=NULL, p50=NULL, p75=NULL, p100=NULL,hist = NULL))
+
 ces %>% 
   group_by(election) %>% 
   my_skim() %>% 
-  write.csv("Results/cesdata2_descriptives.csv")
+  write.csv("Results/cesdata2_descriptives.csv", row.names=F)
 
 
 # # quebec is dichotomous Quebec v. non-quebec
