@@ -838,12 +838,13 @@ my_skim<-skim_with(factor=sfl(ordered=NULL, n_unique=NULL),
                    numeric = sfl(p0=NULL, sd=NULL,p25=NULL, p50=NULL, p75=NULL, p100=NULL,hist = NULL))
 ces$election<-factor(ces$election, ordered=T)
 ces %>% 
- # filter(election!=2021) %>% 
+  filter(election!=2021) %>% 
   #group_by(election) %>% 
   my_skim() %>% 
   write.csv("Results/cesdata_original_descriptives.csv", row.names=F)
 
 ces %>% 
+  filter(election!=2021) %>% 
   group_by(election) %>% 
   my_skim() %>% 
   write.csv("Results/cesdata_original_descriptives_by_election.csv", row.names=F)
