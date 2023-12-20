@@ -124,11 +124,15 @@ library(skimr)
 #This code is just deleting a bunch of statistics that are not usefulr
 my_skim<-skim_with(factor=sfl(ordered=NULL, n_unique=NULL), 
                    numeric = sfl(p0=NULL, sd=NULL,p25=NULL, p50=NULL, p75=NULL, p100=NULL,hist = NULL))
+ces %>% 
+  #group_by(election) %>% 
+  my_skim() %>% 
+  write.csv("Results/cesdata2_descriptives.csv", row.names=F)
 
 ces %>% 
   group_by(election) %>% 
   my_skim() %>% 
-  write.csv("Results/cesdata2_descriptives.csv", row.names=F)
+  write.csv("Results/cesdata2_descriptives_grouped_by_election.csv", row.names=F)
 
 
 # # quebec is dichotomous Quebec v. non-quebec
