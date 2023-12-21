@@ -398,50 +398,7 @@ val_labels(ces7980$vote80)
 table(ces7980$vote80)
 table(ces7980$vote, ces7980$vote80)
 
-#recode Liberal leader (V2080)
-look_for(ces7980, "Trudeau")
-ces7980$liberal_leader80<-Recode(ces7980$V2080, "0=NA")
-#checks
-table(ces7980$liberal_leader80)
 
-#recode conservative leader (V2083)
-look_for(ces7980, "Clark")
-ces7980$conservative_leader80<-Recode(ces7980$V2083, "0=NA")
-#checks
-table(ces7980$conservative_leader80)
-
-#recode NDP leader (V2086)
-look_for(ces7980, "Broadbent")
-ces7980$ndp_leader80<-Recode(ces7980$V2086, "0=NA")
-#checks
-table(ces7980$ndp_leader80)
-
-#recode liberal rating (V2082)
-look_for(ces7980, "therm")
-ces7980$liberal_rating80<-Recode(ces7980$V2082, "0=NA")
-#checks
-table(ces7980$liberal_rating80)
-
-#recode conservative rating (V2085)
-look_for(ces7980, "therm")
-ces7980$conservative_rating80<-Recode(ces7980$V2085, "0=NA")
-#checks
-table(ces7980$conservative_rating80)
-
-#recode NDP rating (V2088)
-look_for(ces7980, "therm")
-ces7980$ndp_rating80<-Recode(ces7980$V2088, "0=NA")
-#checks
-table(ces7980$ndp_rating80)
-
-#recode turnout (V2061)
-look_for(ces7980, "vote")
-ces7980$turnout80<-Recode(ces7980$V2061, "1=1; 2=0;  8=0; else=NA")
-val_labels(ces7980$turnout80)<-c(No=0, Yes=1)
-#checks
-val_labels(ces7980$turnout80)
-table(ces7980$turnout80)
-table(ces7980$turnout80, ces7980$vote80)
 
 ##### See the script 1_master_file.R There I turned the values for the 79 variables into 1980 variables for the 1980 respondents
 # No Occupation variable

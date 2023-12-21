@@ -20,28 +20,30 @@ ces7980 %>%
   filter(V4008==1)->ces80
 
 #Check 
+ces79 %>%
+  filter(V4002==0&V4008==1) %>%
+  select(contains("election"))
+ces80 %>%
+  filter(V4002==0&V4008==1) %>%
+  select(contains("election")) 
 table(ces79$male, useNA = "ifany")
 table(ces79$male80, useNA = "ifany")
 table(ces80$male, useNA = "ifany")
 table(ces80$male80, useNA = "ifany")
-
+table(ces80$V4002, ces80$V4008, useNA="ifany")
 #WE have to rename the ces80 80 variables in order to create the full ces data frame.
-#This is how we did it previously 
+# I would like to find a way to improve on this
+#options("max.print"=1500)
 
-#ces80 %>% 
- # select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income,income_tertile, income2, occupation, occupation3, religion, non_charter_language, size, ideology, turnout, redistribution, market_liberalism, immigration_rates, traditionalism2, mip=mip80, foreign=foreign80)->ces80
+options(max.print="1315")
+
+ces80 %>%
+select(male=male80, region=region80, 
+       quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income,income_tertile, income2, occupation, occupation3, religion, non_charter_language, size,  turnout,mip=mip80, foreign=foreign80, election=election80)->ces80
 
 #Downside is that we have to specify each specific variable.
-#Can do it globally by doing it this way.
 
-#Save into names(ces80) the results of Removing all instances
-names(ces80)<-str_remove_all(
-  #from the names of ces80
-  names(ces80), 
-  #80
-  "80")
-#Check what has happened
-names(ces80)
+
 #Filter the CES93
 ### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
 ces93[!is.na(ces93$RTYPE4), ] -> ces93
@@ -97,7 +99,6 @@ common_vars<-c('male',
                'religion', 
                'vote', 
                'income',
-               'redistribution',
                'market_liberalism', 
                'immigration_rates', 
                'traditionalism',
@@ -115,7 +116,7 @@ ces.list %>%
   #This is a bit different; we don't have to 
    bind_rows(.)->ces 
 
-table(ces$election)
+
 # Descriptives
 #Convert mode to factor
 ces$mode<-factor(ces$mode)
@@ -124,12 +125,19 @@ library(skimr)
 #This code is just deleting a bunch of statistics that are not usefulr
 my_skim<-skim_with(factor=sfl(ordered=NULL, n_unique=NULL), 
                    numeric = sfl(p0=NULL, sd=NULL,p25=NULL, p50=NULL, p75=NULL, p100=NULL,hist = NULL))
+table(ces$election, ces$mode, useNA="ifany")
+table(ces$mode)
+
 ces %>% 
   #group_by(election) %>% 
+  filter(election!=2015&mode!="Web") %>% 
+  filter(election!=2021) %>% 
   my_skim() %>% 
   write.csv("Results/cesdata2_descriptives.csv", row.names=F)
 
 ces %>% 
+  filter(election!=2015&mode!="Web") %>% 
+  filter(election!=2021) %>% 
   group_by(election) %>% 
   my_skim() %>% 
   write.csv("Results/cesdata2_descriptives_grouped_by_election.csv", row.names=F)
