@@ -120,7 +120,7 @@ table(ces80$vote, ces80$vote80)
 ##We just need to turn the variables that end with 80 into regularly named variables.
 
 ces80 %>% 
-  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income,income_tertile, income2, occupation, occupation3, religion, non_charter_language, size, ideology, turnout, redistribution, market_liberalism, immigration_rates, traditionalism2, mip=mip80, foreign=foreign80)->ces80
+  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income,income_tertile, income2, occupation, occupation3, religion, non_charter_language, size, mip=mip80, foreign=foreign80)->ces80
 
 ### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
   ces93[!is.na(ces93$RTYPE4), ] -> ces93
@@ -837,13 +837,17 @@ library(skimr)
 my_skim<-skim_with(factor=sfl(ordered=NULL, n_unique=NULL), 
                    numeric = sfl(p0=NULL, sd=NULL,p25=NULL, p50=NULL, p75=NULL, p100=NULL,hist = NULL))
 ces$election<-factor(ces$election, ordered=T)
+ces$election
+
 ces %>% 
+ # filter(election!=2015&mode!="Web") %>% 
   filter(election!=2021) %>% 
   #group_by(election) %>% 
   my_skim() %>% 
   write.csv("Results/cesdata_original_descriptives.csv", row.names=F)
 
 ces %>% 
+  #filter(election!=2015&mode!="Web") %>% 
   filter(election!=2021) %>% 
   group_by(election) %>% 
   my_skim() %>% 
