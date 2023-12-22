@@ -1,3 +1,4 @@
+library(tidyverse)
 #This scripts generates comparisons descriptive statistics from original cesdata
 # produced on cesdata_test with descriptive statistics produced on cesdata2 branch
 # On those branches, particularly cesdata2, changes must be committed and pushed to those branches
@@ -6,7 +7,9 @@ cesdata_original<-read.csv(file="https://raw.githubusercontent.com/sjkiss/CES_An
 #Read in CESdata2 results
 cesdata2_results<-read.csv(file="https://raw.githubusercontent.com/sjkiss/CES_Analysis/cesdata2/Results/cesdata2_descriptives_grouped_by_election.csv")
 names(cesdata_original)
+cesdata_original
 names(cesdata2_results)
+#View(cesdata2_results)
 #Merge cesdata_original descriptives
 cesdata_original %>% 
   #With cesdata2 descriptives
