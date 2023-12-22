@@ -104,7 +104,7 @@ common_vars<-c('male',
                'traditionalism',
                'traditionalism2', 
                'trad1', 'trad2', 'immigration_rates',
-               'market1','market2',
+               'market1','market2','redistribution',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 'vote3',
                'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich', 'promise', 'trust', 'pol_interest', 'foreign',
                #Note that I have added two new variables to each data-set election and mode
@@ -131,6 +131,7 @@ table(ces$mode)
 ces %>% 
   #group_by(election) %>% 
   filter(election!=2015&mode!="Web") %>% 
+  filter(election!=2019&mode!="Web") %>% 
   filter(election!=2021) %>% 
   my_skim() %>% 
   write.csv("Results/cesdata2_descriptives.csv", row.names=F)
