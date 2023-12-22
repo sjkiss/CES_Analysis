@@ -130,16 +130,18 @@ table(ces$mode)
 
 ces %>% 
   #group_by(election) %>% 
-  filter(election!=2015&mode!="Web") %>% 
-  filter(election!=2019&mode!="Web") %>% 
+  filter(election!=2015|mode!="Web") %>% 
+  filter(election!=2019|mode!="Web") %>% 
   filter(election!=2021) %>% 
   my_skim() %>% 
   write.csv("Results/cesdata2_descriptives.csv", row.names=F)
 
 ces %>% 
-  filter(election!=2015&mode!="Web") %>% 
+  filter(election!=2015|mode!="Web") %>% 
+  filter(election!=2019|mode!="Web") %>% 
   filter(election!=2021) %>% 
   group_by(election) %>% 
+  filter(election==2011) %>% 
   my_skim() %>% 
   write.csv("Results/cesdata2_descriptives_grouped_by_election.csv", row.names=F)
 
