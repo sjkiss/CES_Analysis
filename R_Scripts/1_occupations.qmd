@@ -1,0 +1,73 @@
+---
+title: "Occupations Ideas"
+format: html
+editor: visual
+---
+
+```{r}
+#| label: load-data
+
+library(cesdata2)
+```
+```{r}
+class(ces19web$NOC21_4)
+class(ces21$NOC21_4)
+class(ces19web$NOC21_5)
+class(ces21$NOC21_5)
+table(ces19web$NOC21_4)
+table(ces21$NOC21_4)
+```
+
+```{r}
+library(labelled)
+lookfor(ces19web, "minorities")
+lookfor(ces21, "therm")
+var_label(ces19web$cps19_groups_therm_1)
+ces19web$pes19_donerm
+ces21$pes21_donerm
+val_labels(ces19web$pes19_donerm)
+val_labels(ces21$pes21_donerm)
+var_label(ces21$cps21_groups_therm_1)
+class(ces21$pes21_donerm)
+library(tidyverse)
+glimpse(ces21)
+
+```
+
+```{r}
+ces21 %>% 
+  select(pes21_donerm, cps21_groups_therm_1, NOC21_4)->out
+
+ces19web %>% 
+  select(pes19_donerm, cps19_groups_therm_1,NOC21_4)->out2
+
+bind_rows(out, out2)->out3
+out3
+out3 %>% 
+  mutate(cops=case_when(
+    NOC21_4==4210~1,
+    NOC21_4!=4210~0
+  ))->out3
+names(out3)
+out3 %>% 
+  #filter(NOC21_4==4210) %>% 
+  pivot_longer(cols=c(1,4)) %>% 
+  group_by(cops, name) %>% 
+  summarize(mean=mean(value, na.rm=T))
+ces19web$pes19_donerm
+val_labels(ces21$pes21_donerm)
+
+out3 %>% 
+  filter(NOC21_4==4210) %>% 
+  mutate(groups21=car::Recode(cps21_groups_therm_1, "-99=50"), 
+         groups19=car::Recode(cps19_groups_therm_1, "-99=50")) %>% 
+  pivot_longer(cols=c(groups21, groups19)) %>% 
+  group_by(name) %>% 
+  summarize(mean=mean(value, na.rm=T))
+
+out %>% 
+  filter(NOC21_4==4210)
+out2 %>% 
+  filter(NOC21_4==4210)
+```
+
