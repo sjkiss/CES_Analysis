@@ -3,36 +3,26 @@
 library(nnet)
 library(ggeffects)
 ces %>% 
-  filter(election!=2000&quebec==0&election!=2021) %>% 
+  filter(election!=2000&quebec==0) %>% 
   nest(-election) %>% 
   mutate(model=map(data, function(x) multinom(vote2~occupation2, data=x)), 
-         predicted=map(model, ggpredict))->roc_models_2019
+         predicted=map(model, ggpredict))->roc_models_2021
 
-#Start with where the predicted values are stored
-
-# roc_models_2019 %>% 
-#   unnest_wider(predicted) %>%
-#   unnest(occupation2) %>%
-#   filter(response.level!="Green") %>% 
-#   ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In ROC")+theme(axis.text.x=element_text(angle=90))
-
-#ggsave(here("Plots", "class_voting_roc_2019.png"), width=10, height=3)
-#Now QC 2019
-
+# Quebec models
 ces %>% 
-  filter(election!=2000&quebec==1&election!=2021) %>% 
+  filter(election!=2000&quebec==1) %>% 
   nest(-election) %>% 
   mutate(model=map(data, function(x) multinom(vote2~occupation2, data=x)), 
-         predicted=map(model, ggpredict))-> qc_models_2019
+         predicted=map(model, ggpredict))-> qc_models_2021
 
 #Provide variables to state where the models come frome e.g. Quebec or ROC
-qc_models_2019$region<-rep("Quebec", nrow(qc_models_2019))
-roc_models_2019$region<-rep("Rest of Canada", nrow(roc_models_2019))
-qc_models_2019
+qc_models_2021$region<-rep("Quebec", nrow(qc_models_2021))
+roc_models_2021$region<-rep("Rest of Canada", nrow(roc_models_2021))
+qc_models_2021
 #Visualize
-qc_models_2019 %>% 
+qc_models_2021 %>% 
   #bind the two sets of models together
-  bind_rows(roc_models_2019) %>% 
+  bind_rows(roc_models_2021) %>% 
   #Unnest the predicted values
   unnest_wider(predicted) %>% 
   #Now unnest the class variable
@@ -47,115 +37,117 @@ qc_models_2019 %>%
   facet_grid(region~response.level)+
   scale_linetype_manual(values=c(2,3,6, 1))+theme_minimal()+
   theme(axis.text.x = element_text(angle = 90))+labs(y="Predicted Probability", title=str_wrap("Effect of Social Class on Vote, 1965-2019, without Self-Employed", 35))
-ggsave(filename=here("Plots", "canada_class_voting_1965_2019.png"), dpi=300,width=12, height=4)
+ggsave(filename=here("Plots", "canada_class_voting_1965_2021.png"), dpi=300,width=12, height=4)
 
-#### This section addresses the concerns about the interaction between class and time
-### It closely follows Andersen p. 174
-#This removes pre-1979 elections, The Green Party and the year 2000 for multinomial logit modelling. 
-ces %>% 
-  filter(election> 1974&election!=2000&election!=2021  & vote2!="Green")->ces.out
+# #### This section addresses the concerns about the interaction between class and time
+# ### It closely follows Andersen p. 174
+#This removes pre-1979 elections, The Green Party and the year 2000 for multinomial logit modelling.
+ces %>%
+  filter(election> 1974&election!=2000  & vote2!="Green")->ces.out
 
-# This model is no class and election as a continuous covariate
-model1roc<-multinom(vote2 ~ age+male+as.factor(religion2)+degree+as.numeric(election), data=subset(ces.out, quebec!=1))
-model1qc<-multinom(vote2 ~ age+male+as.factor(religion2)+degree+as.numeric(election), data=subset(ces.out, quebec!=0))
-#This model includes
-model2roc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election), data=subset(ces.out, quebec!=1))
-model2qc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election), data=subset(ces.out, quebec!=0))
-model3roc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+as.numeric(election)*occupation4, data=subset(ces.out, quebec!=1))
-model3qc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+as.numeric(election)*occupation4, data=subset(ces.out, quebec!=0))
-model4roc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+poly(as.numeric(election), 2)*occupation4, data=subset(ces.out, quebec!=1))
-model4qc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+poly(as.numeric(election), 2)*occupation4, data=subset(ces.out, quebec!=0))
-model5roc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+poly(as.numeric(election), 3)*occupation4, data=subset(ces.out, quebec!=1))
-model5qc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+poly(as.numeric(election), 3)*occupation4, data=subset(ces.out, quebec!=0))
-model6roc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+
-                      occupation4*`1979`+
-                      occupation4*`1980`+
-                      occupation4*`1984`+
-                      occupation4*`1988`+
-                      occupation4*`1993`+
-                      occupation4*`1997`+
-                      occupation4*`2004`+
-                      occupation4*`2006`+
-                      occupation4*`2008`+
-                      occupation4*`2011`+
-                      occupation4*`2015`+
-                      occupation4*`2019`, data=subset(ces.out, quebec!=1))
-
-model6qc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+
-                     occupation4*`1979`+
-                     occupation4*`1980`+
-                     occupation4*`1984`+
-                     occupation4*`1988`+
-                     occupation4*`1993`+
-                     occupation4*`1997`+
-                     occupation4*`2004`+
-                     occupation4*`2006`+
-                     occupation4*`2008`+
-                     occupation4*`2011`+
-                     occupation4*`2015`+
-                     occupation4*`2019`, data=subset(ces.out, quebec!=0))
-model7roc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+Period*occupation4, data=subset(ces.out, quebec!=1))
-model7qc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+Period*occupation4, data=subset(ces.out, quebec!=0))
-
-model.list<-list(model1qc, model2qc, model3qc, model4qc,model5qc,model6qc, model7qc, model1roc, model2roc, model3roc, model4roc, model5roc, model6roc, model7roc)
-library(kableExtra)
-model.list %>% 
-  map(., AIC) %>% 
-  matrix(., nrow=7, ncol=2) ->AIC.matrix
-rownames(AIC.matrix)<-c("No Class", "Stable Class",
-                        "Class x Time Linear", 
-                        "Class X Time Quadratic", 
-                        "Class x Time Cubic", 
-                        "Class x Time Dichotomous",
-                        "Class x Time Pre-Post 2004")
-colnames(AIC.matrix)<-c("QC", "ROC")
-library(xtable)
-print(xtable(AIC.matrix), type="html", file=here("Tables/AIC.html"))
-library(stargazer)
-#### This makes Table 1
-### It is a slightly modified version of model2 above.
-### That model treated time as a continuous covariate
-### This does basically the same thing, it just treats election as a factor
-### 1979 as the reference level for ROC and 1993 as the reference level for QC
-### The bottom line is that it is reporting the stable effects of class from 1979 to 2021
-### Controlling for fixed (demographic) and random (electoral) effects
-model8roc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.factor(election)+as.factor(region3), data=subset(ces.out, quebec!=1))
-model8qc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+fct_relevel(election, "1993"), data=subset(ces.out, quebec!=0))
-
-stargazer(model8qc, model8roc, digits=2,out=here("Tables", "andersen_replication_extension_1979_2019_stable_class.html"),  type="html", 
-          column.labels=c("QC", "ROC"), column.separate = c(3,2), 
-          title="Multinomial Logistic Regression of Left Vote On Class, 1979-2019", 
-          #covariate.labels=c('Age', 'Gender (Male)', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other','(Education) Degree', '(Social Class) Managers', '(Social Class) Professionals','(Social Class) Self-Employed', '(Social Class) Routine Non Manual',  '1979','1980' ,'1984','1988','1997', '2004', '2006','2008','2011','2015','2019','1980','1984' ,'1988','1993','1997', '2004', '2006','2008','2011','2015','2019'),
-          add.lines=list(c("N"," ", nrow(model2qc$fitted.values), "", nrow(model2roc$fitted.values), " ")), 
-          single.row = T, 
-          dep.var.labels=c("Right/Liberal", "Right/NDP", "Right/BQ", "Right/Liberal", "Right/NDP"), 
-          star.cutoffs = c(0.05, 0.01, 0.001))
+# # This model is no class and election as a continuous covariate
+# model1roc<-multinom(vote2 ~ age+male+as.factor(religion2)+degree+as.numeric(election), data=subset(ces.out, quebec!=1))
+# model1qc<-multinom(vote2 ~ age+male+as.factor(religion2)+degree+as.numeric(election), data=subset(ces.out, quebec!=0))
+# #This model includes
+# model2roc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election), data=subset(ces.out, quebec!=1))
+# model2qc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election), data=subset(ces.out, quebec!=0))
+# model3roc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+as.numeric(election)*occupation4, data=subset(ces.out, quebec!=1))
+# model3qc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+as.numeric(election)*occupation4, data=subset(ces.out, quebec!=0))
+# model4roc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+poly(as.numeric(election), 2)*occupation4, data=subset(ces.out, quebec!=1))
+# model4qc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+poly(as.numeric(election), 2)*occupation4, data=subset(ces.out, quebec!=0))
+# model5roc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+poly(as.numeric(election), 3)*occupation4, data=subset(ces.out, quebec!=1))
+# model5qc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+poly(as.numeric(election), 3)*occupation4, data=subset(ces.out, quebec!=0))
+# model6roc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+
+#                       occupation4*`1979`+
+#                       occupation4*`1980`+
+#                       occupation4*`1984`+
+#                       occupation4*`1988`+
+#                       occupation4*`1993`+
+#                       occupation4*`1997`+
+#                       occupation4*`2004`+
+#                       occupation4*`2006`+
+#                       occupation4*`2008`+
+#                       occupation4*`2011`+
+#                       occupation4*`2015`+
+#                       occupation4*`2019`, data=subset(ces.out, quebec!=1))
+# 
+# model6qc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.numeric(election)+
+#                      occupation4*`1979`+
+#                      occupation4*`1980`+
+#                      occupation4*`1984`+
+#                      occupation4*`1988`+
+#                      occupation4*`1993`+
+#                      occupation4*`1997`+
+#                      occupation4*`2004`+
+#                      occupation4*`2006`+
+#                      occupation4*`2008`+
+#                      occupation4*`2011`+
+#                      occupation4*`2015`+
+#                      occupation4*`2019`, data=subset(ces.out, quebec!=0))
+# model7roc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+Period*occupation4, data=subset(ces.out, quebec!=1))
+# model7qc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+Period*occupation4, data=subset(ces.out, quebec!=0))
+# 
+# model.list<-list(model1qc, model2qc, model3qc, model4qc,model5qc,model6qc, model7qc, model1roc, model2roc, model3roc, model4roc, model5roc, model6roc, model7roc)
+# library(kableExtra)
+# model.list %>% 
+#   map(., AIC) %>% 
+#   matrix(., nrow=7, ncol=2) ->AIC.matrix
+# rownames(AIC.matrix)<-c("No Class", "Stable Class",
+#                         "Class x Time Linear", 
+#                         "Class X Time Quadratic", 
+#                         "Class x Time Cubic", 
+#                         "Class x Time Dichotomous",
+#                         "Class x Time Pre-Post 2004")
+# colnames(AIC.matrix)<-c("QC", "ROC")
+# library(xtable)
+# print(xtable(AIC.matrix), type="html", file=here("Tables/AIC.html"))
+# library(stargazer)
+# #### This makes Table 1
+# ### It is a slightly modified version of model2 above.
+# ### That model treated time as a continuous covariate
+# ### This does basically the same thing, it just treats election as a factor
+# ### 1979 as the reference level for ROC and 1993 as the reference level for QC
+# ### The bottom line is that it is reporting the stable effects of class from 1979 to 2021
+# ### Controlling for fixed (demographic) and random (electoral) effects
+# model8roc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+as.factor(election)+as.factor(region3), data=subset(ces.out, quebec!=1))
+# model8qc<-multinom(vote2 ~ occupation4+age+male+as.factor(religion2)+degree+fct_relevel(election, "1993"), data=subset(ces.out, quebec!=0))
+# 
+# stargazer(model8qc, model8roc, digits=2,out=here("Tables", "andersen_replication_extension_1979_2019_stable_class.html"),  type="html", 
+#           column.labels=c("QC", "ROC"), column.separate = c(3,2), 
+#           title="Multinomial Logistic Regression of Left Vote On Class, 1979-2019", 
+#           #covariate.labels=c('Age', 'Gender (Male)', '(Religion) Catholic', '(Religion) Protestant', '(Religion) Other','(Education) Degree', '(Social Class) Managers', '(Social Class) Professionals','(Social Class) Self-Employed', '(Social Class) Routine Non Manual',  '1979','1980' ,'1984','1988','1997', '2004', '2006','2008','2011','2015','2019','1980','1984' ,'1988','1993','1997', '2004', '2006','2008','2011','2015','2019'),
+#           add.lines=list(c("N"," ", nrow(model2qc$fitted.values), "", nrow(model2roc$fitted.values), " ")), 
+#           single.row = T, 
+#           dep.var.labels=c("Right/Liberal", "Right/NDP", "Right/BQ", "Right/Liberal", "Right/NDP"), 
+#           star.cutoffs = c(0.05, 0.01, 0.001))
 #### Visualizing the impact of class over time with controls
-#### This fits the multinomial model between 1979 and 2019 with controls
+#### This fits the multinomial model between 1979 and 2021 with controls
 ### Separately for each election
 library(marginaleffects)
+
 ces.out%>% 
   filter(quebec==0) %>% 
   nest(-election) %>% 
   mutate(model=map(data, function(x) multinom(vote2 ~ age+male+as.factor(religion2)+degree+occupation4+as.factor(region3), data=x)),
-         predicted=map(model, avg_predictions, variables=c("occupation4")))->roc_models_2019_with_controls
-
+         predicted=map(model, avg_predictions, variables=c("occupation4")))->roc_models_2021_with_controls
+roc_models_2021_with_controls
 
 ces.out %>% 
   filter(quebec==1) %>% 
   nest(-election) %>% 
   mutate(model=map(data, function(x) multinom(vote2 ~ age+male+religion2+degree+occupation4, data=x)), 
-         predicted=map(model, avg_predictions,variables=c("occupation4")))->qc_models_2019_with_controls
+         predicted=map(model, avg_predictions,variables=c("occupation4")))->qc_models_2021_with_controls
 
+#roc_models_2021_with_controls %>% unnest(predicted) %>% view()
 #Start with where the predicted values are stored
 
 #Now QC 2019
 
-qc_models_2019_with_controls$region<-rep("Quebec", nrow(qc_models_2019_with_controls))
-roc_models_2019_with_controls$region<-rep("Rest of Canada", nrow(roc_models_2019_with_controls))
+qc_models_2021_with_controls$region<-rep("Quebec", nrow(qc_models_2021_with_controls))
+roc_models_2021_with_controls$region<-rep("Rest of Canada", nrow(roc_models_2021_with_controls))
 
-qc_models_2019_with_controls %>% 
-  bind_rows(roc_models_2019_with_controls) %>% 
+qc_models_2021_with_controls %>% 
+  bind_rows(roc_models_2021_with_controls) %>% 
  # select(-data:-model) %>% 
   unnest(predicted) %>% 
   #unnest(x) %>% 

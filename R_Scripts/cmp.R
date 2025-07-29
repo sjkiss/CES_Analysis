@@ -1,6 +1,7 @@
 
 #install.packages('manifestoR')
 library(manifestoR)
+library(here)
 library(tidyverse)
 # mp_setapikey(key='6d3c2dbd29b1633085cc2089f99128d6')
 
@@ -44,5 +45,5 @@ canada %>%
   theme_minimal()+geom_hline(yintercept=1, linetype=2)+
   scale_color_manual(values=c("cyan", "orange", "blue", "darkgreen", "darkred", "black"))+
   labs(title="Ratio of First Dimension to Second Dimension Proportions in Canadian platforms, 1965-2015", caption="A ratio of 1 indicates the platform mentioned first and second dimension issues equally.\nA ratio less than one suggests the platform prioritized second dimension issues.\n A ratio above one suggests the platform privileged first dimension issues.")
+ggsave(filename=here("Plots/cmp_first_second_ration.png"))
 
-cmp$per401

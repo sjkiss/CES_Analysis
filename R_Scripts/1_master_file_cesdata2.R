@@ -66,9 +66,11 @@ names(ces08)<-str_remove_all(names(ces08), "08")
 names(ces11)<-str_remove_all(names(ces11), "11")
 
 # List data frames
-ces.list<-list(ces65, ces68, ces72_nov, ces74, ces79, ces80, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone,  ces19phone)
+ces.list<-list(ces65, ces68, ces72_nov, ces74, ces79, ces80, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone,  ces19phone, ces21)
+ces.list %>% 
+  map(., nrow)
 #Provide names for list
-names(ces.list)<-c(1965, 1968, 1972, 1974, 1979, 1980, 1984, 1988, 1993, 1997, 2000, 2004, 2006, 2008, 2011, "2015 Phone","2019 Phone")
+names(ces.list)<-c(1965, 1968, 1972, 1974, 1979, 1980, 1984, 1988, 1993, 1997, 2000, 2004, 2006, 2008, 2011, "2015 Phone","2019 Phone", 2011)
 #Common variables to be selected
 #common_vars<-c('male')
 common_vars<-c('male',
@@ -137,7 +139,7 @@ ces %>%
 as_factor(ces$vote)
 ces %>% 
   mutate(vote2=case_when(
-    vote==  1~"Liberal",
+    vote==1~"Liberal",
     vote== 2~"Conservative",
     vote== 3~"NDP", 
     vote==  4~"BQ", 
@@ -344,5 +346,6 @@ table(ces$efficacy_external2, ces$election)
 table(ces$efficacy_rich, ces$election)
 table(ces$inequality, ces$election)
 table(ces$turnout, ces$election)
-
+table(ces$vote, ces$election)
 table(ces$vote3, ces$election)
+ces21$occupation3

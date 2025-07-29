@@ -258,7 +258,8 @@ ces %>%
   summarize(avg=mean(traditionalism2, na.rm=T), 
             n=n(), 
             sd=sd(traditionalism2, na.rm=T), se=sd/sqrt(n)) %>% 
-  ggplot(., aes(x=as.factor(working_class3), y=avg, col=vote2))+geom_point()+ylim(c(0,1))+facet_grid(~election)
+  ggplot(., aes(x=as.factor(working_class3), y=avg, col=vote2))+
+  geom_point()+ylim(c(0,1))+facet_grid(~election)
 
 #### This the moral traditionalism interaction that we are dropping
 # ces %>% 

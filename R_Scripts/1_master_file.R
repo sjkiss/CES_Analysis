@@ -812,7 +812,7 @@ common_vars<-c('male',
                'market1','market2',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 'vote3',
                'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich', 'promise', 'trust', 'pol_interest', 'foreign',
-               'non_charter_language', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology', 'income_house', 'enviro_spend', 'duty')
+               'non_charter_language','ndp_leader', 'liberal_leader','bloc_leader', 'conservative_leader', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology', 'income_house', 'enviro_spend', 'duty')
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row binding)
@@ -1020,7 +1020,7 @@ val_labels(ces$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 val_labels(ces$income2)<-c(Lowest=1,  Middle=2, Highest=3)
-val_labels(ces$income3)<-c(Lowest=1,  Middle=2, Highest=3)
+#val_labels(ces$income3)<-c(Lowest=1,  Middle=2, Highest=3)
 #val_labels(ces$redistribution)<-c(Less=0, More=1)
 val_labels(ces$education)<-c(Less=0, Same=0.5, More=1)
 val_labels(ces$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
@@ -1072,4 +1072,3 @@ prop.table(table(ces$income_tertile, ces$election), 2)
 val_labels(ces$income_tertile)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 val_labels(ces$income_house)<-c("Lowest"=1, "Middle"=2, "Highest"=3)
 
-table(ces$election, ces$duty)

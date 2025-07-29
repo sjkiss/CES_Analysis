@@ -1,8 +1,16 @@
+library(here)
 source(here("R_Scripts/1_master_file.R"))
 ### this is the analysis for the book chapter
 theme_set(theme_bw(base_size=7.5))
 theme_update(panel.grid.major=element_blank(),
              panel.grid.minor=element_blank())
+
+ces$Occupation<-Recode(ces$occupation4, "'Working_Class'='Working class' ; 
+                       'Routine_Nonmanual'='Routine non-manual'; 'Self-Employed'='Self-employed'", levels=c(
+                         "Managers", "Professionals", "Self-employed", "Routine non-manual", "Working class"
+                       ))
+
+ces$vote2<-Recode(ces$vote2, "'BQ'='Bloc Québécois'", levels=c("Conservative", "Liberal","NDP", "Bloc Québécois", "Green"))
 #### Voting Shares of Working Class
 library(lubridate)
 ces %>% 
@@ -21,8 +29,7 @@ ces %>%
   labs(y="Percent", x="Election", linetype="Vote")+scale_linetype_manual(values=c(1,3,5,6))+
   scale_x_date(breaks= seq.Date(from=as.Date("1965-01-01"), to=as.Date("2021-01-01"), by="5 years"), date_labels="%Y")
 
-
-ggsave(here("Plots", "book_chapter_working_class_votes_for_parties.png"))
+#ggsave(here("Plots", "book_chapter_working_class_votes_for_parties.png"))
 
 ces %>% 
   select(election, working_class3, vote2) %>% 
@@ -37,13 +44,9 @@ ces %>%
   geom_point()+
   geom_line()+
   labs(y="Percent", x="Election", linetype="Vote", shape="Vote") +
-scale_x_date(breaks= seq.Date(from=as.Date("1965-01-01"), to=as.Date("2021-01-01"), by="4 years"), date_labels="%Y")
-ggsave("book_chapter_parties_share_working_class_votes.png")
-table(ces$occupation3, ces$occupation4)
-ces$Occupation<-Recode(ces$occupation4, "'Working_Class'='Working Class' ; 
-                       'Routine_Nonmanual'='Routine Non-Manual'", levels=c(
-                         "Managers", "Professionals", "Self-Employed", "Routine Non-Manual", "Working Class"
-                       ))
+scale_x_date(breaks=seq.Date(from=as.Date("1965-01-01"), to=as.Date("2021-01-01"), by="4 years"), date_labels="%Y")
+#ggsave("book_chapter_parties_share_working_class_votes.png")
+
 ces %>% 
   select(election, Occupation, vote2) %>% 
   mutate(election=ymd(election, truncated=2L)) %>% 
@@ -59,13 +62,13 @@ filter(vote2!="Green") %>%
   facet_wrap(~vote2)+
   scale_linetype_manual(values=c(3,4,2,5,1))+
   scale_size_manual(values=c(1,1,1,1.5,1.5))+
-  labs(y="Percent", x="Election", title="Raw Support For Parties By Class", linetype="Class", size="Class") +
+  labs(y="Percent", x="Election", linetype="Class", size="Class") +
 scale_x_date(breaks= seq.Date(from=as.Date("1980-01-01"), to=as.Date("2021-01-01"), by="4 years"), date_labels="%Y")+
   theme(axis.text.x=element_text(angle=90), 
-        legend.position = "bottom",
-        legend.box.margin=margin(-8.5,0,0,0))+
+        legend.position = "bottom",legend.key.spacing.y = unit(-6, "pt"),
+        legend.box.margin=margin(-9,0,0,0), legend.title=element_blank())+
   guides(linetype=guide_legend(keywidth=5, ncol=2))
- ggsave(here("Plots", "book_occupation_share_per_party.pdf"), width=5)
+ggsave(here("Plots", "book_figure_7_1_occupation_share_per_party.pdf"), width=5,device=cairo_pdf)
 
  ces %>% 
    select(election, Occupation, vote2) %>% 
@@ -81,11 +84,11 @@ scale_x_date(breaks= seq.Date(from=as.Date("1980-01-01"), to=as.Date("2021-01-01
    geom_col(position="dodge")+
    scale_fill_grey(start=0.8, end=0.2)+
    facet_wrap(~vote2)+
-   labs(y="Percent", x="Election", title="Raw Support For Parties By Class", linetype="Class", size="Class") +
+   labs(y="Percent", x="Election", linetype="Class", size="Class") +
    #scale_x_date(breaks= seq.Date(from=as.Date("1980-01-01"), to=as.Date("2021-01-01"), by="4 years"), date_labels="%Y")+
    theme(axis.text.x=element_text(angle=90), legend.position = "bottom")+
    guides(fill=guide_legend(nrow=2))
- ggsave(here("Plots", "book_occupation_share_per_party_bar.png"), width=10, height=8)
+ #ggsave(here("Plots", "book_occupation_share_per_party_bar.png"), width=10, height=8)
  
 ces %>% 
   select(election, Occupation, vote2) %>% 
@@ -100,12 +103,13 @@ ces %>%
   ggplot(., aes(x=election, y=pct*100, linetype=vote2, group=vote2))+
   geom_line()+
   facet_wrap(~Occupation)+scale_linetype_manual(values=c(1,2,3,4))+
-  labs(y="Percent", x="Election", title="Share Of Each Party's Electorate By Class",linetype="Vote")+
+  labs(y="Percent", x="Election", linetype="Vote")+
   theme(axis.text.x=element_text(angle=90))+
   scale_x_date(breaks= seq.Date(from=as.Date("1980-01-01"), to=as.Date("2021-01-01"), by="5 years"), date_labels="%Y")+theme(
-  legend.position = c(0.8,0.2), # c(0,0) bottom left, c(1,1) top-right.
+  legend.position = c(0.8,0.2),
+  legend.key.spacing.y=(unit(-8, "pt"))# c(0,0) bottom left, c(1,1) top-right.
   )
-ggsave(here("Plots", "book_party_share_by_occupation.pdf"), width=5)
+ggsave(here("Plots", "book_figure_7_2_party_share_by_occupation.pdf"), width=5, device=cairo_pdf)
 
 ces$region2<-factor(ces$region2, levels=c("Atlantic", "Quebec", "Ontario", "West"))
 table(ces$election)
@@ -160,9 +164,10 @@ modelsummary(model.list,coef_map=c(
 
 ces %>% 
   select(election, working_class3, traditionalism2, redistribution, immigration_rates, market_liberalism) %>%
-  rename(Traditionalism=3, Redistribution=4, `Immigration Rates`=5, `Market Liberalism`=6) %>% 
-  mutate(across(c(Traditionalism:6), .fns=function(x) Recode(x, "0.51:1=1; 0:0.5=0; else=NA"))) %>% 
-  mutate(`Working Class`=Recode(working_class3, "0='Other'; 1='Working Class'", levels=c('Working Class', 'Other'))) %>% 
+  rename(`Traditional morals`=3, Redistribution=4, `Immigration rates`=5, `Free market liberalism`=6) %>% 
+  mutate(across(c(`Traditional morals`:6), .fns=function(x) Recode(x, "0.51:1=1; 0:0.5=0; else=NA"))) %>% 
+  mutate(`Working Class`=Recode(working_class3, "0='Other'; 1='Working class'", 
+                                levels=c('Working class', 'Other'))) %>% 
 filter(election>1992) %>% 
   pivot_longer(3:6, names_to=c("Item"), values_to=c("Support")) %>% 
  group_by(election, `Working Class`, Item, Support) %>% 
@@ -171,12 +176,13 @@ summarize(n=n()) %>%
   mutate(Percent=(n/sum(n))*100) %>% 
 filter(Support==1) %>% 
   #summarize(Average=mean(traditionalism2, na.rm=T)) %>% 
-  ggplot(., aes(x=election, y=Percent, fill=`Working Class`))+labs(fill="Class",x="Election" ,y="Percent Agreeing")+
+  ggplot(., aes(x=election, y=Percent, fill=fct_relevel(`Working Class`, "Working class")))+
+  labs(fill="",x="Election" ,y="Percent agreeing")+
   geom_col(position="dodge")+
-  facet_wrap(~fct_relevel(Item, "Immigration Rates", "Traditionalism"))+
-  scale_fill_grey(start=0.9, end=0.2)+
+  facet_wrap(~fct_relevel(Item, "Immigration rates", "Traditional morals"))+
+  scale_fill_grey(start=0.2, end=0.9)+
   theme(legend.position="bottom")
-ggsave(here("Plots", "Proportion_working_class_supporting_measures.pdf"), width=4.25)
+ggsave(here("Plots", "book_figure_7_3_Proportion_working_class_supporting_measures.pdf"), width=4.25, device=cairo_pdf)
 
 ces %>% 
   filter(election==2015|election==2019) %>% 
@@ -217,7 +223,7 @@ ces %>%
   group_by(election) %>% 
   summary()
 
-#### Make MIP PErcent cnage
+#### Make MIP Percent chnage
 ces19phone %>% 
   select(occupation3, mip)->out19
 ces15phone %>% 
@@ -227,12 +233,12 @@ out19$Election<-rep("2019", nrow(out19))
 out15 %>% 
   bind_rows(out19) %>% 
   as_factor() %>% 
-  mutate(occupation3=Recode(occupation3, "'Routine_Nonmanual'='Routine Non-Manual'; 'Skilled'='Working Class';
-                            'Unskilled'='Working Class'; 
-                            'Self_employed'='Self-Employed'", 
-                            levels=c("Managers", "Professional", "Self-Employed", "Routine Non-Manual", "Working Class")) ) %>% 
-mutate(Issue=Recode(mip, "'Jobs'='Jobs and Economy' ;
-                    'Economy'='Jobs and Economy'"))  %>% 
+  mutate(occupation3=Recode(occupation3, "'Routine_Nonmanual'='Routine non-manual'; 'Skilled'='Working class';
+                            'Unskilled'='Working class'; 
+                            'Self_employed'='Self-employed'", 
+                            levels=c("Managers", "Professional", "Self-employed", "Routine non-manual", "Working class")) ) %>% 
+mutate(Issue=Recode(mip, "'Jobs'='Jobs and economy' ;
+                    'Economy'='Jobs and economy'"))  %>% 
   group_by(Election, occupation3, Issue) %>% 
   summarize(n=n()) %>% 
   mutate(Percent=(n/sum(n))*100) %>% 
@@ -242,10 +248,11 @@ mutate(Issue=Recode(mip, "'Jobs'='Jobs and Economy' ;
   #filter(Election==2019) %>% 
   filter(str_detect(Issue, "Jobs|Environment|Immigration|Health|Energy")) %>% 
   filter(!is.na(occupation3)) %>% 
-  ggplot(., aes(y=fct_relevel(occupation3, "Working Class", "Routine Non-Manual", "Self-Employed", "Professional", "Managers"), x=Percent, fill=fct_relevel(Issue, "Environment", "Energy")))+
+  ggplot(., aes(y=fct_relevel(occupation3, "Working class", "Routine non-manual", "Self-employed", "Professional", "Managers"), x=Percent, fill=fct_relevel(Issue, "Environment", "Energy")))+
   facet_grid(~Election)+geom_col(position="dodge")+labs(y="Class", fill="Issue")+
-  scale_fill_grey(guide=guide_legend(reverse=T))+theme(legend.position="bottom")
-ggsave(here("Plots", "book_mip_change.pdf"), width=4.25)
+  scale_fill_grey(guide=guide_legend(reverse=T, nrow=2))+
+  theme(legend.position="bottom")
+ggsave(here("Plots", "book_figure_7_4_mip_change.pdf"), width=4.25, device=cairo_pdf)
 levels(ces$occupation4)
 ces$working_class5<-Recode(ces$occupation4,"'Working_Class'='Working Class' ; 
                            'Routine_Nonmanual'='Routine Non-manual';NA=NA;
@@ -294,17 +301,56 @@ out15 %>%
   bind_rows(out19) %>% 
   as_factor() %>% 
 rename(`Manage Economy`=1, Class=2, Vote=3) %>% 
-  mutate(Election=factor(Election, levels=c("2019", "2015")), Class=Recode(Class, "
-                      'Unskilled'='Working Class' ; 'Skilled'='Working Class' ;
-                      'Self_employed'='Self-Employed'; 
-                      'Routine_Nonmanual'='Routine Non-Manual'", 
-                      levels=c(NA,"Working Class" , "Routine Non-Manual", "Self-Employed", "Professional", "Managers"))) %>% 
+  mutate(Election=factor(Election, levels=c("2019", "2015")), 
+  Class=Recode(Class, "'Unskilled'='Working class' ; 
+  'Skilled'='Working class' ;
+                      'Self_employed'='Self-employed'; 
+                      'Routine_Nonmanual'='Routine non-manual'", 
+                      levels=c("Working class" , "Routine non-manual", "Self-employed", "Professional", "Managers"))) %>%
+mutate(Class=case_when(
+  is.na(Class)~"N/a",
+  TRUE ~ Class
+)) %>% 
   group_by(Election, Class, Vote) %>% 
   summarize(n=n()) %>% 
   mutate(Percent=(n/sum(n))*100) %>% 
   filter(Vote!="Other"&Vote!="Green"& Vote!="Bloc") %>% 
-  ggplot(., aes(x=Percent, y=Class, fill=Election))+geom_col(position="dodge")+facet_grid(vars(Vote))+
-  scale_fill_grey(start=0.2, end=0.8)+labs(fill="Election")+
+  ggplot(., aes(x=Percent, y=fct_relevel(Class, "N/a", "Working class", "Routine non-manual", "Self-employed", "Professional", "Managers"), fill=Election))+
+  geom_col(position="dodge")+facet_grid(vars(Vote))+
+  scale_fill_grey(start=0.2, end=0.8)+labs(fill="Election", y="Class")+
   guides(fill=guide_legend(reverse=T))+theme(legend.position="bottom")
-ggsave(here("Plots", "book_valence_change.pdf"), width=4.25)
+ggsave(here("Plots", "book_figure_7_5_valence_change.pdf"), width=4.25, device=cairo_pdf)
 
+####Leader rating changes ####
+ces %>% 
+  filter(election==2015|election==2019)->out
+
+library(marginaleffects)
+out %>% 
+  select(`Liberal`=liberal_leader, `Conservative`=conservative_leader, `NDP`=ndp_leader, `Bloc Québécois`=bloc_leader, Survey=election, Class=Occupation, Quebec=quebec) %>% 
+  mutate(across(1:4, .fns=skpersonal::revScale)) %>% 
+  filter(!is.na(Quebec)) %>% 
+  mutate(Class=forcats::fct_na_value_to_level(Class, "N/a"))  %>% 
+  pivot_longer(cols=1:4, names_to=c("Party")) %>% 
+  filter(!is.na(value)) %>% 
+  group_by(Party, Quebec) %>% 
+  as_factor() %>% 
+  mutate(Quebec=Recode(Quebec, "'Other'='Rest of Canada'")) %>% 
+  nest() %>% 
+  mutate(model=map(data, function(x) lm(value~Survey*Class, data=x))) %>% 
+  unite(col="Name", sep="-", 1:2) %>% 
+pull(model, name="Name") %>% 
+  map(., avg_slopes, variables=c("Survey"), by="Class") %>% 
+  bind_rows(., .id="Name") %>% 
+  separate(col="Name", sep="-", into=c("Region", "Party")) %>% 
+  mutate(Class=Recode(Class, "'Working_Class'='Working class';
+                      'Routine_Nonmanual'='Routine non-manual';
+                      'Self-Employed'='Self-employed';
+                      ")) %>% 
+  ggplot(., aes(x=estimate, y=fct_relevel(Class, "N/a", "Working class", "Routine non-manual", "Self-employed", "Professionals", "Managers"), col=Region))+
+  geom_pointrange(aes(xmin=estimate-(1.96*std.error), xmax=estimate+(1.96*std.error)))+
+  facet_wrap(~Party)+
+  scale_color_manual(values=c("lightgrey", "black"))+ 
+  geom_vline(xintercept=0,linetype=2)+labs(y="Class", x="Difference (2019 vs. 2015)") +
+  theme(legend.position="bottom")
+ggsave(here("Plots", "book_figure_7_6_leader_approval_ratings_change.pdf"), width=4.25, device=cairo_pdf)
